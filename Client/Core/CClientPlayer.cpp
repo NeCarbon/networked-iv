@@ -32,15 +32,12 @@ CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient-
 	{
 		// Set the player index to local player index
 		m_byteInternalPlayerNumber = (BYTE)CPools::GetLocalPlayerIndex();
-		CLogFile::Printf("CClientPlayer 1\n");
 
 		// Create the player ped instance with the local player ped pointer
 		m_pPlayerPed = new CIVPlayerPed(CPools::GetPlayerInfoFromIndex(0)->m_pPlayerPed);
-		CLogFile::Printf("CClientPlayer 2\n");
 
 		// Create the player info instance with the local player info pointer
 		m_pPlayerInfo = new CIVPlayerInfo(CPools::GetPlayerInfoFromIndex(0));
-		CLogFile::Printf("CClientPlayer 3\n");
 	}
 	else
 	{
@@ -88,9 +85,6 @@ bool CClientPlayer::Create()
 		// Patch to allow us to create like local player (Only needed if player data is MAKEWORD(1, 1), 
 		// (which crashes anyways))
 		//CPatcher::InstallNopPatch((g_pClient->GetBaseAddress()+ 0x81CD52), 2);
-
-		// Patch for something(?)
-		//*(BYTE *)(g_pClient->GetBaseAddress() + 0x97C283) = 0xEB;
 
 		// Create player info instance
 		m_pPlayerInfo = new CIVPlayerInfo(m_byteInternalPlayerNumber);
@@ -416,11 +410,6 @@ bool CClientPlayer::SetModelByHash(DWORD dwModelHash)
 	}
 
 	return false;
-}
-
-int CClientPlayer::GetModel()
-{
-	return m_pModelInfo->GetIndex();
 }
 
 void CClientPlayer::SetNetPadState(const CNetworkPadState& netPadState)

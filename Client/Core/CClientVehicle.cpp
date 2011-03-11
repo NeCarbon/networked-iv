@@ -11,11 +11,11 @@
 
 extern CClient * g_pClient;
 
-CClientVehicle::CClientVehicle(DWORD dwModelHash) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_VEHICLE, 200.0f)
+CClientVehicle::CClientVehicle(int iModelIndex) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_VEHICLE, 200.0f)
 {
 	m_vehicleId = INVALID_ENTITY_ID;
 	m_pVehicle = NULL;
-	m_pModelInfo = new CIVModelInfo(g_pClient->GetGame()->GetModelIndexFromHash(dwModelHash));
+	m_pModelInfo = new CIVModelInfo(iModelIndex);
 	memset(m_byteColors, 0, sizeof(m_byteColors));
 	m_pDriver = NULL;
 	memset(m_pPassengers, 0, sizeof(m_pPassengers));

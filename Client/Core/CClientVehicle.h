@@ -33,7 +33,7 @@ private:
 	void             Destroy();
 
 public:
-	CClientVehicle(DWORD dwModelHash);
+	CClientVehicle(int iModelIndex);
 	~CClientVehicle();
 
 	bool             IsNetworkVehicle() { return (m_vehicleId != INVALID_ENTITY_ID); }

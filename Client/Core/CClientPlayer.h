@@ -90,7 +90,6 @@ public:
 
 	bool             SetModel(int iModelIndex);
 	bool             SetModelByHash(DWORD dwModelHash);
-	int              GetModel();
 
 	void             SetNetPadState(const CNetworkPadState& netPadState);
 	void             GetPreviousNetPadState(CNetworkPadState& netPadState);

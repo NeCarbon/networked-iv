@@ -16,6 +16,7 @@
 bool str2num(const SQChar *s,SQObjectPtr &res)
 {
 	SQChar *end;
+
 	if(scstrstr(s,_SC("."))){
 		SQFloat r = SQFloat(scstrtod(s,&end));
 		if(s == end) return false;
