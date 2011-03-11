@@ -1,6 +1,6 @@
 //============== Networked: IV - http://code.networked-iv.com ==============
 //
-// File: CPlayerManager.cpp
+// File: CClientPlayerManager.cpp
 // Project: Client
 // Author(s): jenksta
 // License: See LICENSE in root directory
@@ -9,7 +9,7 @@
 
 #include <StdInc.h>
 
-CPlayerManager::CPlayerManager()
+CClientPlayerManager::CClientPlayerManager()
 {
 	// Create the local player instance
 	m_pLocalPlayer = new CClientPlayer(true);
@@ -25,7 +25,7 @@ CPlayerManager::CPlayerManager()
 	}
 }
 
-CPlayerManager::~CPlayerManager()
+CClientPlayerManager::~CClientPlayerManager()
 {
 	// Loop through all network player pointers
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
@@ -42,7 +42,7 @@ CPlayerManager::~CPlayerManager()
 	SAFE_DELETE(m_pLocalPlayer);
 }
 
-bool CPlayerManager::Add(EntityId playerId, String strName)
+bool CClientPlayerManager::Add(EntityId playerId, String strName)
 {
 	// Is this player already added?
 	if(IsActive(playerId))
@@ -65,7 +65,7 @@ bool CPlayerManager::Add(EntityId playerId, String strName)
 	return false;
 }
 
-bool CPlayerManager::Delete(EntityId playerId)
+bool CClientPlayerManager::Delete(EntityId playerId)
 {
 	// Is this player not active?
 	if(!IsActive(playerId))
@@ -80,7 +80,7 @@ bool CPlayerManager::Delete(EntityId playerId)
 	return true;
 }
 
-void CPlayerManager::Process()
+void CClientPlayerManager::Process()
 {
 	// Process the local player
 	m_pLocalPlayer->Process();
@@ -97,7 +97,7 @@ void CPlayerManager::Process()
 	}
 }
 
-bool CPlayerManager::IsActive(EntityId playerId)
+bool CClientPlayerManager::IsActive(EntityId playerId)
 {
 	// Is the player id invalid?
 	if(playerId >= PLAYER_MAX)
@@ -106,7 +106,7 @@ bool CPlayerManager::IsActive(EntityId playerId)
 	return (m_pNetworkPlayers[playerId] != NULL);
 }
 
-CClientPlayer * CPlayerManager::Get(EntityId playerId)
+CClientPlayer * CClientPlayerManager::Get(EntityId playerId)
 {
 	// Is this player not active?
 	if(!IsActive(playerId))
@@ -115,7 +115,7 @@ CClientPlayer * CPlayerManager::Get(EntityId playerId)
 	return m_pNetworkPlayers[playerId];
 }
 
-EntityId CPlayerManager::GetCount()
+EntityId CClientPlayerManager::GetCount()
 {
 	EntityId count = 0;
 
@@ -133,7 +133,7 @@ EntityId CPlayerManager::GetCount()
 	return count;
 }
 
-void CPlayerManager::SetLocalPlayerId(EntityId localPlayerId)
+void CClientPlayerManager::SetLocalPlayerId(EntityId localPlayerId)
 {
 	// Clear the current local player (if any)
 	for(EntityId i = 0; i < PLAYER_MAX; i++)

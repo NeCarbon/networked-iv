@@ -228,8 +228,8 @@ void CChatWindow::ProcessInput()
 					// Create vehicle instance
 					pTempVehicle = new CClientVehicle(MODEL_SULTANRS);
 
-					// Create vehicle
-					pTempVehicle->Create();
+					// Set the vehicle as can be streamed in
+					pTempVehicle->SetCanBeStreamedIn(true);
 
 					// Get local player position
 					Vector3 vecPosition;
@@ -245,7 +245,6 @@ void CChatWindow::ProcessInput()
 				else
 				{
 					g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Deleting vehicle...");
-					pTempVehicle->Destroy();
 					SAFE_DELETE(pTempVehicle);
 					g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Deleted vehicle!");
 				}

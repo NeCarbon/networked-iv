@@ -184,7 +184,7 @@ bool CClient::OnLoad()
 	CLogFile::Printf("net module initialized\n");
 
 	// Create the network manager instance
-	m_pNetworkManager = new CNetworkManager();
+	m_pNetworkManager = new CClientNetworkManager();
 
 	CLogFile::Printf("network manager instance created\n");
 
@@ -324,7 +324,7 @@ void CClient::OnGameLoad()
 	CLogFile::Printf("streamer instance created\n");
 
 	// Create the player manager instance
-	m_pPlayerManager = new CPlayerManager();
+	m_pPlayerManager = new CClientPlayerManager();
 
 	CLogFile::Printf("player manager instance created\n");
 
@@ -346,7 +346,6 @@ bool bCreatePlayer = false;
 #define NUM_PL 64
 CClientPlayer * pPlayers[NUM_PL];
 CClientVehicle * pVehicles[NUM_PL];
-bool bChangeModel = false;
 extern bool bShowShit;
 
 /*
@@ -600,10 +599,11 @@ top:
 						CLogFile::Printf("Creating vehicle for clone ped...");
 
 						// Create vehicle instance
-						pVehicles[i] = new CClientVehicle(pVehicle->GetModelHash());
+						pVehicles[i] = new CClientVehicle(pVehicle->GetModelInfo()->GetHash());
 
-						// Create vehicle
-						pVehicles[i]->Create();
+						// Set the vehicle as can be streamed in
+						pVehicles[i]->SetCanBeStreamedIn(true);
+
 						pVehicles[i]->Teleport(vehicleSync.vecPosition);
 						CLogFile::Printf("Done!\n");
 					}
@@ -683,28 +683,6 @@ vtop:
 		}
 
 		bCreatePlayer = !bCreatePlayer;
-	}
-	else if(GetAsyncKeyState(VK_F5) && !bChangeModel)
-	{
-		CLogFile::Printf("Changing model...\n");
-#define MODEL_IG_BRUCIE 0x98E29920
-		int iModelIndex = m_pGame->LoadModel(MODEL_IG_BRUCIE);
-		CLogFile::Printf("Model loaded\n");
-#define FUNC_CPlayerPed__SetModelIndex 0x9C0AA0
-		DWORD dwFunc = (GetBaseAddress() + FUNC_CPlayerPed__SetModelIndex);
-		IVPlayerInfo * pPlayerInfo = CPools::GetPlayerInfoFromIndex(0);
-		IVPlayerPed * pPlayerPed = pPlayerInfo->m_pPlayerPed;
-		CLogFile::Printf("Calling function...\n");
-		_asm
-		{
-			push iModelIndex
-			mov ecx, pPlayerPed
-			call dwFunc
-			add esp, 4
-		}
-		CLogFile::Printf("Model changed!\n");
-		//InvokeNative<void *>(0x232F1A85, 0, MODEL_IG_BRUCIE); // CHANGE_PLAYER_MODEL // MODEL_IG_BRUCIE
-		bChangeModel = true;
 	}
 
 	// Does the network manager exist?

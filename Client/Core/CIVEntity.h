@@ -127,6 +127,7 @@ public:
 	void       GetRoll(Vector3 * vecRoll);
 	void       SetDirection(Vector3 * vecDirection);
 	void       GetDirection(Vector3 * vecDirection);
+	void       SetModelIndex(WORD wModelIndex);
 	WORD       GetModelIndex();
 	void       SetAlpha(BYTE byteAlpha);
 	BYTE       GetAlpha();

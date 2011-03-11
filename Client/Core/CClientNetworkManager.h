@@ -1,6 +1,6 @@
 //============== Networked: IV - http://code.networked-iv.com ==============
 //
-// File: CNetworkManager.h
+// File: CClientNetworkManager.h
 // Project: Client
 // Author(s): jenksta
 // License: See LICENSE in root directory
@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-class CNetworkManager
+class CClientNetworkManager
 {
 private:
 	CNetClientInterface *  m_pNetClient;
@@ -20,8 +20,8 @@ private:
 	unsigned long          m_ulLastFullSyncTime;
 
 public:
-	CNetworkManager();
-	~CNetworkManager();
+	CClientNetworkManager();
+	~CClientNetworkManager();
 
 	void        Startup(String strHost, unsigned short usPort, String strPassword);
 	static void PacketHandler(CPacket * pPacket);

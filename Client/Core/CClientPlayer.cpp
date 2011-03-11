@@ -18,10 +18,11 @@ CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient-
 	m_bIsLocalPlayer = bIsLocalPlayer;
 	m_playerId = INVALID_ENTITY_ID;
 	m_pContextData = NULL;
+	m_pModelInfo = new CIVModelInfo(g_pClient->GetGame()->GetModelIndexFromHash(MODEL_PLAYER));
 	memset(&m_previousNetPadState, 0, sizeof(CNetworkPadState));
 	memset(&m_currentNetPadState, 0, sizeof(CNetworkPadState));
 	m_interp.pos.ulFinishTime = 0;
-	m_uiHealth = 0;
+	m_uiHealth = 200;
 	m_dwWeaponType = 0;
 	m_dwAmmo = 0;
 	m_pVehicle = NULL;
@@ -40,9 +41,6 @@ CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient-
 		// Create the player info instance with the local player info pointer
 		m_pPlayerInfo = new CIVPlayerInfo(CPools::GetPlayerInfoFromIndex(0));
 		CLogFile::Printf("CClientPlayer 3\n");
-
-		// Set the model hash to the default player model hash
-		m_dwModelHash = MODEL_PLAYER;
 	}
 	else
 	{
@@ -54,16 +52,16 @@ CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient-
 
 		// Set the player info instance to NULL
 		m_pPlayerInfo = NULL;
-
-		// Set the model hash to the default player model hash
-		m_dwModelHash = MODEL_PLAYER;
 	}
 }
 
 CClientPlayer::~CClientPlayer()
 {
-	// Notify the stream that we have been deleted
+	// Notify the streamer that we have been deleted
 	OnDelete();
+
+	// Delete the model info instance
+	SAFE_DELETE(m_pModelInfo);
 }
 
 // TODO: Use this to create local player ped too instead of using scripting natives?
@@ -81,12 +79,11 @@ bool CClientPlayer::Create()
 		if(m_byteInternalPlayerNumber == INVALID_PLAYER_PED)
 			return false;
 
-		// Load model (if needed) and get model index
-		int iModelIndex = g_pClient->GetGame()->LoadModel(m_dwModelHash);
+		// Load model
+		m_pModelInfo->Load();
 
-		// Invalid model hash?
-		if(iModelIndex == -1)
-			return false;
+		// Get the model index
+		int iModelIndex = m_pModelInfo->GetIndex();
 
 		// Patch to allow us to create like local player (Only needed if player data is MAKEWORD(1, 1), 
 		// (which crashes anyways))
@@ -179,13 +176,13 @@ bool CClientPlayer::Create()
 		//SetModelByHash(MODEL_PLAYER);
 
 		// Set initial health
-		SetHealth(200);
+		SetHealth(m_uiHealth);
 
 		// Set initial position
-		Teleport(Vector3());
+		Teleport(m_vecPosition);
 
 		// Set initial rotation
-		SetRotation(Vector3());
+		SetRotation(m_vecRotation);
 
 		CLogFile::Printf("Done: PlayerNumber: %d, ScriptingHandle: %d\n", m_byteInternalPlayerNumber, GetScriptingHandle());
 		return true;
@@ -370,39 +367,60 @@ bool CClientPlayer::InternalIsInVehicle()
 CClientVehicle * CClientPlayer::InternalGetVehicle()
 {
 	if(IsSpawned() && IsInVehicle())
-		//return m_pPlayerPed->GetCurrentVehicle();
-		// TODO: We need our own pool system to store our class created players/vehicle/e.t.c.
-		return NULL;
+		return g_pClient->GetStreamer()->GetVehicleFromGameVehicle(m_pPlayerPed->GetCurrentVehicle());
 
 	return NULL;
 }
 
-bool CClientPlayer::SetModelByHash(DWORD dwModelHash)
+bool CClientPlayer::SetModel(int iModelIndex)
 {
-	// Get the model index from the hash
-	int iModelIndex = g_pClient->GetGame()->GetModelIndexFromHash(dwModelHash);
-
-	// Is the model index valid?
-	if(iModelIndex != -1)
+	// Is the model index different from our current model index?
+	if(iModelIndex != m_pModelInfo->GetIndex())
 	{
-		// Set the model hash
-		m_dwModelHash = dwModelHash;
+		// Set the model index
+		m_pModelInfo->SetIndex(iModelIndex);
 
-		// TODO: Find a proper way to do this (this native just destroys/recreates the ped)
-		InvokeNative<void *>(NATIVE_CHANGE_PLAYER_MODEL, (unsigned int)m_byteInternalPlayerNumber, dwModelHash);
-		m_pPlayerPed->SetPlayerPed(m_pPlayerInfo->GetPlayerPed());
-		InvokeNative<void *>(NATIVE_SET_CHAR_DEFAULT_COMPONENT_VARIATION, GetScriptingHandle());
+		// Are we spawned?
+		if(IsSpawned())
+		{
+			// Ensure the model is loaded
+			m_pModelInfo->Load();
+
+			// Remove the player ped from the world (Is this needed?)
+			m_pPlayerPed->RemoveFromWorld();
+
+			// Set the player ped model index
+			//m_pPlayerPed->SetModelIndex(iModelIndex);
+			InvokeNative<void *>(NATIVE_CHANGE_PLAYER_MODEL, (unsigned int)m_byteInternalPlayerNumber, m_pModelInfo->GetHash());
+
+			// Re-add the player ped to the world (Is this needed?)
+			m_pPlayerPed->AddToWorld();
+		}
+
 		return true;
 	}
 
-	// Invalid model hash
 	return false;
 }
 
-DWORD CClientPlayer::GetModelHash()
+bool CClientPlayer::SetModelByHash(DWORD dwModelHash)
 {
-	// TODO: CGame::GetModelHashFromIndex and use IVEntity::m_wModelIndex;
-	return m_dwModelHash;
+	// Get the model index from the model hash
+	int iModelIndex = g_pClient->GetGame()->GetModelIndexFromHash(dwModelHash);
+
+	// Do we have a valid model index?
+	if(iModelIndex != -1)
+	{
+		// Call SetModel with the model index
+		return SetModel(iModelIndex);
+	}
+
+	return false;
+}
+
+int CClientPlayer::GetModel()
+{
+	return m_pModelInfo->GetIndex();
 }
 
 void CClientPlayer::SetNetPadState(const CNetworkPadState& netPadState)

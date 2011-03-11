@@ -329,6 +329,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\CIVModelInfo.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\CIVPad.cpp"
 					>
 				</File>
@@ -389,19 +393,19 @@
 				Name="Net"
 				>
 				<File
+					RelativePath=".\CClientNetworkManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\CClientPacketHandler.cpp"
 					>
 				</File>
 				<File
+					RelativePath=".\CClientPlayerManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\CClientRPCHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CNetworkManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CPlayerManager.cpp"
 					>
 				</File>
 				<Filter
@@ -428,18 +432,18 @@
 						>
 					</File>
 				</Filter>
-				<Filter
-					Name="Streamer"
+			</Filter>
+			<Filter
+				Name="Streamer"
+				>
+				<File
+					RelativePath=".\CStreamableEntity.cpp"
 					>
-					<File
-						RelativePath=".\CStreamableEntity.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\CStreamer.cpp"
-						>
-					</File>
-				</Filter>
+				</File>
+				<File
+					RelativePath=".\CStreamer.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -571,6 +575,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\CIVModelInfo.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CIVPad.h"
 					>
 				</File>
@@ -639,19 +647,19 @@
 				Name="Net"
 				>
 				<File
+					RelativePath=".\CClientNetworkManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CClientPacketHandler.h"
 					>
 				</File>
 				<File
+					RelativePath=".\CClientPlayerManager.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CClientRPCHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CNetworkManager.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CPlayerManager.h"
 					>
 				</File>
 				<Filter
@@ -707,18 +715,6 @@
 					</File>
 					<File
 						RelativePath="..\..\Shared\RPCIdentifiers.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Streamer"
-					>
-					<File
-						RelativePath=".\CStreamableEntity.h"
-						>
-					</File>
-					<File
-						RelativePath=".\CStreamer.h"
 						>
 					</File>
 				</Filter>
@@ -974,6 +970,18 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="Streamer"
+				>
+				<File
+					RelativePath=".\CStreamableEntity.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CStreamer.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

@@ -752,6 +752,11 @@ unsigned int CGame::GetResourceTypeIndex(eResourceType resourceType)
 	return 0;
 }
 
+IVModelInfo * CGame::GetModelInfoFromIndex(int iModelIndex)
+{
+	return *(IVModelInfo **)((g_pClient->GetBaseAddress() + VAR_ModelInfos) + (iModelIndex * 4));
+}
+
 int CGame::GetModelIndexFromHash(DWORD dwModelHash)
 {
 	DWORD dwFunc = COffsets::FUNC_GetModelFromHash;
@@ -767,24 +772,33 @@ int CGame::GetModelIndexFromHash(DWORD dwModelHash)
 	return iModelIndex;
 }
 
-int CGame::RequestModel(DWORD dwModelHash)
+DWORD CGame::GetHashFromModelIndex(int iModelIndex)
+{
+	IVModelInfo * pModelInfo = GetModelInfoFromIndex(iModelIndex);
+	return pModelInfo->dwHash;
+}
+
+void CGame::RequestModel(int iModelIndex)
+{
+	DWORD dwFunc = COffsets::FUNC_RequestResource;
+	unsigned int uFileTypeIndex = GetResourceTypeIndex(RESOURCE_TYPE_WDR);
+	_asm
+	{
+		push 1Ah
+		push uFileTypeIndex
+		push iModelIndex
+		call dwFunc
+		add esp, 0Ch
+	}
+	// TODO: Do something with return value?
+}
+
+int CGame::RequestModelFromHash(DWORD dwModelHash)
 {
 	int iModelIndex = GetModelIndexFromHash(dwModelHash);
 
 	if(iModelIndex != -1)
-	{
-		DWORD dwFunc = COffsets::FUNC_RequestResource;
-		unsigned int uFileTypeIndex = GetResourceTypeIndex(RESOURCE_TYPE_WDR);
-		_asm
-		{
-			push 1Ah
-			push uFileTypeIndex
-			push iModelIndex
-			call dwFunc
-			add esp, 0Ch
-		}
-		// TODO: Do something with return value?
-	}
+		RequestModel(iModelIndex);
 
 	return iModelIndex;
 }
@@ -800,25 +814,28 @@ void CGame::LoadRequestedModels()
 	}
 }
 
-bool CGame::HasModelLoaded(DWORD dwModelHash)
+bool CGame::HasModelLoaded(int iModelIndex)
 {
-	int iModelHash = GetModelIndexFromHash(dwModelHash);
-
-	if(iModelHash != -1)
+	DWORD dwFunc = COffsets::FUNC_HasResourceLoaded;
+	unsigned int uFileTypeIndex = GetResourceTypeIndex(RESOURCE_TYPE_WDR);
+	bool bLoaded = false;
+	_asm
 	{
-		DWORD dwFunc = COffsets::FUNC_HasResourceLoaded;
-		unsigned int uFileTypeIndex = GetResourceTypeIndex(RESOURCE_TYPE_WDR);
-		bool bLoaded = false;
-		_asm
-		{
-			push uFileTypeIndex
-			push iModelHash
-			call dwFunc
-			add esp, 8
-			mov bLoaded, al
-		}
-		return bLoaded;
+		push uFileTypeIndex
+		push iModelIndex
+		call dwFunc
+		add esp, 8
+		mov bLoaded, al
 	}
+	return bLoaded;
+}
+
+bool CGame::HasModelLoadedFromHash(DWORD dwModelHash)
+{
+	WORD wModelIndex = GetModelIndexFromHash(dwModelHash);
+
+	if(wModelIndex != -1)
+		return HasModelLoaded(wModelIndex);
 
 	return false;
 }
@@ -828,20 +845,26 @@ void CGame::UnloadModel(DWORD dwModelHash)
 	// TODO
 }
 
-int CGame::LoadModel(DWORD dwModelHash)
+void CGame::LoadModel(int iModelIndex)
 {
-	if(!HasModelLoaded(dwModelHash))
+	if(!HasModelLoaded(iModelIndex))
 	{
-		int iModelIndex = RequestModel(dwModelHash);
+		RequestModel(iModelIndex);
 		LoadRequestedModels();
 
-		while(!HasModelLoaded(dwModelHash))
+		while(!HasModelLoaded(iModelIndex))
 			Sleep(5);
-
-		return iModelIndex;
 	}
+}
 
-	return GetModelIndexFromHash(dwModelHash);
+int CGame::LoadModelFromHash(DWORD dwModelHash)
+{
+	int iModelIndex = GetModelIndexFromHash(dwModelHash);
+
+	if(iModelIndex != -1)
+		LoadModel(iModelIndex);
+
+	return iModelIndex;
 }
 
 // NOTE: Find out if the time is unsigned

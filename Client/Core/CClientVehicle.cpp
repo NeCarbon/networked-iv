@@ -11,26 +11,45 @@
 
 extern CClient * g_pClient;
 
-CClientVehicle::CClientVehicle(DWORD dwModelHash)/* : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_VEHICLE, 200.0f)*/
+CClientVehicle::CClientVehicle(DWORD dwModelHash) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_VEHICLE, 200.0f)
 {
 	m_vehicleId = INVALID_ENTITY_ID;
 	m_pVehicle = NULL;
-	m_dwModelHash = dwModelHash;
+	m_pModelInfo = new CIVModelInfo(g_pClient->GetGame()->GetModelIndexFromHash(dwModelHash));
+	memset(m_byteColors, 0, sizeof(m_byteColors));
 	m_pDriver = NULL;
 	memset(m_pPassengers, 0, sizeof(m_pPassengers));
+	//m_interp.pos.ulFinishTime = 0;
+	m_fHealth = 1000.0f;
 }
 
 CClientVehicle::~CClientVehicle()
 {
+	// Notify the streamer that we have been deleted
+	OnDelete();
+
+	// Delete the model info instance
+	SAFE_DELETE(m_pModelInfo);
+}
+
+void CClientVehicle::SetColors(BYTE byteColor1, BYTE byteColor2, BYTE byteColor3, BYTE byteColor4)
+{
 	// Are we spawned?
 	if(IsSpawned())
-	{
-		// Destroy ourselves
-		Destroy();
-	}
+		m_pVehicle->SetColors(byteColor1, byteColor2, byteColor3, byteColor4);
 
-	// Delete the vehicle instance
-	SAFE_DELETE(m_pVehicle);
+	m_byteColors[0] = byteColor1;
+	m_byteColors[1] = byteColor2;
+	m_byteColors[2] = byteColor3;
+	m_byteColors[3] = byteColor4;
+}
+
+void CClientVehicle::GetColors(BYTE& byteColor1, BYTE& byteColor2, BYTE& byteColor3, BYTE& byteColor4)
+{
+	byteColor1 = m_byteColors[0];
+	byteColor2 = m_byteColors[1];
+	byteColor3 = m_byteColors[2];
+	byteColor4 = m_byteColors[3];
 }
 
 void CClientVehicle::SetPassenger(BYTE bytePassengerId, CClientPlayer * pPassenger)
@@ -70,16 +89,15 @@ bool CClientVehicle::Create()
 	// Are we not already created?
 	if(!IsSpawned())
 	{
-		// Load model (if needed) and get model index
-		int iModelIndex = g_pClient->GetGame()->LoadModel(m_dwModelHash);
+		// Load the model
+		m_pModelInfo->Load();
 
-		// Invalid model hash?
-		if(iModelIndex == -1)
-			return false;
+		// Get the model hash
+		DWORD dwModelHash = m_pModelInfo->GetHash();
 
 		// Create vehicle (TODO: Don't use natives for this)
 		unsigned int uiVehicleHandle;
-		InvokeNative<void *>(NATIVE_CREATE_CAR, m_dwModelHash, 0.0f, 0.0f, 0.0f, &uiVehicleHandle, true);
+		InvokeNative<void *>(NATIVE_CREATE_CAR, dwModelHash, 0.0f, 0.0f, 0.0f, &uiVehicleHandle, true);
 
 		// Create vehicle instance
 		m_pVehicle = new CIVVehicle(CPools::GetVehicleFromHandle(uiVehicleHandle));
@@ -87,17 +105,20 @@ bool CClientVehicle::Create()
 		// Use the network object pointer to store out player ped instance pointer
 		//m_pVehicle->GetVehicle()->m_dwNetObject = (DWORD)m_pVehicle;
 
+		// Set initial colors
+		SetColors(m_byteColors[0], m_byteColors[1], m_byteColors[2], m_byteColors[3]);
+
 		// Add to world
 		m_pVehicle->AddToWorld();
 
 		// Set initial health
-		SetHealth(1000.0f);
+		SetHealth(m_fHealth);
 
 		// Set initial position
-		Teleport(Vector3());
+		Teleport(m_vecPosition);
 
 		// Set initial rotation
-		SetRotation(Vector3());
+		SetRotation(m_vecRotation);
 		return true;
 	}
 
@@ -132,6 +153,52 @@ void CClientVehicle::Destroy()
 	}
 }
 
+void CClientVehicle::StreamIn()
+{
+	// Attempt to create the vehicle
+	if(Create())
+	{
+		// Set the position
+		Teleport(m_vecPosition);
+
+		// Set the rotation
+		SetRotation(m_vecRotation);
+
+		// Set the move speed
+		SetMoveSpeed(m_vecMoveSpeed);
+
+		// Set the turn speed
+		SetTurnSpeed(m_vecTurnSpeed);
+
+		// Set the colors
+		SetColors(m_byteColors[0], m_byteColors[1], m_byteColors[2], m_byteColors[3]);
+
+		// Set the health
+		SetHealth(m_fHealth);
+	}
+}
+
+void CClientVehicle::StreamOut()
+{
+	// Get the position
+	GetPosition(m_vecPosition);
+
+	// Get the rotation
+	GetRotation(m_vecRotation);
+
+	// Get the move speed
+	GetMoveSpeed(m_vecMoveSpeed);
+
+	// Get the turn speed
+	GetTurnSpeed(m_vecTurnSpeed);
+
+	// Get the health
+	m_fHealth = GetHealth();
+
+	// Destroy the vehicle
+	Destroy();
+}
+
 unsigned int CClientVehicle::GetScriptingHandle()
 {
 	if(IsSpawned())
@@ -147,6 +214,8 @@ void CClientVehicle::SetHealth(float fHealth)
 		// Set the vehicle engine health
 		m_pVehicle->SetEngineHealth(fHealth);
 	}
+
+	m_fHealth = fHealth;
 }
 
 float CClientVehicle::GetHealth()
@@ -157,7 +226,7 @@ float CClientVehicle::GetHealth()
 		return m_pVehicle->GetEngineHealth();
 	}
 
-	return 0.0f;
+	return m_fHealth;
 }
 
 void CClientVehicle::Teleport(const Vector3& vecPosition)
@@ -168,6 +237,8 @@ void CClientVehicle::Teleport(const Vector3& vecPosition)
 		// TODO: Use reversed code from this native
 		InvokeNative<void *>(NATIVE_SET_CAR_COORDINATES_NO_OFFSET, GetScriptingHandle(), vecPosition.fX, vecPosition.fY, vecPosition.fZ);
 	}
+
+	m_vecPosition = vecPosition;
 }
 
 void CClientVehicle::SetPosition(const Vector3& vecPosition)
@@ -185,6 +256,8 @@ void CClientVehicle::SetPosition(const Vector3& vecPosition)
 		// Re-add the vehicle to the world
 		m_pVehicle->AddToWorld();
 	}
+
+	m_vecPosition = vecPosition;
 }
 
 void CClientVehicle::GetPosition(Vector3& vecPosition)
@@ -192,7 +265,7 @@ void CClientVehicle::GetPosition(Vector3& vecPosition)
 	if(IsSpawned())
 		m_pVehicle->GetPosition(&vecPosition);
 	else
-		memset(&vecPosition, 0, sizeof(Vector3));
+		vecPosition = m_vecPosition;
 }
 
 void CClientVehicle::SetRotation(const Vector3& vecRotation)
@@ -216,6 +289,8 @@ void CClientVehicle::SetRotation(const Vector3& vecRotation)
 		// Re-add the vehicle to the world
 		m_pVehicle->AddToWorld();
 	}
+
+	m_vecRotation = vecRotation;
 }
 
 void CClientVehicle::GetRotation(Vector3& vecRotation)
@@ -233,13 +308,15 @@ void CClientVehicle::GetRotation(Vector3& vecRotation)
 		vecRotation.ConvertToDegrees();
 	}
 	else
-		memset(&vecRotation, 0, sizeof(Vector3));
+		vecRotation = m_vecRotation;
 }
 
 void CClientVehicle::SetMoveSpeed(const Vector3& vecMoveSpeed)
 {
 	if(IsSpawned())
 		m_pVehicle->SetMoveSpeed((Vector3 *)&vecMoveSpeed);
+
+	m_vecMoveSpeed = vecMoveSpeed;
 }
 
 void CClientVehicle::GetMoveSpeed(Vector3& vecMoveSpeed)
@@ -247,13 +324,15 @@ void CClientVehicle::GetMoveSpeed(Vector3& vecMoveSpeed)
 	if(IsSpawned())
 		m_pVehicle->GetMoveSpeed(&vecMoveSpeed);
 	else
-		memset(&vecMoveSpeed, 0, sizeof(Vector3));
+		vecMoveSpeed = m_vecMoveSpeed;
 }
 
 void CClientVehicle::SetTurnSpeed(const Vector3& vecTurnSpeed)
 {
 	if(IsSpawned())
 		m_pVehicle->SetTurnSpeed((Vector3 *)&vecTurnSpeed);
+
+	m_vecTurnSpeed = vecTurnSpeed;
 }
 
 void CClientVehicle::GetTurnSpeed(Vector3& vecTurnSpeed)
@@ -261,7 +340,7 @@ void CClientVehicle::GetTurnSpeed(Vector3& vecTurnSpeed)
 	if(IsSpawned())
 		m_pVehicle->GetTurnSpeed(&vecTurnSpeed);
 	else
-		memset(&vecTurnSpeed, 0, sizeof(Vector3));
+		vecTurnSpeed = m_vecTurnSpeed;
 }
 
 BYTE CClientVehicle::GetMaxPassengers()

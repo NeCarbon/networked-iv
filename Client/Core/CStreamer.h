@@ -19,10 +19,11 @@ private:
 	DimensionId                    m_dimensionId;
 	std::list<CStreamableEntity *> m_streamedElements[ENTITY_TYPE_MAX];
 	std::list<CStreamableEntity *> m_newlyStreamedElements[ENTITY_TYPE_MAX];
-	unsigned int                   m_uiStreamingLimits[ENTITY_TYPE_MAX]; // max number of each entity type the game can handle	
+	unsigned int                   m_uiStreamingLimits[ENTITY_TYPE_MAX]; // Max number of each entity type the game can handle	
 
 public:
 	CStreamer();
+	~CStreamer();
 
 	void                             Reset();
 	void                             Process();
@@ -30,4 +31,6 @@ public:
 	void                             ForceStreamIn(CStreamableEntity * pEntity, bool bInstantly = false);
 	void                             remove(CStreamableEntity * pEntity);
 	std::list<CStreamableEntity *> * GetStreamedInEntitiesOfType(eEntityType eType);
+	CClientPlayer                  * GetPlayerFromGamePlayerPed(IVPlayerPed * pGamePlayerPed);
+	CClientVehicle                 * GetVehicleFromGameVehicle(IVVehicle * pGameVehicle);
 };

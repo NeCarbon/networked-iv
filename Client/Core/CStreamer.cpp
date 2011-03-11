@@ -15,8 +15,13 @@ extern CClient * g_pClient;
 CStreamer::CStreamer()
 {
 	m_uiStreamingLimits[ENTITY_TYPE_PLAYER] = 31; // Player infos array size = 32 (Also needs to account for local player)
-	m_uiStreamingLimits[ENTITY_TYPE_PLAYER] = 64; // Vehicle pool = 140
+	m_uiStreamingLimits[ENTITY_TYPE_VEHICLE] = 64; // Vehicle pool = 140
 	Reset();
+}
+
+CStreamer::~CStreamer()
+{
+
 }
 
 void CStreamer::Reset()
@@ -217,11 +222,6 @@ void CStreamer::ForceStreamIn(CStreamableEntity * pEntity, bool bInstantly)
 	m_streamedElements[pEntity->GetType()].push_back(pEntity);
 }
 
-std::list<CStreamableEntity *> * CStreamer::GetStreamedInEntitiesOfType(eEntityType eType)
-{
-	return &m_streamedElements[eType];
-}
-
 void CStreamer::remove(CStreamableEntity * pEntity)
 {
 	// Remove it from the streamed in elements
@@ -232,4 +232,49 @@ void CStreamer::remove(CStreamableEntity * pEntity)
 
 	// Force streaming out
 	pEntity->StreamOutInternal();
+}
+
+std::list<CStreamableEntity *> * CStreamer::GetStreamedInEntitiesOfType(eEntityType eType)
+{
+	return &m_streamedElements[eType];
+}
+
+CClientPlayer * CStreamer::GetPlayerFromGamePlayerPed(IVPlayerPed * pGamePlayerPed)
+{
+	// Get the streamed in players list
+	std::list <CStreamableEntity *> * m_streamedVehicles = &m_streamedElements[ENTITY_TYPE_PLAYER];
+
+	// Loop through the streamed in players list
+	for(std::list<CStreamableEntity *>::iterator iter = m_streamedVehicles->begin(); iter != m_streamedVehicles->end(); iter++)
+	{
+		// Get the player pointer
+		CClientPlayer * pTestPlayer = reinterpret_cast<CClientPlayer *>(*iter);
+
+		// Is this the player we are looking for?
+		if(pTestPlayer->GetGamePlayerPed()->GetPlayerPed() == pGamePlayerPed)
+			return pTestPlayer;
+	}
+
+	// No player found
+	return NULL;
+}
+
+CClientVehicle * CStreamer::GetVehicleFromGameVehicle(IVVehicle * pGameVehicle)
+{
+	// Get the streamed in vehicles list
+	std::list <CStreamableEntity *> * m_streamedVehicles = &m_streamedElements[ENTITY_TYPE_VEHICLE];
+
+	// Loop through the streamed in vehicles list
+	for(std::list<CStreamableEntity *>::iterator iter = m_streamedVehicles->begin(); iter != m_streamedVehicles->end(); iter++)
+	{
+		// Get the vehicle pointer
+		CClientVehicle * pTestVehicle = reinterpret_cast<CClientVehicle *>(*iter);
+
+		// Is this the vehicle we are looking for?
+		if(pTestVehicle->GetGameVehicle()->GetVehicle() == pGameVehicle)
+			return pTestVehicle;
+	}
+
+	// No vehicle found
+	return NULL;
 }

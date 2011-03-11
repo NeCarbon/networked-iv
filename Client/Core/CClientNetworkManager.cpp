@@ -1,6 +1,6 @@
 //============== Networked: IV - http://code.networked-iv.com ==============
 //
-// File: CNetworkManager.cpp
+// File: CClientNetworkManager.cpp
 // Project: Client
 // Author(s): jenksta
 // License: See LICENSE in root directory
@@ -11,7 +11,7 @@
 
 extern CClient * g_pClient;
 
-CNetworkManager::CNetworkManager()
+CClientNetworkManager::CClientNetworkManager()
 {
 	// Create the net client instance
 	m_pNetClient = CNetModule::GetNetClientInterface();
@@ -28,7 +28,7 @@ CNetworkManager::CNetworkManager()
 	m_ulLastFullSyncTime = 0;
 }
 
-CNetworkManager::~CNetworkManager()
+CClientNetworkManager::~CClientNetworkManager()
 {
 	// Unregister the rpcs
 	m_pClientRPCHandler->Unregister();
@@ -49,7 +49,7 @@ CNetworkManager::~CNetworkManager()
 	CNetModule::DestroyNetClientInterface(m_pNetClient);
 }
 
-void CNetworkManager::Startup(String strHost, unsigned short usPort, String strPassword)
+void CClientNetworkManager::Startup(String strHost, unsigned short usPort, String strPassword)
 {
 	// Start up the net client
 	m_pNetClient->Startup();
@@ -74,10 +74,10 @@ void CNetworkManager::Startup(String strHost, unsigned short usPort, String strP
 	m_pClientRPCHandler->Register();
 }
 
-void CNetworkManager::PacketHandler(CPacket * pPacket)
+void CClientNetworkManager::PacketHandler(CPacket * pPacket)
 {
 	// Get the network manager pointer
-	CNetworkManager * pNetworkManager = g_pClient->GetNetworkManager();
+	CClientNetworkManager * pNetworkManager = g_pClient->GetNetworkManager();
 
 	// Pass it to the packet handler, if that doesn't handle it, pass it to the rpc handler
 	if(!pNetworkManager->m_pClientPacketHandler->HandlePacket(pPacket) && 
@@ -89,13 +89,13 @@ void CNetworkManager::PacketHandler(CPacket * pPacket)
 	}
 }
 
-void CNetworkManager::Process()
+void CClientNetworkManager::Process()
 {
 	// Process the net client
 	m_pNetClient->Process();
 
 	// Get the player manager
-	CPlayerManager * pPlayerManager = g_pClient->GetPlayerManager();
+	CClientPlayerManager * pPlayerManager = g_pClient->GetPlayerManager();
 
 	// Process the player manager
 	pPlayerManager->Process();
@@ -107,7 +107,7 @@ void CNetworkManager::Process()
 	ProcessSync(pPlayerManager->GetLocalPlayer());
 }
 
-void CNetworkManager::ProcessSync(CClientPlayer * pPlayer)
+void CClientNetworkManager::ProcessSync(CClientPlayer * pPlayer)
 {
 	// Is the player pointer valid?
 	if(pPlayer)
@@ -164,7 +164,7 @@ void CNetworkManager::ProcessSync(CClientPlayer * pPlayer)
 	}
 }
 
-void CNetworkManager::Connect()
+void CClientNetworkManager::Connect()
 {
 	// Are we not already connected?
 	if(!IsConnected())
@@ -199,12 +199,12 @@ void CNetworkManager::Connect()
 	}
 }
 
-bool CNetworkManager::IsConnected()
+bool CClientNetworkManager::IsConnected()
 {
 	return m_pNetClient->IsConnected();
 }
 
-void CNetworkManager::Disconnect()
+void CClientNetworkManager::Disconnect()
 {
 	// Are we connected?
 	if(IsConnected())
@@ -214,7 +214,7 @@ void CNetworkManager::Disconnect()
 	}
 }
 
-void CNetworkManager::RPC(RPCIdentifier rpcId, CBitStreamInterface * pBitStream, ePacketPriority priority, ePacketReliability reliability, char cOrderingChannel)
+void CClientNetworkManager::RPC(RPCIdentifier rpcId, CBitStreamInterface * pBitStream, ePacketPriority priority, ePacketReliability reliability, char cOrderingChannel)
 {
 	m_pNetClient->RPC(rpcId, pBitStream, priority, reliability, cOrderingChannel);
 }

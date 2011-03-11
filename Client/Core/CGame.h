@@ -11,6 +11,8 @@
 
 #include <StdInc.h>
 
+#define VAR_ModelInfos 0x15F73B0
+
 #define MODEL_PLAYER 0x6F0783F5
 
 #define NATIVE_SET_CHAR_HEALTH 0x575E2880
@@ -54,15 +56,20 @@ public:
 	CGame();
 	~CGame();
 
-	void         ApplyPatches();
-	unsigned int GetResourceTypeIndex(eResourceType fileType);
-	int          GetModelIndexFromHash(DWORD dwModelHash);
-	int          RequestModel(DWORD dwModelHash);
-	void         LoadRequestedModels();
-	bool         HasModelLoaded(DWORD dwModelHash);
-	void         UnloadModel(DWORD dwModelHash);
-	int          LoadModel(DWORD dwModelHash);
-	void         FadeScreen(eFadeType fadeType, int iTime);
-	void         ConvertRotationMatrixToEulerAngles(Matrix * matRotation, Vector3 * vecRotation);
-	void         ConvertEulerAnglesToRotationMatrix(Vector3 * vecRotation, Matrix * matRotation);
+	void          ApplyPatches();
+	unsigned int  GetResourceTypeIndex(eResourceType fileType);
+	IVModelInfo * GetModelInfoFromIndex(int iModelIndex);
+	int           GetModelIndexFromHash(DWORD dwModelHash);
+	DWORD         GetHashFromModelIndex(int iModelIndex);
+	void          RequestModel(int iModelIndex);
+	int           RequestModelFromHash(DWORD dwModelHash);
+	void          LoadRequestedModels();
+	bool          HasModelLoaded(int iModelIndex);
+	bool          HasModelLoadedFromHash(DWORD dwModelHash);
+	void          UnloadModel(DWORD dwModelHash);
+	void          LoadModel(int iModelIndex);
+	int           LoadModelFromHash(DWORD dwModelHash);
+	void          FadeScreen(eFadeType fadeType, int iTime);
+	void          ConvertRotationMatrixToEulerAngles(Matrix * matRotation, Vector3 * vecRotation);
+	void          ConvertEulerAnglesToRotationMatrix(Vector3 * vecRotation, Matrix * matRotation);
 };

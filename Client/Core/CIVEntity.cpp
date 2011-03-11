@@ -104,6 +104,21 @@ void CIVEntity::GetDirection(Vector3 * vecDirection)
 		memcpy(vecDirection, &m_pEntity->m_pMatrix->vecFront, sizeof(Vector3));
 }
 
+void CIVEntity::SetModelIndex(WORD wModelIndex)
+{
+	if(m_pEntity)
+	{
+		DWORD dwFunc = m_pEntity->m_VFTable->SetModelIndex;
+		int iModelIndex = wModelIndex;
+		_asm
+		{
+			push /*w*/iModelIndex
+			call dwFunc
+			add esp, 4
+		}
+	}
+}
+
 WORD CIVEntity::GetModelIndex()
 {
 	if(m_pEntity)

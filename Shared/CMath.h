@@ -3,6 +3,7 @@
 // File: CMath.h
 // Project: Shared
 // Author(s): jenksta
+//            Multi Theft Auto Team
 // License: See LICENSE in root directory
 //
 //==========================================================================
