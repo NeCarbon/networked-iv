@@ -226,6 +226,7 @@ void _declspec(naked) GetIndexFromPlayerInfo_Hook()
 	}
 }
 
+bool bInvalidReturn = false;
 IVPlayerPed * _pPlayerPed = NULL;
 
 IVPlayerPed * GetLocalPlayerPed()
@@ -263,7 +264,19 @@ IVPlayerPed * GetLocalPlayerPed()
 
 	if(_pPlayerPed == NULL)
 	{
-		CLogFile::Printf("GetLocalPlayerPed Return Is Invalid\n");
+		if(!bInvalidReturn)
+		{
+			CLogFile::Printf("GetLocalPlayerPed Return Is Invalid (Start)\n");
+			bInvalidReturn = true;
+		}
+	}
+	else
+	{
+		if(bInvalidReturn)
+		{
+			CLogFile::Printf("GetLocalPlayerPed Return Is Invalid (End)\n");
+			bInvalidReturn = false;
+		}
 	}
 
 	return _pPlayerPed;

@@ -212,7 +212,7 @@ void CClientPlayer::Destroy()
 		// Delete the player ped
 		// We use the CPed destructor and not the CPlayerPed destructor because the CPlayerPed destructor
 		// messes with our player info (which we handle manually)
-		//DWORD dwFunc = m_pPlayerPed->GetPlayerPed()->m_VFTable->ScalarDeletingDestructor;
+		//dwFunc = m_pPlayerPed->GetPlayerPed()->m_VFTable->ScalarDeletingDestructor;
 #define FUNC_CPed__ScalarDeletingDestructor 0x8ACAC0
 		dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPed__ScalarDeletingDestructor);
 		_asm
