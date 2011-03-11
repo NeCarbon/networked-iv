@@ -23,8 +23,16 @@ bool str2num(const SQChar *s,SQObjectPtr &res)
 		return true;
 	}
 	else{
-		SQInteger r = SQInteger(scstrtol(s,&end,10));
-		if(s == end) return false;
+		// mabako: hack to allow hex .tointeger() and full ranges from 0 to 0xFFFFFFFF
+		SQInteger r = 0;
+
+		if(scstrlen(s) > 0 && s[0] != '-')
+			r = SQInteger((int)scstrtoul(s,&end,0));
+		else
+			r = SQInteger(scstrtol(s,&end,0));
+
+		if(s == end)
+			return false;
 		res = r;
 		return true;
 	}
