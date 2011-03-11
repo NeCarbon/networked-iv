@@ -226,7 +226,7 @@ void CChatWindow::ProcessInput()
 					g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Creating vehicle at your position...");
 #define MODEL_SULTANRS 0xEE6024BC
 					// Create vehicle instance
-					pTempVehicle = new CClientVehicle(MODEL_SULTANRS);
+					pTempVehicle = new CClientVehicle(g_pClient->GetGame()->GetModelIndexFromHash(MODEL_SULTANRS));
 
 					// Set the vehicle as can be streamed in
 					pTempVehicle->SetCanBeStreamedIn(true);

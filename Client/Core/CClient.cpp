@@ -599,7 +599,7 @@ top:
 						CLogFile::Printf("Creating vehicle for clone ped...");
 
 						// Create vehicle instance
-						pVehicles[i] = new CClientVehicle(pVehicle->GetModelInfo()->GetHash());
+						pVehicles[i] = new CClientVehicle(pVehicle->GetModelInfo()->GetIndex());
 
 						// Set the vehicle as can be streamed in
 						pVehicles[i]->SetCanBeStreamedIn(true);
