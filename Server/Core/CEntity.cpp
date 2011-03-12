@@ -173,13 +173,13 @@ void CEntity::DeleteAllChildren()
 bool CEntity::AddEvent(String strEventName, sEventData sData)
 {
 	// search the Event
-	std::map<String, std::list<sEventData>>::iterator iter = m_pEvents.find(strEventName);
+	std::map<String, std::list<sEventData> >::iterator iter = m_pEvents.find(strEventName);
 
 	if(iter == m_pEvents.end())
 	{
 		// Event does not yet exist, create it
-		std::pair<std::map<String, std::list<sEventData>>::iterator,bool> ret;
-		ret = m_pEvents.insert(std::pair<String, std::list<sEventData>>(strEventName, std::list<sEventData>()));
+		std::pair<std::map<String, std::list<sEventData> >::iterator,bool> ret;
+		ret = m_pEvents.insert(std::pair<String, std::list<sEventData> >(strEventName, std::list<sEventData>()));
 
 		// error creating it 
 		if(ret.second == false)
@@ -199,7 +199,7 @@ bool CEntity::AddEvent(String strEventName, sEventData sData)
 bool CEntity::RemoveEvent(String strEventName, sEventData sData)
 {
 	// search the Event
-	std::map<String, std::list<sEventData>>::iterator iter = m_pEvents.find(strEventName);
+	std::map<String, std::list<sEventData> >::iterator iter = m_pEvents.find(strEventName);
 
 	if(iter != m_pEvents.end())
 	{
@@ -229,7 +229,7 @@ void CEntity::RemoveEvents(CResource* pCreator)
 	if(m_pEvents.size()>0)
 	{
 		// loop through all events
-		for(std::map<String, std::list<sEventData>>::iterator iter = m_pEvents.begin(); iter != m_pEvents.end();)
+		for(std::map<String, std::list<sEventData> >::iterator iter = m_pEvents.begin(); iter != m_pEvents.end();)
 		{
 			// loop through all attached event handlers
 			for(std::list<sEventData>::iterator iter2 = iter->second.begin(); iter2 != iter->second.end();)
@@ -263,7 +263,7 @@ bool CEntity::CallEvent(String strEventName, CSquirrelArguments* pArguments, boo
 	bool bReturn = true;
 
 	// search the Event within this entity
-	std::map<String, std::list<sEventData>>::iterator iter = m_pEvents.find(strEventName);
+	std::map<String, std::list<sEventData> >::iterator iter = m_pEvents.find(strEventName);
 
 	// event exists
 	if(iter != m_pEvents.end())

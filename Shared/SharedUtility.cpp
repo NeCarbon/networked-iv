@@ -12,7 +12,11 @@
 #include <StdInc.h>
 #include <time.h>
 #include <sys/stat.h>
+#ifdef WIN32
 #include <direct.h>
+#else
+#include <sys/time.h>
+#endif
 #include <errno.h>
 
 namespace SharedUtility

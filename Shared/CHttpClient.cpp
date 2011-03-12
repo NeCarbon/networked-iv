@@ -116,7 +116,7 @@ bool CHttpClient::Connect()
 	sinAddress.sin_family = AF_INET;
 	sinAddress.sin_port = htons(m_usPort);
 	sinAddress.sin_addr = *((in_addr *)heHost->h_addr);
-	memset(&sinAddress.sin_zero, 0, (sizeof(CHAR) * 8));
+	memset(&sinAddress.sin_zero, 0, (sizeof(char) * 8));
 
 	// Set the socket receive timeout amount
 	timeval tvTimeout;

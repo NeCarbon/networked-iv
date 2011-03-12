@@ -90,6 +90,6 @@ public:
 #ifdef WIN32
         static void StartAddress(CThread * pThis);
 #else
-        static void * StartAddress(CThread * pThis);
+        static void * StartAddress(void * pVoidThis);
 #endif
 };

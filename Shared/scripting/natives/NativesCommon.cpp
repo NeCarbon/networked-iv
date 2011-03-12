@@ -14,7 +14,7 @@ CEntity* sq_toentity(SQVM* pVM, int idx)
 	SQUserPointer ptr;
 	if(SQ_SUCCEEDED(sq_getuserpointer(pVM,idx,&ptr)))
 	{
-		CEntity* pEntity = CEntityIDs::Get( (EntityID)ptr );
+		CEntity* pEntity = CEntityIDs::Get( (int)ptr );
 		if( pEntity )
 			return pEntity;
 	}

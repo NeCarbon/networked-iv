@@ -9,9 +9,7 @@
 
 #include <StdInc.h>
 
-#ifdef WIN32
 #define SERVER_TITLE MOD_NAME " v" MOD_VERSION_STRING " Server [" MOD_OS_STRING "]"
-#endif
 
 CConfig *          g_pConfig = NULL;
 CNetworkManager *  g_pNetworkManager = NULL;
@@ -245,7 +243,9 @@ void CServer::AddToInputQueue(String strString)
 
 void CServer::SetTitle(String strTitle)
 {
+#ifdef WIN32
 	SetConsoleTitle(strTitle);
+#endif
 }
 
 void CServer::ProcessInputQueue()

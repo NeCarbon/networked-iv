@@ -15,6 +15,11 @@
 #define DEFAULT_CONTENT_TYPE "text/plain"
 //#define DEFAULT_CONTENT_TYPE "application/x-www-form-urlencoded"
 
+#ifndef WIN32
+#define SOCKET_ERROR -1
+#define INVALID_SOCKET -1
+#endif
+
 // Status codes
 enum eHttpStatus
 {

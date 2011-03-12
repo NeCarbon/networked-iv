@@ -15,6 +15,8 @@
 #include <Linux.h>
 #endif
 
+#include <string.h>
+
 // Shared
 #include <Common.h>
 #include <CString.h>

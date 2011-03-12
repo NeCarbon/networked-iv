@@ -40,7 +40,7 @@ CMutex::~CMutex()
         CloseHandle(m_hMutex);
 #endif
 #else
-        pthread_mutex_destroy(&m_hMutex);
+        pthread_mutex_destroy(&m_mutex);
 #endif
 }
 
