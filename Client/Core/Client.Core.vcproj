@@ -429,7 +429,7 @@
 				Name="Scripting"
 				>
 				<File
-					RelativePath=".\CEntity.cpp"
+					RelativePath="..\..\Shared\scripting\CEntity.cpp"
 					>
 				</File>
 				<File
@@ -441,7 +441,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\CRootEntity.cpp"
+					RelativePath="..\..\Shared\scripting\CRootEntity.cpp"
 					>
 				</File>
 				<File
@@ -1303,7 +1303,7 @@
 				Name="Scripting"
 				>
 				<File
-					RelativePath=".\CEntity.h"
+					RelativePath="..\..\Shared\scripting\CEntity.h"
 					>
 				</File>
 				<File
@@ -1315,7 +1315,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\CRootEntity.h"
+					RelativePath="..\..\Shared\scripting\CRootEntity.h"
 					>
 				</File>
 				<File

@@ -62,8 +62,8 @@
 #include "CServerRPCHandler.h"
 #include "CServerPacketHandler.h"
 #include "CNetworkManager.h"
-#include "CEntity.h"
-#include "CRootEntity.h"
+#include <scripting/CEntity.h>
+#include <scripting/CRootEntity.h>
 #include "CPlayer.h"
 #include "CPlayerManager.h"
 

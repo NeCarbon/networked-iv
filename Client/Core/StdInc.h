@@ -87,13 +87,13 @@
 #include "CClientTaskManager.h"
 
 // Project
-#include <squirrel/squirrel.h>
-#include "CEntity.h"
-#include "CRootEntity.h"
 #include "CBitStream.h"
 #include "CClientRPCHandler.h"
 #include "CClientPacketHandler.h"
 #include "CStreamableEntity.h"
+#include <squirrel/squirrel.h>
+#include <scripting/CEntity.h>
+#include <scripting/CRootEntity.h>
 #include "CClientPlayer.h"
 #include "CClientVehicle.h"
 #include "CStreamer.h"
