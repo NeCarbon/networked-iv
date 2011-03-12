@@ -67,5 +67,5 @@ private:
 
 protected:
 	std::list<CEntity*> m_pChildren;
-	std::map<String, std::list<sEventData>> m_pEvents;
+	std::map<String, std::list<sEventData> > m_pEvents;
 };
