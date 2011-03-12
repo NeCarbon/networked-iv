@@ -18,7 +18,7 @@
 
 class CClientVehicle;
 
-class CClientPlayer : public CStreamableEntity
+class CClientPlayer : public CStreamableEntity, public CEntity
 {
 private:
 	bool              m_bIsLocalPlayer;

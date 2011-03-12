@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Server.Core"
 	ProjectGUID="{F1233B8F-5386-487F-9C06-F8501A7EA338}"
 	RootNamespace="Server"
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".;../../Shared;../../Shared/squirrel"
-				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;CLIENT_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;CLIENT_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SERVER"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -120,7 +120,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories=".;../../Shared;../../Shared/squirrel"
-				PreprocessorDefinitions="WIN32;NDEBUG;_USRDLL;CLIENT_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_USRDLL;CLIENT_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SERVER"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -371,11 +371,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CResource.cpp"
+					RelativePath="..\..\Shared\scripting\CResource.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CResourceManager.cpp"
+					RelativePath="..\..\Shared\scripting\CResourceManager.cpp"
 					>
 				</File>
 				<File
@@ -383,50 +383,30 @@
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CSquirrel.cpp"
+					RelativePath="..\..\Shared\scripting\CSquirrel.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CSquirrelArguments.cpp"
+					RelativePath="..\..\Shared\scripting\CSquirrelArguments.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CTimer.cpp"
+					RelativePath="..\..\Shared\scripting\CTimer.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CTimers.cpp"
+					RelativePath="..\..\Shared\scripting\CTimers.cpp"
 					>
 				</File>
 				<Filter
 					Name="Natives"
 					>
 					<File
-						RelativePath=".\scripting\natives\CEntityNatives.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\scripting\natives\CEventNatives.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\scripting\natives\CPlayerNatives.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\scripting\natives\CResourceNatives.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\scripting\natives\CServerNatives.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\scripting\natives\CTimerNatives.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\scripting\natives\NativesCommon.cpp"
 						>
 					</File>
 				</Filter>
@@ -834,6 +814,30 @@
 						</FileConfiguration>
 					</File>
 				</Filter>
+				<Filter
+					Name="Shared Natives"
+					>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\CEntityNatives.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\CEventNatives.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\CResourceNatives.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\CTimerNatives.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\NativesCommon.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1017,11 +1021,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CResource.h"
+					RelativePath="..\..\Shared\scripting\CResource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CResourceManager.h"
+					RelativePath="..\..\Shared\scripting\CResourceManager.h"
 					>
 				</File>
 				<File
@@ -1029,50 +1033,30 @@
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CSquirrel.h"
+					RelativePath="..\..\Shared\scripting\CSquirrel.h"
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CSquirrelArguments.h"
+					RelativePath="..\..\Shared\scripting\CSquirrelArguments.h"
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CTimer.h"
+					RelativePath="..\..\Shared\scripting\CTimer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\scripting\CTimers.h"
+					RelativePath="..\..\Shared\scripting\CTimers.h"
 					>
 				</File>
 				<Filter
 					Name="Natives"
 					>
 					<File
-						RelativePath=".\scripting\natives\CEntityNatives.h"
-						>
-					</File>
-					<File
-						RelativePath=".\scripting\natives\CEventNatives.h"
-						>
-					</File>
-					<File
 						RelativePath=".\scripting\natives\CPlayerNatives.h"
 						>
 					</File>
 					<File
-						RelativePath=".\scripting\natives\CResourceNatives.h"
-						>
-					</File>
-					<File
 						RelativePath=".\scripting\natives\CServerNatives.h"
-						>
-					</File>
-					<File
-						RelativePath=".\scripting\natives\CTimerNatives.h"
-						>
-					</File>
-					<File
-						RelativePath=".\scripting\natives\NativesCommon.h"
 						>
 					</File>
 				</Filter>
@@ -1177,6 +1161,30 @@
 					</File>
 					<File
 						RelativePath="..\..\Shared\squirrel\sqvm.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Shared Natives"
+					>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\CEntityNatives.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\CEventNatives.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\CResourceNatives.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\CTimerNatives.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\Shared\scripting\natives\NativesCommon.h"
 						>
 					</File>
 				</Filter>

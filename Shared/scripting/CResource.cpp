@@ -24,8 +24,12 @@ CResource::CResource(String name) : CEntity(ENTITY_TYPE_RESOURCE, g_pRootEntity,
 		return;
 
 	// place all files are located in
-	m_strResourcePath = String("%sresources/%s", SharedUtility::GetAppPath(), name.Get());
+#ifdef _SERVER
 
+	m_strResourcePath = String("%sresources/%s", SharedUtility::GetAppPath(), name.Get());
+#else
+	m_strResourcePath = String("%sclient/resources/%s", SharedUtility::GetAppPath(), name.Get());
+#endif
 	// load the meta.xml
 	if(!Reload())
 		return;

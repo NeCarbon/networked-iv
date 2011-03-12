@@ -11,6 +11,9 @@
 
 extern CClient * g_pClient;
 
+CRootEntity *      g_pRootEntity = NULL;
+CResourceManager * g_pResourceManager = NULL;
+
 bool CClient::OnLoad()
 {
 	// Open the log file
@@ -193,12 +196,23 @@ bool CClient::OnLoad()
 
 	CLogFile::Printf("client task manager instance created\n");
 
+	// Create the resource and scripting manager
+	CEntityIDs::Initalize();
+	g_pRootEntity = new CRootEntity();
+	g_pResourceManager = new CResourceManager();
+
 	// Success!
 	return true;
 }
 
 void CClient::OnUnload()
 {
+	// Delete the Root Entity instance
+	SAFE_DELETE(g_pRootEntity);
+
+	// Delete the resource manager
+	SAFE_DELETE(g_pResourceManager);
+
 	// Delete the chat window instance
 	SAFE_DELETE(m_pChatWindow);
 
@@ -690,5 +704,12 @@ vtop:
 	{
 		// Process it
 		m_pNetworkManager->Process();
+	}
+
+	// Does the resource manager exist?
+	if(g_pResourceManager)
+	{
+		// Process it
+		g_pResourceManager->Process(GetTickCount());
 	}
 }

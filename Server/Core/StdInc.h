@@ -68,16 +68,20 @@
 #include "CPlayerManager.h"
 
 // Scripting
-#include "scripting/CSquirrelArguments.h"
-#include "scripting/CSquirrel.h"
-#include "scripting/CTimer.h"
-#include "scripting/CTimers.h"
-#include "scripting/CResource.h"
-#include "scripting/CResourceManager.h"
-#include "scripting/natives/NativesCommon.h"
+#include <scripting/CSquirrelArguments.h>
+#include <scripting/CSquirrel.h>
+#include <scripting/CTimer.h>
+#include <scripting/CTimers.h>
+#include <scripting/CResource.h>
+#include <scripting/CResourceManager.h>
+
+// Shared natives
+#include <scripting/natives/NativesCommon.h>
+#include <scripting/natives/CEntityNatives.h>
+#include <scripting/natives/CResourceNatives.h>
+#include <scripting/natives/CEventNatives.h>
+#include <scripting/natives/CTimerNatives.h>
+
+// Server natives
 #include "scripting/natives/CServerNatives.h"
-#include "scripting/natives/CEntityNatives.h"
 #include "scripting/natives/CPlayerNatives.h"
-#include "scripting/natives/CResourceNatives.h"
-#include "scripting/natives/CEventNatives.h"
-#include "scripting/natives/CTimerNatives.h"

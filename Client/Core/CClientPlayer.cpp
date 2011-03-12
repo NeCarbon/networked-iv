@@ -12,8 +12,9 @@
 #define PASSENGER_KEY_HOLD_TIME 1000 // 1 Second
 
 extern CClient * g_pClient;
+extern CRootEntity * g_pRootEntity;
 
-CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_PLAYER, 200.0f)
+CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_PLAYER, 200.0f), CEntity(ENTITY_TYPE_PLAYER, g_pRootEntity, "player")
 {
 	m_bIsLocalPlayer = bIsLocalPlayer;
 	m_playerId = INVALID_ENTITY_ID;

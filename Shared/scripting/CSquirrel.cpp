@@ -16,7 +16,12 @@
 #include <squirrel/sqstdstring.h>
 #include <squirrel/sqstdsystem.h>
 #include <squirrel/sqvm.h>
-#include "natives/CServerNatives.h"
+
+#ifdef _SERVER
+#include "scripting/natives/CServerNatives.h"
+#else
+
+#endif
 
 /************************************/
 /* Some old shit from the other mod */
@@ -131,13 +136,20 @@ CSquirrel::CSquirrel(CResource* pResource)
 		sq_pushentity(m_pVM, pResource);
 		sq_newslot(m_pVM, -3, true);
 
-		// Register our own functions
-		CServerNatives::LoadFunctions( this );
+		// Register our shared functions
+
 		CEntityNatives::LoadFunctions( this );
-		CPlayerNatives::LoadFunctions( this );
 		CResourceNatives::LoadFunctions( this );
 		CEventNatives::LoadFunctions( this );
 		CTimerNatives::LoadFunctions( this );
+
+		// Register our own functions
+#ifdef _SERVER
+		CServerNatives::LoadFunctions( this );
+		CPlayerNatives::LoadFunctions( this );
+#else
+
+#endif
 	}
 }
 

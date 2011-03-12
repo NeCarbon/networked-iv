@@ -16,6 +16,9 @@
 #include <d3dx9.h>
 #include <list>
 #include <mmsystem.h>
+#include <map>
+#include <queue>
+#include <assert.h>
 
 // Shared
 #include <Common.h>
@@ -42,6 +45,11 @@
 #include <CNetModule.h>
 #include <CLogFile.h>
 #include <CExceptionHandler.h>
+
+// XML stuff
+#include <TinyXML/tinyxml.h>
+#include <TinyXML/ticpp.h>
+#include <CXML.h>
 
 // Project
 #include "CDirect3D9Hook.h"
@@ -79,6 +87,9 @@
 #include "CClientTaskManager.h"
 
 // Project
+#include <squirrel/squirrel.h>
+#include "CEntity.h"
+#include "CRootEntity.h"
 #include "CBitStream.h"
 #include "CClientRPCHandler.h"
 #include "CClientPacketHandler.h"
@@ -89,3 +100,18 @@
 #include "CClientNetworkManager.h"
 #include "CClientPlayerManager.h"
 #include "CClient.h"
+
+// Scripting
+#include <scripting/CSquirrelArguments.h>
+#include <scripting/CSquirrel.h>
+#include <scripting/CTimer.h>
+#include <scripting/CTimers.h>
+#include <scripting/CResource.h>
+#include <scripting/CResourceManager.h>
+
+// Shared natives
+#include <scripting/natives/NativesCommon.h>
+#include <scripting/natives/CEntityNatives.h>
+#include <scripting/natives/CResourceNatives.h>
+#include <scripting/natives/CEventNatives.h>
+#include <scripting/natives/CTimerNatives.h>
