@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Server.Core"
 	ProjectGUID="{F1233B8F-5386-487F-9C06-F8501A7EA338}"
-	RootNamespace="Server"
+	RootNamespace="Server.Core"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib ws2_32.lib"
+				AdditionalDependencies="winmm.lib ws2_32.lib psapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName).Debug.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -184,23 +184,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Shared\CExceptionHandler.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Shared\CLibrary.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Shared\CLogFile.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Shared\CString.cpp"
 				>
 			</File>
 			<File
@@ -222,10 +206,6 @@
 						UsePrecompiledHeader="2"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\Shared\SharedUtility.cpp"
-				>
 			</File>
 			<File
 				RelativePath=".\StdInc.cpp"
@@ -270,6 +250,14 @@
 					RelativePath=".\CServerRPCHandler.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\CVehicle.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CVehicleManager.cpp"
+					>
+				</File>
 				<Filter
 					Name="Shared"
 					>
@@ -278,7 +266,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\Shared\CNetModule.cpp"
+						RelativePath="..\..\Shared\CNetworkModule.cpp"
 						>
 					</File>
 					<File
@@ -839,6 +827,30 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="Shared"
+				>
+				<File
+					RelativePath="..\..\Shared\CExceptionHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\CLibrary.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\CLogFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\CString.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\SharedUtility.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -850,31 +862,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Shared\CExceptionHandler.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Shared\CLibrary.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Shared\CLogFile.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Shared\Common.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CServer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Shared\CString.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Shared\SharedUtility.h"
 				>
 			</File>
 			<File
@@ -904,6 +896,14 @@
 					RelativePath=".\CServerRPCHandler.h"
 					>
 				</File>
+				<File
+					RelativePath=".\CVehicle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CVehicleManager.h"
+					>
+				</File>
 				<Filter
 					Name="Shared"
 					>
@@ -920,11 +920,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\Shared\CNetModule.h"
+						RelativePath="..\..\Shared\CNetServerInterface.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\Shared\CNetServerInterface.h"
+						RelativePath="..\..\Shared\CNetworkModule.h"
 						>
 					</File>
 					<File
@@ -1188,6 +1188,34 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="Shared"
+				>
+				<File
+					RelativePath="..\..\Shared\CExceptionHandler.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\CLibrary.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\CLogFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\CServerInterface.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\CString.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\SharedUtility.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

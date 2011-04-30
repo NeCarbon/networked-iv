@@ -4,7 +4,7 @@
 	Version="9.00"
 	Name="Client.Launcher"
 	ProjectGUID="{7E4883E3-6BC8-4F4C-B189-5CAD30796186}"
-	RootNamespace="Launcher"
+	RootNamespace="Client.Launcher"
 	Keyword="MFCProj"
 	TargetFrameworkVersion="196613"
 	>
@@ -203,10 +203,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Shared\SharedUtility.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\StdInc.cpp"
 				>
 				<FileConfiguration
@@ -228,6 +224,18 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<Filter
+				Name="Shared"
+				>
+				<File
+					RelativePath="..\..\Shared\CString.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\SharedUtility.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -247,13 +255,21 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Shared\SharedUtil.h"
-				>
-			</File>
-			<File
 				RelativePath=".\StdInc.h"
 				>
 			</File>
+			<Filter
+				Name="Shared"
+				>
+				<File
+					RelativePath="..\..\Shared\CString.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\SharedUtil.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

@@ -27,7 +27,7 @@ CD3DXFont::~CD3DXFont()
 
 }
 
-void CD3DXFont::Draw(char * szText, DWORD dwColor, float fPosX, float fPosY)
+void CD3DXFont::Draw(const char * szText, DWORD dwColor, float fPosX, float fPosY)
 {
 	// Does the font exist?
 	if(m_pFont)
@@ -46,7 +46,7 @@ float CD3DXFont::GetHeight()
 	return m_fHeight;
 }
 
-float CD3DXFont::GetTextExtent(char * szText)
+float CD3DXFont::GetTextExtent(const char * szText)
 {
 	// Does the font exist?
 	if(m_pFont)

@@ -1,6 +1,6 @@
 //============== Networked: IV - http://code.networked-iv.com ==============
 //
-// File: CClientPlayer.cpp
+// File: CPlayer.cpp
 // Project: Server
 // Author(s): jenksta
 // License: See LICENSE in root directory
@@ -13,41 +13,43 @@ extern CNetworkManager * g_pNetworkManager;
 extern CPlayerManager *  g_pPlayerManager;
 extern CRootEntity *     g_pRootEntity;
 
-CClientPlayer::CClientPlayer(EntityId playerId, String strName) : CEntity(ENTITY_TYPE_PLAYER, g_pRootEntity, "player")
+CPlayer::CPlayer(EntityId playerId, String strName) : CEntity(ENTITY_TYPE_PLAYER, g_pRootEntity, "player")
 {
 	m_playerId = playerId;
 	m_strName.SetLimit(NICK_MAX);
 	m_strName = strName;
 	m_bSpawned = false;
 	m_state = STATE_CONNECTED;
+	m_pVehicle = NULL;
+	m_byteVehicleSeatId = 0;
 }
 
-CClientPlayer::~CClientPlayer()
+CPlayer::~CPlayer()
 {
 
 }
 
-EntityId CClientPlayer::GetPlayerId()
+EntityId CPlayer::GetPlayerId()
 {
 	return m_playerId;
 }
 
-String CClientPlayer::GetName()
+String CPlayer::GetName()
 {
 	return m_strName;
 }
 
-String CClientPlayer::GetIp()
+String CPlayer::GetIp()
 {
 	return g_pNetworkManager->GetPlayerIp(m_playerId);
 }
 
-bool CClientPlayer::IsSpawned()
+bool CPlayer::IsSpawned()
 {
 	return m_bSpawned;
 }
 
-void CClientPlayer::AddForPlayer(EntityId playerId)
+void CPlayer::AddForPlayer(EntityId playerId)
 {
 	// Construct the BitStream
 	CBitStream bitStream;
@@ -58,7 +60,7 @@ void CClientPlayer::AddForPlayer(EntityId playerId)
 	g_pNetworkManager->RPC(RPC_ADD_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 }
 
-void CClientPlayer::AddForWorld()
+void CPlayer::AddForWorld()
 {
 	// Loop through all players
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
@@ -72,7 +74,7 @@ void CClientPlayer::AddForWorld()
 	}
 }
 
-void CClientPlayer::DeleteForPlayer(EntityId playerId)
+void CPlayer::DeleteForPlayer(EntityId playerId)
 {
 	// Construct the BitStream
 	CBitStream bitStream;
@@ -82,7 +84,7 @@ void CClientPlayer::DeleteForPlayer(EntityId playerId)
 	g_pNetworkManager->RPC(RPC_DELETE_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 
 }
-void CClientPlayer::DeleteForWorld()
+void CPlayer::DeleteForWorld()
 {
 	// Loop through all players
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
@@ -96,7 +98,7 @@ void CClientPlayer::DeleteForWorld()
 	}
 }
 
-void CClientPlayer::SpawnForPlayer(EntityId playerId)
+void CPlayer::SpawnForPlayer(EntityId playerId)
 {
 	// Construct the BitStream
 	CBitStream bitStream;
@@ -106,7 +108,7 @@ void CClientPlayer::SpawnForPlayer(EntityId playerId)
 	g_pNetworkManager->RPC(RPC_SPAWN_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 }
 
-void CClientPlayer::SpawnForWorld()
+void CPlayer::SpawnForWorld()
 {
 	// Loop through all players
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
@@ -123,7 +125,7 @@ void CClientPlayer::SpawnForWorld()
 	m_bSpawned = true;
 }
 
-void CClientPlayer::DestroyForPlayer(EntityId playerId)
+void CPlayer::DestroyForPlayer(EntityId playerId)
 {
 	// Construct the BitStream
 	CBitStream bitStream;
@@ -133,7 +135,7 @@ void CClientPlayer::DestroyForPlayer(EntityId playerId)
 	g_pNetworkManager->RPC(RPC_DESTROY_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 }
 
-void CClientPlayer::DestroyForWorld()
+void CPlayer::DestroyForWorld()
 {
 	// Loop through all players
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
@@ -148,4 +150,24 @@ void CClientPlayer::DestroyForWorld()
 
 	// Mark us as not spawned
 	m_bSpawned = false;
+}
+
+void CPlayer::SetVehicle(CVehicle * pVehicle)
+{
+	m_pVehicle = pVehicle;
+}
+
+CVehicle * CPlayer::GetVehicle()
+{
+	return m_pVehicle;
+}
+
+void CPlayer::SetVehicleSeatId(BYTE byteSeatId)
+{
+	m_byteVehicleSeatId = byteSeatId;
+}
+
+BYTE CPlayer::GetVehicleSeatId()
+{
+	return m_byteVehicleSeatId;
 }

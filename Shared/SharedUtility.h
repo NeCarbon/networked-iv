@@ -17,8 +17,6 @@
 #define DEBUG_SUFFIX
 #endif
 
-#define atob(str) (atoi(str) != 0)
-
 namespace SharedUtility
 {
 // Strip a path back to the last '\' ('/')
@@ -33,10 +31,10 @@ const char * GetAppPath();
 
 #ifdef WIN32
 // Inject the library into the specified process
-int InjectLibraryIntoProcess(HANDLE hProcess, char * szLibraryPath);
+int InjectLibraryIntoProcess(HANDLE hProcess, const char * szLibraryPath);
 
 // Get the process id's handle then inject the library into it
-int InjectLibraryIntoProcess(DWORD dwProcessId, char * szLibraryPath);
+int InjectLibraryIntoProcess(DWORD dwProcessId, const char * szLibraryPath);
 
 // Read a string from the registry
 bool ReadRegistryString(HKEY hKeyLocation, const char * szSubKey, const char * szKey, const char * szDefault, char * szData, DWORD dwSize);
@@ -45,10 +43,10 @@ bool ReadRegistryString(HKEY hKeyLocation, const char * szSubKey, const char * s
 bool WriteRegistryString(HKEY hKeyLocation, const char * szSubKey, const char * szKey, char * szData, DWORD dwSize);
 
 // Convert an Ansi string to a Unicode string
-int AnsiToUnicode(char * szAnsiString, size_t sAnsiStringLength, wchar_t * wszUnicodeString, size_t sUnicodeStringLength, DWORD dwFlags = NULL);
+int AnsiToUnicode(const char * szAnsiString, size_t sAnsiStringLength, wchar_t * wszUnicodeString, size_t sUnicodeStringLength, DWORD dwFlags = NULL);
 
 // Convert a Unicode string to an Ansi string
-int UnicodeToAnsi(wchar_t * wszUnicodeString, size_t sUnicodeStringLength, char * szAnsiString, size_t sAnsiStringLength, DWORD dwFlags = NULL);
+int UnicodeToAnsi(const wchar_t * wszUnicodeString, size_t sUnicodeStringLength, char * szAnsiString, size_t sAnsiStringLength, DWORD dwFlags = NULL);
 #endif
 
 // Returns the current time and date in the
@@ -73,4 +71,8 @@ bool Exists(const char * szPath);
 
 // Copy a file to another file
 bool CopyFile(const char * szSource, const char * szDestination);
+
+// Parts taken from SparkIV
+// All of the IV hash functions merged into one
+unsigned int IVHash(std::string strString, unsigned int uiInitialHash = 0, bool bEnsureLowercase = true);
 };

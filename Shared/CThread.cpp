@@ -13,170 +13,170 @@
 
 CThread::CThread()
 {
-        // Set the class variables to their default values
-        m_bStarted = false;
-        m_bRunning = false;
-        m_pUserData = NULL;
+	// Set the class variables to their default values
+	m_bStarted = false;
+	m_bRunning = false;
+	m_pUserData = NULL;
 }
 
 
 CThread::~CThread()
 {
-        // Stop the thread if it is started
-        Stop();
+	// Stop the thread if it is started
+	Stop();
 }
 
 
 void CThread::Start(ThreadFunction_t pfnThreadFunction, bool bWaitForStart)
 {
-        // Stop the thread if it is started
-        Stop();
+	// Stop the thread if it is started
+	Stop();
 
 
-        // Set the thread function pointer
-        m_pfnThreadFunction = pfnThreadFunction;
+	// Set the thread function pointer
+	m_pfnThreadFunction = pfnThreadFunction;
 
 
-        // Set the started state to false
-        m_bStarted = false;
+	// Set the started state to false
+	m_bStarted = false;
 
 
-        // Set the running state to false
-        m_bRunning = false;
+	// Set the running state to false
+	m_bRunning = false;
 
 
-        // Create the thread
+	// Create the thread
 #ifdef WIN32
-        m_hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartAddress, (void *)this, 0, NULL);
+	m_hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartAddress, (void *)this, 0, NULL);
 #else
-        pthread_create(&m_thread, NULL, StartAddress, (void*)this);
+	pthread_create(&m_thread, NULL, StartAddress, (void *)this);
 #endif
 
 
-        // Are we supposed to wait for the thread to start?
-        if(bWaitForStart)
-        {
-                // Wait for the thread to start
-                while(!IsStarted())
-                {
-                        // Sleep for 1ms
-                        Sleep(1);
-                }
-        }
+	// Are we supposed to wait for the thread to start?
+	if(bWaitForStart)
+	{
+		// Wait for the thread to start
+		while(!IsStarted())
+		{
+			// Sleep for 1ms
+			Sleep(1);
+		}
+	}
 }
 
 
 bool CThread::Stop(bool bWaitForExit)
 {
-        // Is the thread started?
-        if(IsStarted())
-        {
-                // Delete the thread
+	// Is the thread started?
+	if(IsStarted())
+	{
+		// Delete the thread
 #ifdef WIN32
-                CloseHandle(m_hThread);
+		CloseHandle(m_hThread);
 #else
-                pthread_cancel(m_thread);
+		pthread_cancel(m_thread);
 #endif
 
 
-                // Are we supposed to wait for the thread to exit?
-                if(bWaitForExit)
-                {
-                        // Wait for the thread to exit
-                        while(IsRunning())
-                        {
-                                // Sleep for 1ms
-                                Sleep(1);
-                        }
-                }
+		// Are we supposed to wait for the thread to exit?
+		if(bWaitForExit)
+		{
+			// Wait for the thread to exit
+			while(IsRunning())
+			{
+				// Sleep for 1ms
+				Sleep(1);
+			}
+		}
 
 
-                // Set the running state to false
-                SetRunning(false);
+		// Set the running state to false
+		SetRunning(false);
 
 
-                // Set the started state to false
-                SetStarted(false);
+		// Set the started state to false
+		SetStarted(false);
 
 
-                // Reset the thread handle
+		// Reset the thread handle
 #ifdef WIN32
-                m_hThread = NULL;
+		m_hThread = NULL;
 #else
 		m_thread = NULL;
 #endif
 
-                return true;
-        }
+		return true;
+	}
 
 
-        return false;
+	return false;
 }
 
 
 void CThread::SetStarted(bool bStarted)
 {
-        // Lock the started state mutex
-        m_startedMutex.Lock();
+	// Lock the started state mutex
+	m_startedMutex.Lock();
 
 
-        // Set the started state
-        m_bStarted = bStarted;
+	// Set the started state
+	m_bStarted = bStarted;
 
 
-        // Unlock the started state mutex
-        m_startedMutex.Unlock();
+	// Unlock the started state mutex
+	m_startedMutex.Unlock();
 }
 
 
 bool CThread::IsStarted()
 {
-        // Lock the started state mutex
-        m_startedMutex.Lock();
+	// Lock the started state mutex
+	m_startedMutex.Lock();
 
 
-        // Get the started state
-        bool bStarted = m_bStarted;
+	// Get the started state
+	bool bStarted = m_bStarted;
 
 
-        // Unlock the started state mutex
-        m_startedMutex.Unlock();
+	// Unlock the started state mutex
+	m_startedMutex.Unlock();
 
 
-        return bStarted;
+	return bStarted;
 }
 
 
 void CThread::SetRunning(bool bRunning)
 {
-        // Lock the running state mutex
-        m_runningMutex.Lock();
+	// Lock the running state mutex
+	m_runningMutex.Lock();
 
 
-        // Set the running state
-        m_bRunning = bRunning;
+	// Set the running state
+	m_bRunning = bRunning;
 
 
-        // Unlock the running state mutex
-        m_runningMutex.Unlock();
+	// Unlock the running state mutex
+	m_runningMutex.Unlock();
 }
 
 
 bool CThread::IsRunning()
 {
-        // Lock the running state mutex
-        m_runningMutex.Lock();
+	// Lock the running state mutex
+	m_runningMutex.Lock();
 
 
-        // Get the running state
-        bool bRunning = m_bRunning;
+	// Get the running state
+	bool bRunning = m_bRunning;
 
 
-        // Unlock the running state mutex
-        m_runningMutex.Unlock();
+	// Unlock the running state mutex
+	m_runningMutex.Unlock();
 
 
-        return bRunning;
+	return bRunning;
 }
 
 
@@ -191,23 +191,23 @@ void * CThread::StartAddress(void * pVoidThis)
 	CThread * pThis = (CThread *)pVoidThis;
 #endif
 
-        // Set the started state to true
-        pThis->SetStarted(true);
+	// Set the started state to true
+	pThis->SetStarted(true);
 
 
-        // Set the running state to true
-        pThis->SetRunning(true);
+	// Set the running state to true
+	pThis->SetRunning(true);
 
 
-        // Call the thread function
-        pThis->m_pfnThreadFunction(pThis);
+	// Call the thread function
+	pThis->m_pfnThreadFunction(pThis);
 
 
-        // Set the running state to false
-        pThis->SetRunning(false);
+	// Set the running state to false
+	pThis->SetRunning(false);
 
 
 #ifndef WIN32
-        return (void *)1;
+	return (void *)1;
 #endif
 }

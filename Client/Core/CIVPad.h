@@ -11,6 +11,11 @@
 
 #include <StdInc.h>
 
+// Analog values
+#define MIN_ANALOG_VALUE 0
+#define DEFAULT_ANALOG_VALUE 128
+#define MAX_ANALOG_VALUE 255
+
 // Enum from 0xF132F8 (char szControlNames[187][44])
 enum eInput
 {
@@ -201,7 +206,7 @@ enum eInput
 	INPUT_DETONATE, // On Foot - Detonate
 	INPUT_VEH_MOVE_LEFT_2,
 	INPUT_VEH_MOVE_RIGHT_2,
-	INPUT_MAX
+	INPUT_COUNT
 };
 
 // rage::ioManager?
@@ -209,7 +214,7 @@ class IVPad
 {
 public:
 	CPadConfig m_padConfig[5];     // 0000-2698
-	CPadData m_padData[INPUT_MAX]; // 2698-3248
+	CPadData m_padData[INPUT_COUNT]; // 2698-3248
 	CPadData m_otherPadData0;      // 3248-3258
 	CPadData m_otherPadData1;      // 3258-3268
 	CPadData m_otherPadData2;      // 3268-3278

@@ -16,6 +16,7 @@ class CServerRPCHandler : public CRPCHandler
 private:
 	static void InitialData(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
 	static void ChatInput(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+	static void VehicleEnterExit(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
 	static void PlayerSync(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
 
 public:

@@ -26,6 +26,6 @@ int CServerNatives::Log(SQVM* pVM)
 
 int CServerNatives::TickCount(SQVM* pVM)
 {
-	sq_pushinteger(pVM, GetTickCount());
+	sq_pushinteger(pVM, SharedUtility::GetTime());
 	return 1;
 }

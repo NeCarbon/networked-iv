@@ -9,13 +9,17 @@
 
 #include <StdInc.h>
 
-extern CClient * g_pClient;
+#define MODEL_ADMIRAL_INDEX 84
 
-CClientVehicle::CClientVehicle(int iModelIndex) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_VEHICLE, 200.0f)
+extern CClient * g_pClient;
+extern CRootEntity * g_pRootEntity;
+
+CClientVehicle::CClientVehicle(int iModelIndex) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_VEHICLE, 200.0f), CEntity(ENTITY_TYPE_VEHICLE, g_pRootEntity, "player")
 {
 	m_vehicleId = INVALID_ENTITY_ID;
 	m_pVehicle = NULL;
-	m_pModelInfo = new CIVModelInfo(iModelIndex);
+	m_pModelInfo = g_pClient->GetGame()->GetModelInfo(MODEL_ADMIRAL_INDEX);
+	SetModel(iModelIndex);
 	memset(m_byteColors, 0, sizeof(m_byteColors));
 	m_pDriver = NULL;
 	memset(m_pPassengers, 0, sizeof(m_pPassengers));
@@ -27,9 +31,6 @@ CClientVehicle::~CClientVehicle()
 {
 	// Notify the streamer that we have been deleted
 	OnDelete();
-
-	// Delete the model info instance
-	SAFE_DELETE(m_pModelInfo);
 }
 
 void CClientVehicle::SetColors(BYTE byteColor1, BYTE byteColor2, BYTE byteColor3, BYTE byteColor4)
@@ -54,7 +55,7 @@ void CClientVehicle::GetColors(BYTE& byteColor1, BYTE& byteColor2, BYTE& byteCol
 
 void CClientVehicle::SetPassenger(BYTE bytePassengerId, CClientPlayer * pPassenger)
 {
-	if(bytePassengerId < MAX_PASSENGERS)
+	if(bytePassengerId < MAX_VEHICLE_PASSENGERS)
 		return;
 
 	m_pPassengers[bytePassengerId] = pPassenger;
@@ -62,7 +63,7 @@ void CClientVehicle::SetPassenger(BYTE bytePassengerId, CClientPlayer * pPasseng
 
 CClientPlayer * CClientVehicle::GetPassenger(BYTE bytePassengerId)
 {
-	if(bytePassengerId >= MAX_PASSENGERS)
+	if(bytePassengerId >= MAX_VEHICLE_PASSENGERS)
 		return NULL;
 
 	return m_pPassengers[bytePassengerId];
@@ -100,10 +101,7 @@ bool CClientVehicle::Create()
 		InvokeNative<void *>(NATIVE_CREATE_CAR, dwModelHash, 0.0f, 0.0f, 0.0f, &uiVehicleHandle, true);
 
 		// Create vehicle instance
-		m_pVehicle = new CIVVehicle(CPools::GetVehicleFromHandle(uiVehicleHandle));
-
-		// Use the network object pointer to store out player ped instance pointer
-		//m_pVehicle->GetVehicle()->m_dwNetObject = (DWORD)m_pVehicle;
+		m_pVehicle = new CIVVehicle(CPools::GetVehiclePool()->AtHandle(uiVehicleHandle));
 
 		// Set initial colors
 		SetColors(m_byteColors[0], m_byteColors[1], m_byteColors[2], m_byteColors[3]);
@@ -131,6 +129,17 @@ void CClientVehicle::Destroy()
 	// Are we spawned?
 	if(IsSpawned())
 	{
+		// Remove the driver
+		if(m_pDriver)
+			m_pDriver->ExitVehicle(true);
+
+		// Remove all passengers
+		for(BYTE i = 0; i < MAX_VEHICLE_PASSENGERS; i++)
+		{
+			if(m_pPassengers[i])
+				m_pPassengers[i]->ExitVehicle(true);
+		}
+
 		// Get the vehicle pointer
 		IVVehicle * pVehicle = m_pVehicle->GetVehicle();
 
@@ -199,10 +208,58 @@ void CClientVehicle::StreamOut()
 	Destroy();
 }
 
+void CClientVehicle::Process()
+{
+
+}
+
+bool CClientVehicle::SetModel(int iModelIndex)
+{
+	// Is the model index different from our current model index?
+	if(iModelIndex != m_pModelInfo->GetIndex())
+	{
+		// Get the new model info
+		CIVModelInfo * pNewModelInfo = g_pClient->GetGame()->GetModelInfo(iModelIndex);
+
+		// Is the new model info valid?
+		if(!pNewModelInfo || !pNewModelInfo->IsValid() || !pNewModelInfo->IsVehicle())
+		{
+			CLogFile::Printf("CClientVehicle::SetModel Failed (Invalid model)!\n");
+			return false;
+		}
+
+		bool bSpawned = IsSpawned();
+
+		// Are we spawned?
+		if(bSpawned)
+		{
+			// Destroy the old vehicle
+			StreamOut();
+		}
+
+		// Set the new model info
+		m_pModelInfo = pNewModelInfo;
+
+		// Are we spawned?
+		if(bSpawned)
+		{
+			// Ensure the new model is loaded
+			m_pModelInfo->Load();
+
+			// Create the new vehicle
+			StreamIn();
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 unsigned int CClientVehicle::GetScriptingHandle()
 {
 	if(IsSpawned())
-		return CPools::GetHandleFromVehicle(m_pVehicle->GetVehicle());
+		return CPools::GetVehiclePool()->HandleOf(m_pVehicle->GetVehicle());
 
 	return 0;
 }
@@ -229,7 +286,7 @@ float CClientVehicle::GetHealth()
 	return m_fHealth;
 }
 
-void CClientVehicle::Teleport(const Vector3& vecPosition)
+void CClientVehicle::Teleport(const CVector3& vecPosition)
 {
 	if(IsSpawned())
 	{
@@ -241,7 +298,7 @@ void CClientVehicle::Teleport(const Vector3& vecPosition)
 	m_vecPosition = vecPosition;
 }
 
-void CClientVehicle::SetPosition(const Vector3& vecPosition)
+void CClientVehicle::SetPosition(const CVector3& vecPosition)
 {
 	// TODO: Use reversed code from SET_CAR_COORDINATES_NO_OFFSET native to fix this
 	// (atm it cannot be used for long distances)
@@ -251,7 +308,7 @@ void CClientVehicle::SetPosition(const Vector3& vecPosition)
 		m_pVehicle->RemoveFromWorld();
 
 		// Set the position in the vehicle matrix
-		m_pVehicle->SetPosition((Vector3 *)&vecPosition);
+		m_pVehicle->SetPosition((CVector3 *)&vecPosition);
 
 		// Re-add the vehicle to the world
 		m_pVehicle->AddToWorld();
@@ -260,7 +317,7 @@ void CClientVehicle::SetPosition(const Vector3& vecPosition)
 	m_vecPosition = vecPosition;
 }
 
-void CClientVehicle::GetPosition(Vector3& vecPosition)
+void CClientVehicle::GetPosition(CVector3& vecPosition)
 {
 	if(IsSpawned())
 		m_pVehicle->GetPosition(&vecPosition);
@@ -268,7 +325,7 @@ void CClientVehicle::GetPosition(Vector3& vecPosition)
 		vecPosition = m_vecPosition;
 }
 
-void CClientVehicle::SetRotation(const Vector3& vecRotation)
+void CClientVehicle::SetRotation(const CVector3& vecRotation)
 {
 	if(IsSpawned())
 	{
@@ -280,8 +337,9 @@ void CClientVehicle::SetRotation(const Vector3& vecRotation)
 		m_pVehicle->GetMatrix(&matMatrix);
 
 		// Convert the rotation to radians and apply it to the vehicle matrix
-		Vector3 vecNewRotation = ((Vector3)vecRotation).ToRadians();
-		g_pClient->GetGame()->ConvertEulerAnglesToRotationMatrix(&vecNewRotation, &matMatrix);
+		CVector3 vecNewRotation = vecRotation;
+		ConvertDegreesToRadians(vecNewRotation);
+		g_pClient->GetGame()->ConvertEulerAnglesToRotationMatrix(vecNewRotation, matMatrix);
 
 		// Set the new vehicle matrix
 		m_pVehicle->SetMatrix(&matMatrix);
@@ -293,7 +351,7 @@ void CClientVehicle::SetRotation(const Vector3& vecRotation)
 	m_vecRotation = vecRotation;
 }
 
-void CClientVehicle::GetRotation(Vector3& vecRotation)
+void CClientVehicle::GetRotation(CVector3& vecRotation)
 {
 	if(IsSpawned())
 	{
@@ -302,24 +360,29 @@ void CClientVehicle::GetRotation(Vector3& vecRotation)
 		m_pVehicle->GetMatrix(&matMatrix);
 
 		// Convert the matrix to euler angles
-		g_pClient->GetGame()->ConvertRotationMatrixToEulerAngles(&matMatrix, &vecRotation);
+		g_pClient->GetGame()->ConvertRotationMatrixToEulerAngles(matMatrix, vecRotation);
+
+		// Flip the rotation
+		vecRotation.fX = (2 * PI) - vecRotation.fX;
+		vecRotation.fY = (2 * PI) - vecRotation.fY;
+		vecRotation.fZ = (2 * PI) - vecRotation.fZ;
 
 		// Convert the rotation from radians to degrees
-		vecRotation.ConvertToDegrees();
+		ConvertRadiansToDegrees(vecRotation);
 	}
 	else
 		vecRotation = m_vecRotation;
 }
 
-void CClientVehicle::SetMoveSpeed(const Vector3& vecMoveSpeed)
+void CClientVehicle::SetMoveSpeed(const CVector3& vecMoveSpeed)
 {
 	if(IsSpawned())
-		m_pVehicle->SetMoveSpeed((Vector3 *)&vecMoveSpeed);
+		m_pVehicle->SetMoveSpeed((CVector3 *)&vecMoveSpeed);
 
 	m_vecMoveSpeed = vecMoveSpeed;
 }
 
-void CClientVehicle::GetMoveSpeed(Vector3& vecMoveSpeed)
+void CClientVehicle::GetMoveSpeed(CVector3& vecMoveSpeed)
 {
 	if(IsSpawned())
 		m_pVehicle->GetMoveSpeed(&vecMoveSpeed);
@@ -327,15 +390,15 @@ void CClientVehicle::GetMoveSpeed(Vector3& vecMoveSpeed)
 		vecMoveSpeed = m_vecMoveSpeed;
 }
 
-void CClientVehicle::SetTurnSpeed(const Vector3& vecTurnSpeed)
+void CClientVehicle::SetTurnSpeed(const CVector3& vecTurnSpeed)
 {
 	if(IsSpawned())
-		m_pVehicle->SetTurnSpeed((Vector3 *)&vecTurnSpeed);
+		m_pVehicle->SetTurnSpeed((CVector3 *)&vecTurnSpeed);
 
 	m_vecTurnSpeed = vecTurnSpeed;
 }
 
-void CClientVehicle::GetTurnSpeed(Vector3& vecTurnSpeed)
+void CClientVehicle::GetTurnSpeed(CVector3& vecTurnSpeed)
 {
 	if(IsSpawned())
 		m_pVehicle->GetTurnSpeed(&vecTurnSpeed);
@@ -349,4 +412,74 @@ BYTE CClientVehicle::GetMaxPassengers()
 		return m_pVehicle->GetMaxPasssengers();
 
 	return 0;
+}
+
+void CClientVehicle::Serialize(CBitStreamInterface * pBitStream)
+{
+	// Write the vehicle position
+	CVector3 vecPosition;
+	GetPosition(vecPosition);
+	pBitStream->Write(vecPosition);
+
+	// Write the vehicle rotation
+	CVector3 vecRotation;
+	GetRotation(vecRotation);
+	pBitStream->Write(vecRotation);
+
+	// Write the vehicle move speed
+	CVector3 vecMoveSpeed;
+	GetMoveSpeed(vecMoveSpeed);
+	pBitStream->Write(vecMoveSpeed);
+
+	// Write the vehicle turn speed
+	CVector3 vecTurnSpeed;
+	GetTurnSpeed(vecTurnSpeed);
+	pBitStream->Write(vecTurnSpeed);
+
+	// Write the vehicle health
+	pBitStream->Write(GetHealth());
+}
+
+bool CClientVehicle::Deserialize(CBitStreamInterface * pBitStream)
+{
+	// Read the vehicle position
+	CVector3 vecPosition;
+
+	if(!pBitStream->Read(vecPosition))
+		return false;
+
+	SetPosition(vecPosition);
+
+	// Read the vehicle rotation
+	CVector3 vecRotation;
+
+	if(!pBitStream->Read(vecRotation))
+		return false;
+
+	SetRotation(vecRotation);
+
+	// Read the vehicle move speed
+	CVector3 vecMoveSpeed;
+
+	if(!pBitStream->Read(vecMoveSpeed))
+		return false;
+
+	SetMoveSpeed(vecMoveSpeed);
+
+	// Read the vehicle turn speed
+	CVector3 vecTurnSpeed;
+
+	if(!pBitStream->Read(vecTurnSpeed))
+		return false;
+
+	SetTurnSpeed(vecTurnSpeed);
+
+	// Read the vehicle health
+	float fHealth;
+
+	if(!pBitStream->Read(fHealth))
+		return false;
+
+	SetHealth(fHealth);
+	return true;
 }

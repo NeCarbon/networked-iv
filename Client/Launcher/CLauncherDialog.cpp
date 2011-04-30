@@ -5,7 +5,7 @@
 #include "CLauncherApp.h"
 #include "CLauncherDialog.h"
 
-int ShowMessageBox(char * szText, UINT uType = (MB_ICONEXCLAMATION | MB_OK))
+int ShowMessageBox(const char * szText, UINT uType = (MB_ICONEXCLAMATION | MB_OK))
 {
 	return MessageBox(NULL, szText, MOD_NAME, uType);
 }
@@ -43,7 +43,6 @@ bool GetProcessIdFromProcessName(char * szProcessName, DWORD * dwProcessId)
 
 	// Close the snapshot handle
 	CloseHandle(hProcessSnapShot); 
-
 	return bReturn;
 }
 
@@ -244,11 +243,10 @@ void CLauncherDialog::OnBnClickedOk()
 	}
 
 	// Get the full path to LaunchGTAIV.exe
-	char szApplicationPath[MAX_PATH];
-	sprintf(szApplicationPath, "%s\\LaunchGTAIV.exe", szInstallDirectory);
+	String strApplicationPath("%s\\LaunchGTAIV.exe", szInstallDirectory);
 
 	// Check if LaunchGTAIV.exe exists
-	if(!SharedUtility::Exists(szApplicationPath))
+	if(!SharedUtility::Exists(strApplicationPath.Get()))
 	{
 		ShowMessageBox("Failed to find LaunchGTAIV.exe. Cannot launch Networked: IV.");
 		return;
@@ -259,38 +257,36 @@ void CLauncherDialog::OnBnClickedOk()
 		SharedUtility::WriteRegistryString(HKEY_CURRENT_USER, "Software\\NIV", "gtaivdir", szInstallDirectory, strlen(szInstallDirectory));
 
 	// Format the command line params
-	char szParams[256];
-	sprintf(szParams, "\"%s\" -ip %s -port %s -nick %s", szApplicationPath, ipAddress, port, nick);
+	String strParams("\"%s\" -ip %s -port %s -nick %s", strApplicationPath.Get(), ipAddress, port, nick);
 
 	// Do we have a password?
 	if(!password.IsEmpty())
 	{
 		// Append it to the command line params
-		strcat(szParams, " -password ");
-		strcat(szParams, password);
+		strParams += " -password";
+		strParams += password;
 	}
 
 	// Save the edit box values
 	SaveInfo();
 
 	// Get the full path of the client core
-	char szLibraryPath[MAX_PATH];
-	sprintf(szLibraryPath, "%s" CLIENT_CORE_NAME DEBUG_SUFFIX ".dll", SharedUtility::GetAppPath());
+	String strClientCore("%s" CLIENT_CORE_NAME DEBUG_SUFFIX ".dll", SharedUtility::GetAppPath());
 
 	// Check if the client core exists
-	if(!SharedUtility::Exists(szLibraryPath))
+	if(!SharedUtility::Exists(strClientCore.Get()))
 	{
 		ShowMessageBox("Failed to find " CLIENT_CORE_NAME DEBUG_SUFFIX ".dll. Cannot launch Networked: IV.");
 		return;
 	}
 
-	// Get the full path of the launcher library dll
-	sprintf(szLibraryPath, "%s" CLIENT_LAUNCH_HELPER DEBUG_SUFFIX ".dll", SharedUtility::GetAppPath());
+	// Get the full path of the launch helper
+	String strLaunchHelper("%s" CLIENT_LAUNCH_HELPER_NAME DEBUG_SUFFIX ".dll", SharedUtility::GetAppPath());
 
 	// Check if the launch helper exists
-	if(!SharedUtility::Exists(szLibraryPath))
+	if(!SharedUtility::Exists(strLaunchHelper.Get()))
 	{
-		ShowMessageBox("Failed to find " CLIENT_LAUNCH_HELPER DEBUG_SUFFIX ".dll. Cannot launch Networked: IV.");
+		ShowMessageBox("Failed to find " CLIENT_LAUNCH_HELPER_NAME DEBUG_SUFFIX ".dll. Cannot launch Networked: IV.");
 		return;
 	}
 
@@ -314,7 +310,8 @@ void CLauncherDialog::OnBnClickedOk()
 	memset(&siStartupInfo, 0, sizeof(siStartupInfo));
 	memset(&piProcessInfo, 0, sizeof(piProcessInfo));
 	siStartupInfo.cb = sizeof(siStartupInfo);
-	if(!CreateProcess(szApplicationPath, szParams, NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, 
+
+	if(!CreateProcess(strApplicationPath.Get(), strParams.GetData(), NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, 
 		SharedUtility::GetAppPath(), &siStartupInfo, &piProcessInfo))
 	{
 		ShowMessageBox("Failed to start LaunchGTAIV.exe. Cannot launch Networked: IV.");
@@ -322,7 +319,7 @@ void CLauncherDialog::OnBnClickedOk()
 	}
 
 	// Inject LauncherLibrary.dll into LaunchGTAIV.exe
-	int iReturn = SharedUtility::InjectLibraryIntoProcess(piProcessInfo.hProcess, szLibraryPath);
+	int iReturn = SharedUtility::InjectLibraryIntoProcess(piProcessInfo.hProcess, strLaunchHelper.Get());
 
 	// Did the injection fail?
 	if(iReturn > 0)
@@ -330,13 +327,17 @@ void CLauncherDialog::OnBnClickedOk()
 		// Terminate the process
 		TerminateProcess(piProcessInfo.hProcess, 0);
 
-		if(iReturn == 1)
-			ShowMessageBox("Failed to write library path into remote process. Cannot launch Networked: IV.");
-		else if(iReturn == 2)
-			ShowMessageBox("Failed to create remote thread in remote process. Cannot launch Networked: IV.");
-		else if(iReturn == 3)
-			ShowMessageBox("Failed to open the remote process, Cannot launch Networked: IV.");
+		// Show the error message
+		String strError("Unknown error. Cannot launch Networked: IV.");
 
+		if(iReturn == 1)
+			strError = "Failed to write library path into remote process. Cannot launch Networked: IV.";
+		else if(iReturn == 2)
+			strError = "Failed to create remote thread in remote process. Cannot launch Networked: IV.";
+		else if(iReturn == 3)
+			strError = "Failed to open the remote process, Cannot launch Networked: IV.";
+
+		ShowMessageBox(strError.Get());
 		return;
 	}
 

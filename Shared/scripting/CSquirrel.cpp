@@ -23,6 +23,8 @@
 
 #endif
 
+#define DEFAULT_STACK_SIZE 1024
+
 /************************************/
 /* Some old shit from the other mod */
 /************************************/
@@ -96,8 +98,10 @@ CSquirrel::CSquirrel(CResource* pResource)
 {
 	m_pResource = pResource;
 
-	// create the VM
-	m_pVM = sq_open(1024);
+	// Create the VM
+	m_pVM = sq_open(DEFAULT_STACK_SIZE);
+
+	// Was the VM created successfully?
 	if( m_pVM )
 	{
 		// Push the root table onto the stack
@@ -137,7 +141,6 @@ CSquirrel::CSquirrel(CResource* pResource)
 		sq_newslot(m_pVM, -3, true);
 
 		// Register our shared functions
-
 		CEntityNatives::LoadFunctions( this );
 		CResourceNatives::LoadFunctions( this );
 		CEventNatives::LoadFunctions( this );
@@ -256,7 +259,55 @@ bool CSquirrel::Call(CEntity* pSource, SQObjectPtr& pFunction, CSquirrelArgument
 		return false;
 }
 
-SQVM* CSquirrel::GetVM()
+bool CSquirrel::RegisterClassStart(const char * szClassName, const char * szBaseClassName)
+{
+	// Get the stack top
+	int oldtop = sq_gettop(m_pVM);
+
+	// Push the root table onto the stack
+	sq_pushroottable(m_pVM);
+
+	// Push the class name onto the stack
+	sq_pushstring(m_pVM, szClassName, -1);
+
+	// Do we have a base class name?
+	if(szBaseClassName)
+	{
+		// Push the base class name onto the stack
+		sq_pushstring(m_pVM, szBaseClassName, -1);
+
+		// Attempt to get the base class
+		if(SQ_FAILED(sq_get(m_pVM, -3)))
+		{
+			// Failed to get the base class, Restore the stack top
+			sq_settop(m_pVM, oldtop);
+			return false;
+		}
+	}
+
+	// Create the class
+	if(SQ_FAILED(sq_newclass(m_pVM, (szBaseClassName == NULL) ? 0 : 1)))
+	{
+		// Failed to create the class, Restore the stack top
+		sq_settop(m_pVM, oldtop);
+		return false;
+	}
+
+	// Set the class type tag
+	//sq_settypetag(m_pVM, -1, NULL);
+	return true;
+}
+
+void CSquirrel::RegisterClassFinish()
+{
+	// Create a new slot
+	sq_createslot(m_pVM, -3);
+
+	// Pop the root table from the stack
+	sq_pop(m_pVM, 1);
+}
+
+SQVM * CSquirrel::GetVM()
 {
 	return m_pVM;
 }

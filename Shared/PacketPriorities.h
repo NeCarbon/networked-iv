@@ -27,5 +27,6 @@ enum ePacketPriority
 	// Messages at this priority and lower are buffered to be sent in groups at 10 millisecond intervals to reduce UDP overhead and better measure congestion control. 
 	PRIORITY_LOW,
 
+	// Number of packet priorities
 	PRIORITY_COUNT
 };

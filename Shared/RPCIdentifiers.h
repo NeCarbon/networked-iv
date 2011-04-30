@@ -31,6 +31,12 @@ enum eRPCIdentfiers
 	// Destroy a player
 	RPC_DESTROY_PLAYER,
 
+	// Spawn a vehicle
+	RPC_SPAWN_VEHICLE,
+
+	// Destroy a vehicle
+	RPC_DESTROY_VEHICLE,
+
 	// Send chat input
 	RPC_CHAT_INPUT,
 

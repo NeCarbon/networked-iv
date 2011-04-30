@@ -15,7 +15,7 @@
 
 #define FUNC_ScrVM__FindNativeAddress_7 0x5A76D0
 
-void InvokeNativeInternal(unsigned int uHash, NativeContext * pContext);
+void InvokeNativeInternal(unsigned int uiHash, NativeContext * pContext);
 
 template <typename ReturnType>
 static ReturnType InvokeNative(unsigned int uHash)

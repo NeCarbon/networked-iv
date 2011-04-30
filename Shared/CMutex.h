@@ -7,39 +7,33 @@
 //
 //==========================================================================
 
-
 #pragma once
-
 
 #include <StdInc.h>
 
-
 #define USE_CRITICAL_SECTION
-
 
 class CMutex
 {
 private:
 #ifdef _WIN32
 #ifdef USE_CRITICAL_SECTION
-        // This is (apparently, not done any actual tests) faster than a mutex
-        CRITICAL_SECTION m_criticalSection;
+	// This is (apparently, not done any actual tests) faster than a mutex
+	CRITICAL_SECTION m_criticalSection;
 #else
-        HANDLE m_hMutex;
+	HANDLE m_hMutex;
 #endif
 #else
-        pthread_mutex_t m_mutex;
+	pthread_mutex_t m_mutex;
 #endif
-        int m_iLockCount;
-
+	unsigned int m_uiLockCount;
 
 public:
-        // NOTE: Name is only used if on windows and NOT using a critical section
-        CMutex(String strName = "");
-        ~CMutex();
+	// NOTE: Name is only used if on windows and NOT using a critical section
+	CMutex(String strName = "");
+	~CMutex();
 
-
-        void Lock();
-        bool TryLock(unsigned int uiTimeOutMilliseconds);
-        void Unlock();
+	void Lock();
+	bool TryLock(unsigned int uiTimeOutMilliseconds);
+	void Unlock();
 };

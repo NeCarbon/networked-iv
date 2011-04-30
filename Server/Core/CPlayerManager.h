@@ -14,8 +14,7 @@
 class CPlayerManager
 {
 private:
-	// TODO: Use std::list?
-	CClientPlayer * m_pPlayers[PLAYER_MAX];
+	CPlayer * m_pPlayers[PLAYER_MAX];
 
 public:
 	CPlayerManager();
@@ -24,7 +23,7 @@ public:
 	bool      Add(EntityId playerId, String strName);
 	bool      Delete(EntityId playerId);
 	bool      IsActive(EntityId playerId);
-	CClientPlayer * Get(EntityId playerId);
+	CPlayer * Get(EntityId playerId);
 	EntityId  GetCount();
 	void      HandlePlayerJoin(EntityId playerId);
 };

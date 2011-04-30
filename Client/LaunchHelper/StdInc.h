@@ -16,5 +16,6 @@
 
 // Shared
 #include <Common.h>
+#include <CString.h>
 #include <SharedUtility.h>
 #include <CPatcher.h>

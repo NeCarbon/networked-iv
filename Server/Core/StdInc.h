@@ -32,7 +32,9 @@
 #include <PacketIdentifiers.h>
 #include <PacketPriorities.h>
 #include <PacketReliabilities.h>
+#include <PacketChannels.h>
 #include <RPCIdentifiers.h>
+#include <CVector3.h>
 #include <CMath.h>
 #include <CNetworkPadState.h>
 #include <CNetBitStreamInterface.h>
@@ -44,7 +46,7 @@
 #include <CNetServerInterface.h>
 #include <CNetClientInterface.h>
 #include <CLibrary.h>
-#include <CNetModule.h>
+#include <CNetworkModule.h>
 #include <CLogFile.h>
 #include <TinyXML/tinyxml.h>
 #include <TinyXML/ticpp.h>
@@ -65,7 +67,9 @@
 #include <scripting/CEntity.h>
 #include <scripting/CRootEntity.h>
 #include "CPlayer.h"
+#include "CVehicle.h"
 #include "CPlayerManager.h"
+#include "CVehicleManager.h"
 
 // Scripting
 #include <scripting/CSquirrelArguments.h>

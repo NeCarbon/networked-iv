@@ -34,8 +34,8 @@ public:
 	virtual void                     Process() = 0;
 	virtual void                     SetPassword(String strPassword) = 0;
 	virtual String                   GetPassword() = 0;
-	virtual unsigned int             Send(CBitStreamInterface * bsData, ePacketPriority priority, ePacketReliability reliability, char cOrderingChannel = 0) = 0;
-	virtual unsigned int             RPC(RPCIdentifier rpcId, CBitStreamInterface * bsData, ePacketPriority priority, ePacketReliability reliability, char cOrderingChannel = 0) = 0;
+	virtual unsigned int             Send(CBitStreamInterface * bsData, ePacketPriority priority, ePacketReliability reliability, char cOrderingChannel = PACKET_CHANNEL_DEFAULT) = 0;
+	virtual unsigned int             RPC(RPCIdentifier rpcId, CBitStreamInterface * bsData, ePacketPriority priority, ePacketReliability reliability, char cOrderingChannel = PACKET_CHANNEL_DEFAULT) = 0;
 	virtual void                     SetHost(String strHost) = 0;
 	virtual String                   GetHost() = 0;
 	virtual void                     SetPort(unsigned short usPort) = 0;

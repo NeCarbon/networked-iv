@@ -15,14 +15,14 @@ class CClientPlayerManager
 {
 private:
 	CClientPlayer * m_pLocalPlayer;
-	EntityId         m_localPlayerId;
+	EntityId        m_localPlayerId;
 	CClientPlayer * m_pNetworkPlayers[PLAYER_MAX];
 
 public:
 	CClientPlayerManager();
 	~CClientPlayerManager();
 
-	bool            Add(EntityId playerId, String strName);
+	CClientPlayer * Add(EntityId playerId, String strName);
 	bool            Delete(EntityId playerId);
 	void            Process();
 	bool            IsActive(EntityId playerId);

@@ -14,15 +14,18 @@ typedef void (_cdecl * NativeFunction_t)(scrNativeCallContext * pContext);
 
 extern CClient * g_pClient;
 
-void InvokeNativeInternal(unsigned int uHash, NativeContext * pContext)
+void InvokeNativeInternal(unsigned int uiHash, NativeContext * pContext)
 {
+	/*CLogFile::SetUseCallback(false);
+	CLogFile::Printf("InvokeNativeInternal(Hash 0x%p)\n", uiHash);
+	CLogFile::SetUseCallback(true);*/
 	DWORD dwFunction = (g_pClient->GetBaseAddress() + FUNC_ScrVM__FindNativeAddress_7);
 	DWORD dwNativeAddress = NULL;
 	_asm
 	{
 		xor eax, eax
 		push esi
-		mov esi, uHash
+		mov esi, uiHash
 		call dwFunction
 		pop esi
 		mov dwNativeAddress, eax

@@ -9,6 +9,7 @@
 
 #include <StdInc.h>
 
+#define MODEL_PLAYER_INDEX 211
 #define PASSENGER_KEY_HOLD_TIME 1000 // 1 Second
 
 extern CClient * g_pClient;
@@ -19,15 +20,21 @@ CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient-
 	m_bIsLocalPlayer = bIsLocalPlayer;
 	m_playerId = INVALID_ENTITY_ID;
 	m_pContextData = NULL;
-	m_pModelInfo = new CIVModelInfo(g_pClient->GetGame()->GetModelIndexFromHash(MODEL_PLAYER));
+	m_pModelInfo = g_pClient->GetGame()->GetModelInfo(MODEL_PLAYER_INDEX);
+	// TODO: Model parameter
+	//SetModel(iModelIndex);
 	memset(&m_previousNetPadState, 0, sizeof(CNetworkPadState));
 	memset(&m_currentNetPadState, 0, sizeof(CNetworkPadState));
 	m_interp.pos.ulFinishTime = 0;
+	m_fCurrentHeading = 0.0f;
+	m_fDesiredHeading = 0.0f;
 	m_uiHealth = 200;
 	m_dwWeaponType = 0;
 	m_dwAmmo = 0;
 	m_pVehicle = NULL;
+	m_byteVehicleSeatId = 0;
 	ResetVehicleEnterExit();
+	m_bDucking = false;
 
 	if(bIsLocalPlayer)
 	{
@@ -57,9 +64,6 @@ CClientPlayer::~CClientPlayer()
 {
 	// Notify the streamer that we have been deleted
 	OnDelete();
-
-	// Delete the model info instance
-	SAFE_DELETE(m_pModelInfo);
 }
 
 // TODO: Use this to create local player ped too instead of using scripting natives?
@@ -177,7 +181,7 @@ bool CClientPlayer::Create()
 		Teleport(m_vecPosition);
 
 		// Set initial rotation
-		SetRotation(m_vecRotation);
+		SetCurrentHeading(m_fCurrentHeading);
 
 		CLogFile::Printf("Done: PlayerNumber: %d, ScriptingHandle: %d\n", m_byteInternalPlayerNumber, GetScriptingHandle());
 		return true;
@@ -263,13 +267,10 @@ void CClientPlayer::StreamIn()
 			Teleport(m_vecPosition);
 
 			// Set the rotation
-			SetRotation(m_vecRotation);
+			SetCurrentHeading(m_fCurrentHeading);
 
 			// Set the move speed
 			SetMoveSpeed(m_vecMoveSpeed);
-
-			// Set the turn speed
-			SetTurnSpeed(m_vecTurnSpeed);
 
 			// Set the health
 			SetHealth(m_uiHealth);
@@ -277,6 +278,16 @@ void CClientPlayer::StreamIn()
 			// Set the current weapon
 			GiveWeapon(m_dwWeaponType, m_dwAmmo);
 			SetCurrentWeapon(m_dwWeaponType);
+
+			// Are we supposed to be in a vehicle?
+			if(m_pVehicle)
+			{
+				// Put ourselves into the vehicle
+				PutInVehicle(m_pVehicle, m_byteVehicleSeatId);
+			}
+
+			// Set the duck state
+			SetDucking(m_bDucking);
 		}
 	}
 }
@@ -290,13 +301,10 @@ void CClientPlayer::StreamOut()
 		GetPosition(m_vecPosition);
 
 		// Get the rotation
-		GetRotation(m_vecRotation);
+		m_fCurrentHeading = GetCurrentHeading();
 
 		// Get the move speed
 		GetMoveSpeed(m_vecMoveSpeed);
-
-		// Get the turn speed
-		GetTurnSpeed(m_vecTurnSpeed);
 
 		// Get the health
 		m_uiHealth = GetHealth();
@@ -304,6 +312,9 @@ void CClientPlayer::StreamOut()
 		// Get the current weapon
 		m_dwWeaponType = GetCurrentWeaponType();
 		m_dwAmmo = GetWeaponAmmo(m_dwWeaponType);
+
+		// Get the duck state
+		m_bDucking = IsDucking();
 
 		// Destroy the player
 		Destroy();
@@ -319,9 +330,8 @@ void CClientPlayer::Process()
 
 		if(IsLocalPlayer())
 		{
-			// If input is enabled check vehicle entry/exit key
-			//if(CGame::GetInputState())
-				CheckVehicleEntryExitKey();
+			// Check vehicle entry/exit key
+			CheckVehicleEntryExitKey();
 
 			// Copy the current net pad state to the previous net pad state
 			memcpy(&m_previousNetPadState, &m_currentNetPadState, sizeof(CNetworkPadState));
@@ -346,7 +356,7 @@ void CClientPlayer::Process()
 unsigned int CClientPlayer::GetScriptingHandle()
 {
 	if(IsSpawned())
-		return CPools::GetHandleFromPed(m_pPlayerPed->GetPed());
+		return CPools::GetPedPool()->HandleOf(m_pPlayerPed->GetPed());
 
 	return 0;
 }
@@ -369,45 +379,43 @@ CClientVehicle * CClientPlayer::InternalGetVehicle()
 
 bool CClientPlayer::SetModel(int iModelIndex)
 {
+	// TODO: Fix (this doesn't work for local player)
 	// Is the model index different from our current model index?
 	if(iModelIndex != m_pModelInfo->GetIndex())
 	{
-		// Set the model index
-		m_pModelInfo->SetIndex(iModelIndex);
+		// Get the new model info
+		CIVModelInfo * pNewModelInfo = g_pClient->GetGame()->GetModelInfo(iModelIndex);
+
+		// Is the new model info valid?
+		if(!pNewModelInfo || !pNewModelInfo->IsValid() || !pNewModelInfo->IsPed())
+		{
+			CLogFile::Printf("CClientPlayer::SetModel Failed (Invalid model)!\n");
+			return false;
+		}
+
+		bool bSpawned = IsSpawned();
 
 		// Are we spawned?
-		if(IsSpawned())
+		if(bSpawned)
 		{
-			// Ensure the model is loaded
+			// Destroy the old player
+			StreamOut();
+		}
+
+		// Set the new model info
+		m_pModelInfo = pNewModelInfo;
+
+		// Are we spawned?
+		if(bSpawned)
+		{
+			// Ensure the new model is loaded
 			m_pModelInfo->Load();
 
-			// Remove the player ped from the world (Is this needed?)
-			m_pPlayerPed->RemoveFromWorld();
-
-			// Set the player ped model index
-			//m_pPlayerPed->SetModelIndex(iModelIndex);
-			InvokeNative<void *>(NATIVE_CHANGE_PLAYER_MODEL, (unsigned int)m_byteInternalPlayerNumber, m_pModelInfo->GetHash());
-
-			// Re-add the player ped to the world (Is this needed?)
-			m_pPlayerPed->AddToWorld();
+			// Create the new player
+			StreamIn();
 		}
 
 		return true;
-	}
-
-	return false;
-}
-
-bool CClientPlayer::SetModelByHash(DWORD dwModelHash)
-{
-	// Get the model index from the model hash
-	int iModelIndex = g_pClient->GetGame()->GetModelIndexFromHash(dwModelHash);
-
-	// Do we have a valid model index?
-	if(iModelIndex != -1)
-	{
-		// Call SetModel with the model index
-		return SetModel(iModelIndex);
 	}
 
 	return false;
@@ -514,7 +522,7 @@ unsigned int CClientPlayer::GetHealth()
 
 // TODO: CClientPlayer::WarpFromVehicleToPosition
 
-void CClientPlayer::Teleport(const Vector3& vecPosition)
+void CClientPlayer::Teleport(const CVector3& vecPosition)
 {
 	if(IsSpawned())
 	{
@@ -526,7 +534,7 @@ void CClientPlayer::Teleport(const Vector3& vecPosition)
 	m_vecPosition = vecPosition;
 }
 
-void CClientPlayer::SetPosition(const Vector3& vecPosition)
+void CClientPlayer::SetPosition(const CVector3& vecPosition)
 {
 	// TODO: Use reversed code from SET_CHAR_COORDINATES native to fix this
 	// (atm it doesn't work properly)
@@ -536,7 +544,7 @@ void CClientPlayer::SetPosition(const Vector3& vecPosition)
 		m_pPlayerPed->RemoveFromWorld();
 
 		// Set the position in the player ped matrix
-		m_pPlayerPed->SetPosition((Vector3 *)&vecPosition);
+		m_pPlayerPed->SetPosition((CVector3 *)&vecPosition);
 
 		// Re-add the player ped to the world
 		m_pPlayerPed->AddToWorld();
@@ -545,7 +553,7 @@ void CClientPlayer::SetPosition(const Vector3& vecPosition)
 	m_vecPosition = vecPosition;
 }
 
-void CClientPlayer::GetPosition(Vector3& vecPosition)
+void CClientPlayer::GetPosition(CVector3& vecPosition)
 {
 	if(IsSpawned())
 		m_pPlayerPed->GetPosition(&vecPosition);
@@ -553,79 +561,55 @@ void CClientPlayer::GetPosition(Vector3& vecPosition)
 		vecPosition = m_vecPosition;
 }
 
-void CClientPlayer::SetRotation(const Vector3& vecRotation)
+void CClientPlayer::SetCurrentHeading(float fCurrentHeading)
 {
 	if(IsSpawned())
 	{
-		// Remove the player ped from the world
-		m_pPlayerPed->RemoveFromWorld();
-
-		// Get the player ped matrix
-		Matrix matMatrix;
-		m_pPlayerPed->GetMatrix(&matMatrix);
-
-		// Convert the rotation to radians and apply it to the player ped matrix
-		Vector3 vecNewRotation = ((Vector3)vecRotation).ToRadians();
-		g_pClient->GetGame()->ConvertEulerAnglesToRotationMatrix(&/*vecRotation.ToRadians()*/vecNewRotation, &matMatrix);
-
-		// Set the new player ped matrix
-		m_pPlayerPed->SetMatrix(&matMatrix);
-
-		// Re-add the player ped to the world
-		m_pPlayerPed->AddToWorld();
+		m_pPlayerPed->SetCurrentHeading(fCurrentHeading);
+		SetDesiredHeading(fCurrentHeading);
 	}
 
-	m_vecRotation = vecRotation;
+	m_fCurrentHeading = fCurrentHeading;
 }
 
-void CClientPlayer::GetRotation(Vector3& vecRotation)
+float CClientPlayer::GetCurrentHeading()
 {
 	if(IsSpawned())
-	{
-		// Get the player ped matrix
-		Matrix matMatrix;
-		m_pPlayerPed->GetMatrix(&matMatrix);
-
-		// Convert the matrix to euler angles
-		g_pClient->GetGame()->ConvertRotationMatrixToEulerAngles(&matMatrix, &vecRotation);
-
-		// Convert the rotation from radians to degrees
-		vecRotation = vecRotation.ToDegrees();
-	}
+		return m_pPlayerPed->GetCurrentHeading();
 	else
-		vecRotation = m_vecRotation;
+		return m_fCurrentHeading;
 }
 
-void CClientPlayer::SetMoveSpeed(const Vector3& vecMoveSpeed)
+void CClientPlayer::SetDesiredHeading(float fDesiredHeading)
 {
 	if(IsSpawned())
-		m_pPlayerPed->SetMoveSpeed((Vector3 *)&vecMoveSpeed);
+		m_pPlayerPed->SetDesiredHeading(fDesiredHeading);
+
+	m_fDesiredHeading = fDesiredHeading;
+}
+
+float CClientPlayer::GetDesiredHeading()
+{
+	if(IsSpawned())
+		return m_pPlayerPed->GetDesiredHeading();
+	else
+		return m_fDesiredHeading;
+}
+
+void CClientPlayer::SetMoveSpeed(const CVector3& vecMoveSpeed)
+{
+	if(IsSpawned())
+		m_pPlayerPed->SetMoveSpeed((CVector3 *)&vecMoveSpeed);
 
 	m_vecMoveSpeed = vecMoveSpeed;
 }
 
-void CClientPlayer::GetMoveSpeed(Vector3& vecMoveSpeed)
+void CClientPlayer::GetMoveSpeed(CVector3& vecMoveSpeed)
 {
 	if(IsSpawned())
 		m_pPlayerPed->GetMoveSpeed(&vecMoveSpeed);
 	else
 		vecMoveSpeed = m_vecMoveSpeed;
-}
-
-void CClientPlayer::SetTurnSpeed(const Vector3& vecTurnSpeed)
-{
-	if(IsSpawned())
-		m_pPlayerPed->SetTurnSpeed((Vector3 *)&vecTurnSpeed);
-
-	m_vecTurnSpeed = vecTurnSpeed;
-}
-
-void CClientPlayer::GetTurnSpeed(Vector3& vecTurnSpeed)
-{
-	if(IsSpawned())
-		m_pPlayerPed->GetTurnSpeed(&vecTurnSpeed);
-	else
-		vecTurnSpeed = m_vecTurnSpeed;
 }
 
 void CClientPlayer::GiveWeapon(DWORD dwWeaponType, DWORD dwAmmo)
@@ -728,6 +712,22 @@ void CClientPlayer::ClearPrimaryTask(bool bImmidiately)
 	}
 }
 
+void CClientPlayer::SetDucking(bool bDucking)
+{
+	if(IsSpawned())
+		m_pPlayerPed->SetDucking(bDucking);
+
+	m_bDucking = bDucking;
+}
+
+bool CClientPlayer::IsDucking()
+{
+	if(IsSpawned())
+		return m_pPlayerPed->IsDucking();
+
+	return m_bDucking;
+}
+
 bool CClientPlayer::IsGettingInToAVehicle()
 {
 	bool bReturn = false;
@@ -807,11 +807,11 @@ bool CClientPlayer::GetClosestVehicle(bool bPassenger, CClientVehicle ** pVehicl
 	if(IsSpawned())
 	{
 		float fCurrent = 6.0f; // Maximum distance 6.0f
-		Vector3 vecVehiclePos;
+		CVector3 vecVehiclePos;
 		CClientVehicle * pClosestVehicle = NULL;
 
 		// Get our position
-		Vector3 vecPlayerPos;
+		CVector3 vecPlayerPos;
 		GetPosition(vecPlayerPos);
 
 		// Loop through all streamed in vehicles
@@ -879,11 +879,39 @@ bool CClientPlayer::GetClosestVehicle(bool bPassenger, CClientVehicle ** pVehicl
 	return false;
 }
 
+// From 0x9C6DB0
+// Looks like vehicles never have more than 4 doors?
+BYTE GetDoorFromSeat(BYTE byteSeatId)
+{
+	BYTE byteDoorId;
+
+	switch(byteSeatId)
+	{
+	case 0:
+		byteDoorId = 2;
+		break;
+	case 1:
+		byteDoorId = 1;
+		break;
+	case 2:
+		byteDoorId = 3;
+		break;
+	default:
+		byteDoorId = 0;
+		break;
+	}
+
+	return byteDoorId;
+}
+
+
 void CClientPlayer::EnterVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 {
 	// Are we spawned?
 	if(IsSpawned())
 	{
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d)\n", pVehicle, byteSeatId);
+
 		// Is the vehicle invalid?
 		if(!pVehicle)
 			return;
@@ -901,9 +929,29 @@ void CClientPlayer::EnterVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 				return;
 		}
 
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 2\n", pVehicle, byteSeatId);
+
 		// Are we already in a vehicle?
 		if(IsInVehicle())
 			return;
+
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 3\n", pVehicle, byteSeatId);
+
+		/*BYTE byteDoorId = GetDoorFromSeat(byteSeatId);
+		int iUnknown2 = 0;
+
+		//if(byteSeatId != 0)
+		//	iUnknown2 = 0x200000;
+
+		// Create the enter vehicle task
+		CIVTaskComplexNewGetInVehicle * pTask = new CIVTaskComplexNewGetInVehicle(m_pVehicle->GetGameVehicle(), byteDoorId, 27, iUnknown2, 0.0f);
+
+		// Did the task create successfully?
+		if(pTask)
+		{
+			// Set it as the ped task
+			pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+		}*/
 
 		// Are we entering as the driver?
 		if(byteSeatId == 0)
@@ -917,10 +965,14 @@ void CClientPlayer::EnterVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 			InvokeNative<void *>(TASK_ENTER_CAR_AS_PASSENGER, GetScriptingHandle(), pVehicle->GetScriptingHandle(), -2, (byteSeatId - 1));
 		}
 
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 4\n", pVehicle, byteSeatId);
+
 		// Mark ourselves as entering a vehicle and store our vehicle and seat
 		m_vehicleEnterExit.bEntering = true;
 		m_vehicleEnterExit.pVehicle = pVehicle;
 		m_vehicleEnterExit.byteSeatId = byteSeatId;
+
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 5\n", pVehicle, byteSeatId);
 
 		// Reset interpolation
 		ResetInterpolation();
@@ -938,17 +990,33 @@ void CClientPlayer::ExitVehicle(bool bWarp)
 			if(bWarp)
 			{
 				// Warp ourselves out of the vehicle
-				Vector3 vecPos;
+				CVector3 vecPos;
 				m_pVehicle->GetPosition(vecPos);
 				InvokeNative<void *>(WARP_CHAR_FROM_CAR_TO_COORD, GetScriptingHandle(), vecPos.fX, vecPos.fY, (vecPos.fZ + 1.0f));
+
+				// Reset the vehicle occupant for our seat
+				m_pVehicle->SetOccupant(m_vehicleEnterExit.byteSeatId, NULL);
+
+				// Reset our current vehicle pointer
+				m_pVehicle = NULL;
+
+				// Reset our vehicle seat id
+				m_byteVehicleSeatId = 0;
 
 				// Reset vehicle entry/exit flags
 				ResetVehicleEnterExit();
 			}
 			else
 			{
-				// Start the leave car task
-				InvokeNative<void *>(TASK_LEAVE_CAR, GetScriptingHandle(), m_pVehicle->GetScriptingHandle());
+				// Create the exit vehicle task
+				CIVTaskComplexNewExitVehicle * pTask = new CIVTaskComplexNewExitVehicle(m_pVehicle->GetGameVehicle(), 0xF, 0, 0);
+
+				// Did the task create successfully?
+				if(pTask)
+				{
+					// Set it as the ped task
+					pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+				}
 
 				// Mark ourselves as exiting a vehicle
 				m_vehicleEnterExit.bExiting = true;
@@ -998,6 +1066,27 @@ void CClientPlayer::PutInVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 			ExitVehicle(true);
 		}
 
+		/*
+		v3 = CPool__AtHandle(g_pPedPool, a1);
+		v2 = CPool__AtHandle(g_pVehiclePool, a2);
+		if ( *(_DWORD *)(v3 + 0x24) & 0x8000000 )
+		{
+		CWorld__RemoveEntity(v3, 0);
+		sub_9E6830(v3, v2, 0);
+		CWorld__AddEntity(v3, 0);
+		}
+		result = *(_DWORD *)(v3 + 0x6C);
+		if ( !result || !*(_BYTE *)(result + 0xE) )
+		{
+		ShutdownPedIntelligence(*(void **)(v3 + 0x224), 0);
+		v5 = GetDoorFromSeat(-1);
+		CTaskSimpleCarSetPedInVehicle__CTaskSimpleCarSetPedInVehicle(&v6, v2, v5, 0, 0);
+		sub_AA07C0(v3);
+		result = CTaskSimpleCarSetPedInVehicle___CTaskSimpleCarSetPedInVehicle(&v6);
+		}
+		return result;
+		*/
+
 		// Is the seat the driver seat?
 		if(byteSeatId == 0)
 			InvokeNative<void *>(NATIVE_WARP_CHAR_INTO_CAR, GetScriptingHandle(), pVehicle->GetScriptingHandle());
@@ -1011,113 +1100,121 @@ void CClientPlayer::PutInVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 		// Reset vehicle entry/exit
 		ResetVehicleEnterExit();
 		m_pVehicle = pVehicle;
+		m_byteVehicleSeatId = byteSeatId;
 		pVehicle->SetOccupant(byteSeatId, this);
 	}
 }
 
 void CClientPlayer::CheckVehicleEntryExitKey()
 {
-	if(IsSpawned())
+	// Are we spawned and is input enabled?
+	if(IsSpawned() && g_pClient->GetInputState())
 	{
 		// Has the enter/exit vehicle key just been pressed?
 		if(!m_previousNetPadState.IsUsingEnterExitVehicle() && m_currentNetPadState.IsUsingEnterExitVehicle())
 		{
-			// Save the current time into the enter/exit vehicle key hold start time
-			m_vehicleEnterExit.ulKeyHoldStartTime = SharedUtility::GetTime();
+			if(!m_vehicleEnterExit.bRequesting && IsInVehicle() && !m_vehicleEnterExit.bExiting)
+			{
+				if(IsLocalPlayer())
+					CLogFile::Printf("HandleVehicleExit(LocalPlayer)\n");
+				else
+					CLogFile::Printf("HandleVehicleExit(%d)\n", m_playerId);
 
-			if(IsLocalPlayer())
-				CLogFile::Printf("EnterExitVehicleKeyHoldStart(LocalPlayer)");
+				// Is this a network vehicle?
+				if(m_pVehicle->IsNetworkVehicle())
+				{
+					// Request the vehicle exit
+					CBitStream bitStream;
+					bitStream.Write((BYTE)VEHICLE_EXIT_REQUEST);
+					bitStream.WriteCompressed(m_pVehicle->GetVehicleId());
+					g_pClient->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE);
+					m_vehicleEnterExit.bRequesting = true;
+				}
+				else
+				{
+					// Exit the vehicle
+					ExitVehicle(false);
+				}
+			}
 			else
-				CLogFile::Printf("EnterExitVehicleKeyHoldStart(%d)", m_playerId);
+			{
+				// Save the current time into the enter/exit vehicle key hold start time
+				m_vehicleEnterExit.ulKeyHoldStartTime = SharedUtility::GetTime();
+
+				if(IsLocalPlayer())
+					CLogFile::Printf("EnterExitVehicleKeyHoldStart(LocalPlayer)\n");
+				else
+					CLogFile::Printf("EnterExitVehicleKeyHoldStart(%d)\n", m_playerId);
+			}
 		}
 		else
 		{
 			// Has the enter/exit vehicle key just been released?
-			if(m_previousNetPadState.IsUsingEnterExitVehicle() && !m_currentNetPadState.IsUsingEnterExitVehicle())
+			if(m_previousNetPadState.IsUsingEnterExitVehicle() && !m_currentNetPadState.IsUsingEnterExitVehicle() && 
+				m_vehicleEnterExit.ulKeyHoldStartTime)
 			{
 				if(IsLocalPlayer())
-					CLogFile::Printf("EnterExitVehicleKeyHoldEnd(LocalPlayer)");
+					CLogFile::Printf("EnterExitVehicleKeyHoldEnd(LocalPlayer)\n");
 				else
-					CLogFile::Printf("EnterExitVehicleKeyHoldEnd(%d)", m_playerId);
+					CLogFile::Printf("EnterExitVehicleKeyHoldEnd(%d)\n", m_playerId);
 
-				if(IsInVehicle() && !m_vehicleEnterExit.bExiting)
+				if(!m_vehicleEnterExit.bRequesting)
 				{
-					if(IsLocalPlayer())
-						CLogFile::Printf("HandleVehicleExit(LocalPlayer)");
-					else
-						CLogFile::Printf("HandleVehicleExit(%d)", m_playerId);
-
-					// Exit the vehicle
-					ExitVehicle(false);
-
-					// Is this a network vehicle?
-					if(m_pVehicle->IsNetworkVehicle())
+					if(!IsInVehicle() && !m_vehicleEnterExit.bEntering)
 					{
-						// Send vehicle exit notification to server
-						/*g_pNetworkManager->GetRakClient()->RPC(RPC_VehicleExit, NULL, HIGH_PRIORITY, RELIABLE);*/
-					}
-				}
-				else if(!IsInVehicle() && !m_vehicleEnterExit.bEntering)
-				{
-					// Get the time the enter/exit vehicle key was held for
-					unsigned long ulKeyHoldTime = (SharedUtility::GetTime() - m_vehicleEnterExit.ulKeyHoldStartTime);
+						// Get the time the enter/exit vehicle key was held for
+						unsigned long ulKeyHoldTime = (SharedUtility::GetTime() - m_vehicleEnterExit.ulKeyHoldStartTime);
 
-					// Has the key been held long enough to enter as a passenger?
-					if(ulKeyHoldTime >= PASSENGER_KEY_HOLD_TIME)
-					{
-						// Do we have a close vehicle?
 						CClientVehicle * pVehicle = NULL;
 						BYTE byteSeatId = 0;
+						bool bFound = false;
 
-						if(GetClosestVehicle(true, &pVehicle, byteSeatId))
+						// Has the key been held long enough to enter as a passenger?
+						if(ulKeyHoldTime >= PASSENGER_KEY_HOLD_TIME)
+						{
+							// Do we have a close vehicle?
+							bFound = GetClosestVehicle(true, &pVehicle, byteSeatId);
+						}
+						else
+						{
+							// Key has not been held long enough to enter as a passenger, enter as driver
+							// Do we have a close vehicle?
+							bFound = GetClosestVehicle(false, &pVehicle, byteSeatId);
+						}
+
+						// Have we found a close vehicle?
+						if(bFound)
 						{
 							if(IsLocalPlayer())
-								CLogFile::Printf("HandleVehicleEntry(LocalPlayer, %d, %d)", pVehicle->GetVehicleId(), byteSeatId);
+								CLogFile::Printf("HandleVehicleEntry(LocalPlayer, %d, %d)\n", pVehicle->GetVehicleId(), byteSeatId);
 							else
-								CLogFile::Printf("HandleVehicleEntry(%d, %d, %d)", m_playerId, pVehicle->GetVehicleId(), byteSeatId);
-
-							// Enter the vehicle
-							EnterVehicle(pVehicle, byteSeatId);
+								CLogFile::Printf("HandleVehicleEntry(%d, %d, %d)\n", m_playerId, pVehicle->GetVehicleId(), byteSeatId);
 
 							// Is this a network vehicle?
 							if(pVehicle->IsNetworkVehicle())
 							{
-								// Send the passenger entry to the server
-								/*RakNet::BitStream bsSend;
-								bsSend.Write(pVehicle->GetVehicleId());
-								bsSend.Write(byteSeatId);
-								g_pNetworkManager->GetRakClient()->RPC(RPC_VehicleEntry, &bsSend, HIGH_PRIORITY, RELIABLE);*/
+								// Request the vehicle entry
+								CBitStream bitStream;
+								bitStream.Write((BYTE)VEHICLE_ENTRY_REQUEST);
+								bitStream.WriteCompressed(pVehicle->GetVehicleId());
+								bitStream.Write(byteSeatId);
+								g_pClient->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE);
+								m_vehicleEnterExit.bRequesting = true;
 							}
-						}
-					}
-					else
-					{
-						// Key has not been held long enough to enter as a passenger, enter as driver
-						// Do we have a close vehicle?
-						CClientVehicle * pVehicle = NULL;
-						BYTE byteSeatId = 0;
-
-						if(GetClosestVehicle(false, &pVehicle, byteSeatId))
-						{
-							CLogFile::Printf("HandleVehicleEntry(LocalPlayer, %d, %d)", pVehicle->GetVehicleId(), byteSeatId);
-
-							// Enter the vehicle
-							EnterVehicle(pVehicle, byteSeatId);
-
-							// Is this a network vehicle?
-							if(pVehicle->IsNetworkVehicle())
+							else
 							{
-								// Send the vehicle entry to the server
-								/*RakNet::BitStream bsSend;
-								bsSend.Write(pVehicle->GetVehicleId());
-								bsSend.Write(byteSeatId);
-								g_pNetworkManager->GetRakClient()->RPC(RPC_VehicleEntry, &bsSend, HIGH_PRIORITY, RELIABLE);*/
+								// Enter the vehicle
+								EnterVehicle(pVehicle, byteSeatId);
 							}
 						}
-					}
 
-					// Reset the enter/exit vehicle key hold start time
-					m_vehicleEnterExit.ulKeyHoldStartTime = 0;
+						// Reset the enter/exit vehicle key hold start time
+						m_vehicleEnterExit.ulKeyHoldStartTime = 0;
+					}
+				}
+				else
+				{
+					CLogFile::Printf("Already requesting vehicle entry/exit!");
 				}
 			}
 		}
@@ -1141,13 +1238,25 @@ void CClientPlayer::ProcessVehicleEntryExit()
 					// Vehicle entry is complete
 					m_vehicleEnterExit.bEntering = false;
 					m_pVehicle = m_vehicleEnterExit.pVehicle;
+					m_byteVehicleSeatId = m_vehicleEnterExit.byteSeatId;
 					m_pVehicle->SetOccupant(m_vehicleEnterExit.byteSeatId, this);
 					m_vehicleEnterExit.pVehicle = NULL;
 
+					// Is this a network vehicle?
+					if(m_pVehicle->IsNetworkVehicle())
+					{
+						// Send the network rpc
+						CBitStream bitStream;
+						bitStream.Write((BYTE)VEHICLE_ENTRY_COMPLETE);
+						bitStream.WriteCompressed(m_pVehicle->GetVehicleId());
+						bitStream.Write(m_byteVehicleSeatId);
+						g_pClient->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE);
+					}
+
 					if(IsLocalPlayer())
-						CLogFile::Printf("VehicleEntryComplete(LocalPlayer)");
+						CLogFile::Printf("VehicleEntryComplete(LocalPlayer)\n");
 					else
-						CLogFile::Printf("VehicleEntryComplete(%d)", m_playerId);
+						CLogFile::Printf("VehicleEntryComplete(%d)\n", m_playerId);
 				}
 			}
 		}
@@ -1166,26 +1275,29 @@ void CClientPlayer::ProcessVehicleEntryExit()
 						// Is our enter/exit vehicle a network vehicle?
 						if(m_vehicleEnterExit.pVehicle->IsNetworkVehicle())
 						{
-							// Vehicle entry has been canceled
-							m_vehicleEnterExit.bEntering = false;
-							m_vehicleEnterExit.pVehicle = NULL;
-
 							// Get our position
-							Vector3 vecPosition;
+							CVector3 vecPosition;
 							GetPosition(vecPosition);
 
-							// Send cancel vehicle entry notification to server
-							/*BitStream bsSend;
-							bsSend.Write((char *)&vecPosition, sizeof(Vector3));
-							g_pNetworkManager->GetRakClient()->RPC(RPC_CancelVehicleEntry, &bsSend, HIGH_PRIORITY, RELIABLE);*/
-							CLogFile::Printf("VehicleEntryCancelled(LocalPlayer)");
+							// Send the network rpc
+							CBitStream bitStream;
+							bitStream.Write((BYTE)VEHICLE_ENTRY_CANCELLED);
+							bitStream.WriteCompressed(m_vehicleEnterExit.pVehicle->GetVehicleId());
+							bitStream.Write(m_byteVehicleSeatId);
+							g_pClient->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE);
+
+							CLogFile::Printf("VehicleEntryCancelled(LocalPlayer)\n");
 						}
+
+						// Vehicle entry has been canceled
+						m_vehicleEnterExit.bEntering = false;
+						m_vehicleEnterExit.pVehicle = NULL;
 					}
 					else
 					{
 						// Force ourselves to enter the vehicle
-						/*EnterVehicle(m_vehicleEnterExit.vehicleId, m_vehicleEnterExit.byteSeatId, false);*/
-						CLogFile::Printf("VehicleEntryRestarted(%d)", m_playerId);
+						EnterVehicle(m_vehicleEnterExit.pVehicle, m_vehicleEnterExit.byteSeatId);
+						CLogFile::Printf("VehicleEntryRestarted(%d)\n", m_playerId);
 					}
 				}
 			}
@@ -1198,9 +1310,9 @@ void CClientPlayer::ProcessVehicleEntryExit()
 					ClearPrimaryTask(true);
 
 					if(IsLocalPlayer())
-						CLogFile::Printf("VehicleEntryRemoved(LocalPlayer)");
+						CLogFile::Printf("VehicleEntryRemoved(LocalPlayer)\n");
 					else
-						CLogFile::Printf("VehicleEntryRemoved(%d)", m_playerId);
+						CLogFile::Printf("VehicleEntryRemoved(%d)\n", m_playerId);
 				}
 			}
 
@@ -1210,16 +1322,54 @@ void CClientPlayer::ProcessVehicleEntryExit()
 				// Have we finished our exit vehicle task?
 				if(!IsGettingOutOfAVehicle())
 				{
+					// Is this a network vehicle?
+					if(m_pVehicle->IsNetworkVehicle())
+					{
+						// Send the network rpc
+						CBitStream bitStream;
+						bitStream.Write((BYTE)VEHICLE_EXIT_COMPLETE);
+						bitStream.WriteCompressed(m_pVehicle->GetVehicleId());
+						g_pClient->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE);
+					}
+
 					// Vehicle exit is complete
 					m_vehicleEnterExit.bExiting = false;
-					m_pVehicle->SetOccupant(m_vehicleEnterExit.byteSeatId, NULL);
+					m_pVehicle->SetOccupant(m_byteVehicleSeatId, NULL);
 					m_pVehicle = NULL;
-					m_vehicleEnterExit.byteSeatId = 0;
+					m_byteVehicleSeatId = 0;
 
 					if(IsLocalPlayer())
-						CLogFile::Printf("VehicleExitComplete(LocalPlayer)");
+						CLogFile::Printf("VehicleExitComplete(LocalPlayer)\n");
 					else
-						CLogFile::Printf("VehicleExitComplete(%d)", m_playerId);
+						CLogFile::Printf("VehicleExitComplete(%d)\n", m_playerId);
+				}
+			}
+			else
+			{
+				// Do we have an exit vehicle task?
+				if(IsGettingOutOfAVehicle())
+				{
+					// Clear our primary task
+					ClearPrimaryTask(true);
+
+					if(IsLocalPlayer())
+						CLogFile::Printf("VehicleExitRemoved(LocalPlayer)\n");
+					else
+						CLogFile::Printf("VehicleExitRemoved(%d)\n", m_playerId);
+				}
+
+				// Are we flagged as in a vehicle?
+				if(m_pVehicle)
+				{
+					// Player has forcefully exited the vehicle (out of windscreen, e.t.c.)
+					m_pVehicle->SetOccupant(m_byteVehicleSeatId, NULL);
+					m_pVehicle = NULL;
+					m_byteVehicleSeatId = 0;
+
+					if(IsLocalPlayer())
+						CLogFile::Printf("VehicleForcefulExit(LocalPlayer)\n");
+					else
+						CLogFile::Printf("VehicleForcefulExit(%d)\n", m_playerId);
 				}
 			}
 		}
@@ -1234,6 +1384,7 @@ void CClientPlayer::ResetVehicleEnterExit()
 	m_vehicleEnterExit.byteSeatId = 0;
 	m_vehicleEnterExit.bExiting = false;
 	m_vehicleEnterExit.ulKeyHoldStartTime = 0;
+	m_vehicleEnterExit.bRequesting = false;
 }
 
 void CClientPlayer::UpdateTargetPosition()
@@ -1243,7 +1394,7 @@ void CClientPlayer::UpdateTargetPosition()
 		unsigned long ulCurrentTime = SharedUtility::GetTime();
 
 		// Get our position
-		Vector3 vecCurrentPosition;
+		CVector3 vecCurrentPosition;
 		GetPosition(vecCurrentPosition);
 
 		// Get the factor of time spent from the interpolation start
@@ -1258,14 +1409,14 @@ void CClientPlayer::UpdateTargetPosition()
 		m_interp.pos.fLastAlpha = fAlpha;
 
 		// Apply the error compensation
-		Vector3 vecCompensation = Lerp(Vector3(), fCurrentAlpha, m_interp.pos.vecError);
+		CVector3 vecCompensation = Lerp(CVector3(), fCurrentAlpha, m_interp.pos.vecError);
 
 		// If we finished compensating the error, finish it for the next pulse
 		if(fAlpha == 1.0f)
 			m_interp.pos.ulFinishTime = 0;
 
 		// Calculate the new position
-		Vector3 vecNewPosition = (vecCurrentPosition + vecCompensation);
+		CVector3 vecNewPosition = (vecCurrentPosition + vecCompensation);
 
 		// Check if the distance to interpolate is too far
 		if((vecCurrentPosition - m_interp.pos.vecTarget).Length() > 5)
@@ -1287,7 +1438,7 @@ void CClientPlayer::Interpolate()
 		UpdateTargetPosition();
 }
 
-void CClientPlayer::SetTargetPosition(const Vector3& vecPosition, unsigned long ulDelay)
+void CClientPlayer::SetTargetPosition(const CVector3& vecPosition, unsigned long ulDelay)
 {
 	// Are we spawned?
 	if(IsSpawned())
@@ -1296,7 +1447,7 @@ void CClientPlayer::SetTargetPosition(const Vector3& vecPosition, unsigned long 
 		UpdateTargetPosition();
 
 		// Get our position
-		Vector3 vecCurrentPosition;
+		CVector3 vecCurrentPosition;
 		GetPosition(vecCurrentPosition);
 
 		// Set the target position
@@ -1323,4 +1474,130 @@ void CClientPlayer::RemoveTargetPosition()
 void CClientPlayer::ResetInterpolation()
 {
 	RemoveTargetPosition();
+}
+
+void CClientPlayer::Serialize(CBitStreamInterface * pBitStream)
+{
+	// Write the player net pad state
+	CNetworkPadState netPadState;
+	GetNetPadState(netPadState);
+	pBitStream->Write(netPadState);
+
+	// Write if we are on foot
+	pBitStream->WriteBit(IsOnFoot());
+
+	// Are we on foot?
+	if(IsOnFoot())
+	{
+		// Write the player position
+		CVector3 vecPosition;
+		GetPosition(vecPosition);
+		pBitStream->Write(vecPosition);
+
+		// Write the player heading
+		pBitStream->Write(GetCurrentHeading());
+
+		// Write the player move speed
+		CVector3 vecMoveSpeed;
+		GetMoveSpeed(vecMoveSpeed);
+		pBitStream->Write(vecMoveSpeed);
+		
+		// Write the player duck state
+		pBitStream->WriteBit(IsDucking());
+	}
+	else
+	{
+		// Write our vehicle id
+		pBitStream->WriteCompressed(m_pVehicle->GetVehicleId());
+
+		// Write our vehicle seat id
+		pBitStream->Write(m_byteVehicleSeatId);
+
+		// Are we the driver?
+		if(m_byteVehicleSeatId == 0)
+		{
+			// Serialize the vehicle to the bit stream
+			m_pVehicle->Serialize(pBitStream);
+		}
+	}
+}
+
+bool CClientPlayer::Deserialize(CBitStreamInterface * pBitStream)
+{
+	// Read the player net pad state
+	CNetworkPadState netPadState;
+
+	if(!pBitStream->Read(netPadState))
+		return false;
+
+	SetNetPadState(netPadState);
+
+	// Are we on foot?
+	if(IsOnFoot())
+	{
+		// Read the player position
+		CVector3 vecPosition;
+
+		if(!pBitStream->Read(vecPosition))
+			return false;
+
+		SetTargetPosition(vecPosition, NETWORK_TICK_RATE);
+
+		// Read the player heading
+		// TODO: Interpolate rotation too
+		float fHeading;
+
+		if(!pBitStream->Read(fHeading))
+			return false;
+
+		SetCurrentHeading(fHeading);
+
+		// Read the player move speed
+		CVector3 vecMoveSpeed;
+
+		if(!pBitStream->Read(vecMoveSpeed))
+			return false;
+
+		SetMoveSpeed(vecMoveSpeed);
+
+		// Read the player duck state
+		SetDucking(pBitStream->ReadBit());
+	}
+	else
+	{
+		// Read the vehicle id
+		EntityId vehicleId;
+
+		if(!pBitStream->ReadCompressed(vehicleId))
+			return false;
+
+		// Read the vehicle seat id
+		BYTE byteSeatId;
+
+		if(!pBitStream->Read(byteSeatId))
+			return false;
+
+		// Get the vehicle pointer
+		CClientVehicle * pVehicle = g_pClient->GetVehicleManager()->Get(vehicleId);
+
+		// Is the vehicle pointer valid?
+		if(!pVehicle)
+			return false;
+
+		// Are we not already in the vehicle?
+		if(m_pVehicle != pVehicle)
+		{
+			// Force us in to the vehicle
+			PutInVehicle(pVehicle, byteSeatId);
+		}
+
+		// Are we the driver?
+		if(byteSeatId == 0)
+		{
+			// Deserialize the vehicle from the bit stream
+			pVehicle->Deserialize(pBitStream);
+		}
+	}
+
+	return true;
 }

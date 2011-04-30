@@ -14,9 +14,9 @@
 class CFont
 {
 public:
-	virtual void  Draw(char * szText, DWORD dwColor, float fPosX, float fPosY) = 0;
+	virtual void  Draw(const char * szText, DWORD dwColor, float fPosX, float fPosY) = 0;
 	virtual float GetHeight() = 0;
-	virtual float GetTextExtent(char * szText) = 0;
+	virtual float GetTextExtent(const char * szText) = 0;
 	virtual void  OnDeviceLost() = 0;
 	virtual void  OnDeviceReset() = 0;
 };

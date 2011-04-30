@@ -22,9 +22,9 @@ public:
 
 	bool	SetParent(CEntity* pEntity);
 private:
-	SQObjectPtr			pFunction;
-	unsigned long		ulInterval;
-	unsigned int		uiAmountRepeating;
-	CSquirrelArguments*	pArguments;
-	unsigned long		ulNextExecution;
+	SQObjectPtr			m_pFunction;
+	unsigned long		m_ulInterval;
+	unsigned int		m_uiAmountRepeating;
+	CSquirrelArguments*	m_pArguments;
+	unsigned long		m_ulNextExecution;
 };

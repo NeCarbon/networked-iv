@@ -11,23 +11,20 @@
 
 #include <StdInc.h>
 
-// This is also a GTA limit
-#define MAX_PASSENGERS 8
-
-class CClientVehicle : public CStreamableEntity
+class CClientVehicle : public CStreamableEntity, public CEntity
 {
 private:
-	EntityId         m_vehicleId;
-	CIVVehicle     * m_pVehicle;
-	CIVModelInfo   * m_pModelInfo;
-	BYTE             m_byteColors[4];
-	CClientPlayer  * m_pDriver;
-	CClientPlayer  * m_pPassengers[MAX_PASSENGERS];
-	Vector3          m_vecPosition;
-	Vector3          m_vecRotation;
-	Vector3          m_vecMoveSpeed;
-	Vector3          m_vecTurnSpeed;
-	float            m_fHealth;
+	EntityId        m_vehicleId;
+	CIVVehicle    * m_pVehicle;
+	CIVModelInfo  * m_pModelInfo;
+	BYTE            m_byteColors[4];
+	CClientPlayer * m_pDriver;
+	CClientPlayer * m_pPassengers[MAX_VEHICLE_PASSENGERS];
+	CVector3         m_vecPosition;
+	CVector3         m_vecRotation;
+	CVector3         m_vecMoveSpeed;
+	CVector3         m_vecTurnSpeed;
+	float           m_fHealth;
 
 	bool             Create();
 	void             Destroy();
@@ -52,21 +49,27 @@ public:
 	CClientPlayer  * GetOccupant(BYTE byteSeatId);
 	void             StreamIn();
 	void             StreamOut();
+	void             Process();
+	bool             SetModel(int iModelIndex);
 	unsigned int     GetScriptingHandle();
 	void             SetHealth(float fHealth);
 	float            GetHealth();
 
-	void             Teleport(const Vector3& vecPosition);
-	void             SetPosition(const Vector3& vecPosition);
-	void             GetPosition(Vector3& vecPosition);
-	void             GetStreamPosition(Vector3& vecPosition) { GetPosition(vecPosition); }
-	void             SetRotation(const Vector3& vecRotation);
-	void             GetRotation(Vector3& vecRotation);
-	void             SetMoveSpeed(const Vector3& vecMoveSpeed);
-	void             GetMoveSpeed(Vector3& vecMoveSpeed);
-	void             SetTurnSpeed(const Vector3& vecTurnSpeed);
-	void             GetTurnSpeed(Vector3& vecTurnSpeed);
+	void             Teleport(const CVector3& vecPosition);
+	void             SetPosition(const CVector3& vecPosition);
+	void             GetPosition(CVector3& vecPosition);
+	void             GetStreamPosition(CVector3& vecPosition) { GetPosition(vecPosition); }
+	void             SetRotation(const CVector3& vecRotation);
+	void             GetRotation(CVector3& vecRotation);
+	void             SetMoveSpeed(const CVector3& vecMoveSpeed);
+	void             GetMoveSpeed(CVector3& vecMoveSpeed);
+	void             SetTurnSpeed(const CVector3& vecTurnSpeed);
+	void             GetTurnSpeed(CVector3& vecTurnSpeed);
 
 	// Max passengers
 	BYTE             GetMaxPassengers();
+
+	// Information Serialization/Deserialization
+	void             Serialize(CBitStreamInterface * pBitStream);
+	bool             Deserialize(CBitStreamInterface * pBitStream);
 };

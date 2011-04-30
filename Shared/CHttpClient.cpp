@@ -107,7 +107,7 @@ bool CHttpClient::Connect()
 	if(heHost == NULL)
 	{
 		// Failed to get the host, set the last error
-		m_lastError = HTTP_ERROR_INVALID_HOST;
+		m_lastError = HTTP_ERROR_HOST_RESOLUTION_FAILED;
 		return false;
 	}
 
@@ -178,7 +178,8 @@ int CHttpClient::Read(char * szBuffer, int iLen)
 bool CHttpClient::Get(String strPath)
 {
 	// Connect to the host
-	Connect();
+	if(!Connect())
+		return false;
 
 	// Reset the header and data
 	m_strHeader.Clear();
@@ -209,7 +210,8 @@ bool CHttpClient::Get(String strPath)
 bool CHttpClient::Post(bool bHasResponse, String strPath, String strData, String strContentType)
 {
 	// Connect to the host
-	Connect();
+	if(!Connect())
+		return false;
 
 	// Reset the header and data
 	m_strHeader.Clear();
@@ -381,8 +383,8 @@ String CHttpClient::GetLastErrorString()
 	case HTTP_ERROR_SOCKET_PREPARE_FAILED:
 		strError.Set("Failed to prepare socket");
 		break;
-	case HTTP_ERROR_INVALID_HOST:
-		strError.Set("Invalid host");
+	case HTTP_ERROR_HOST_RESOLUTION_FAILED:
+		strError.Set("Failed to resolve host");
 		break;
 	case HTTP_ERROR_CONNECTION_FAILED:
 		strError.Set("Connection failed");

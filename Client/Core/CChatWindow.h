@@ -15,6 +15,7 @@
 #define NUM_CHAT_LINES_PER_PAGE 10
 #define NUM_CHAT_LINES (NUM_CHAT_PAGES * NUM_CHAT_LINES_PER_PAGE)
 #define MESSAGE_INFO_COLOR D3DCOLOR_RGBA(0, 0, 255, 255)
+#define COMMAND_CHAR '/'
 
 class CChatWindow
 {
@@ -25,7 +26,7 @@ private:
 	int          m_iCurrentPageScroll;
 	unsigned int m_uiTotalMessages;
 	bool         m_bInputEnabled;
-	char         m_szCurrentInput[CHAT_LINE_LEN + 1];
+	String       m_strCurrentInput;
 	bool         m_bLogMessages;
 
 public:

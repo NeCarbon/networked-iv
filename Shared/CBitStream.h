@@ -47,7 +47,7 @@ public:
 	void                     Write(const float &inVar);
 	void                     Write(const double &inVar);
 	void                     Write(const String &inString);
-	void                     Write(const Vector3 &inVar);
+	void                     Write(const CVector3 &inVar);
 	void                     Write(const CNetworkPadState &inVar);
 
 	// Write any integral type compressed to the BitStream.
@@ -76,7 +76,7 @@ public:
 	bool                     Read(float &outVar);
 	bool                     Read(double &outVar);
 	bool                     Read(String &outString);
-	bool                     Read(Vector3 &outVar);
+	bool                     Read(CVector3 &outVar);
 	bool                     Read(CNetworkPadState &outVar);
 
 	// Read any compressed integral type from the BitStream.

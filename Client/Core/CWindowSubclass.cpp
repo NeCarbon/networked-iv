@@ -16,14 +16,40 @@ extern CClient * g_pClient;
 
 LRESULT APIENTRY CWindowSubclass::WndProc_Hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// Does our chat window exist?
-	if(g_pClient->GetChatWindow())
+	// NOTE: This is bad, but the only way i could get it working
+	// Are we focused?
+	bool bFocused = (GetForegroundWindow() == hWnd);
+
+	// Have we gained focus?
+	if(bFocused && !g_pClient->IsFocused())
 	{
-		// Give this input to our chat window
-		if(g_pClient->GetChatWindow()->HandleUserInput(uMsg, (DWORD)wParam))
+		// Set the client focused flag
+		g_pClient->SetFocused(true);
+		CLogFile::Printf("Gained window focus\n");
+	}
+	// Have we lost focus?
+	else if(!bFocused && g_pClient->IsFocused())
+	{
+		// Set the client focused flag
+		g_pClient->SetFocused(false);
+		CLogFile::Printf("Lost window focus\n");
+	}
+
+	// Show/hide the mouse
+	//ShowCursor(!bFocused);
+
+	// Are we focused?
+	if(bFocused)
+	{
+		// Does our chat window exist?
+		if(g_pClient->GetChatWindow())
 		{
-			// The chat window handled it
-			return 0;
+			// Give this input to our chat window
+			if(g_pClient->GetChatWindow()->HandleUserInput(uMsg, (DWORD)wParam))
+			{
+				// The chat window handled it
+				return 0;
+			}
 		}
 	}
 

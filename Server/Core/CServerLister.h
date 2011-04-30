@@ -19,6 +19,7 @@ private:
 	unsigned long  m_ulLastUpdate;
 	String         m_strUpdatePath;
 	bool           m_bWaitingForData;
+	bool           m_bSentFailedMessage;
 	bool           m_bSentListedMessage;
 	bool           m_bSentBannedMessage;
 

@@ -78,7 +78,7 @@ const char * GetAppPath()
 }
 
 #ifdef WIN32
-int InjectLibraryIntoProcess(HANDLE hProcess, char * szLibraryPath)
+int InjectLibraryIntoProcess(HANDLE hProcess, const char * szLibraryPath)
 {
 	int iReturn = 0;
 
@@ -129,7 +129,7 @@ int InjectLibraryIntoProcess(HANDLE hProcess, char * szLibraryPath)
 	return iReturn;
 }
 
-int InjectLibraryIntoProcess(DWORD dwProcessId, char * szLibraryPath)
+int InjectLibraryIntoProcess(DWORD dwProcessId, const char * szLibraryPath)
 {
 	// Open our target process
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
@@ -186,12 +186,12 @@ bool WriteRegistryString(HKEY hKeyLocation, const char * szSubKey, const char * 
 	return false;
 }
 
-int AnsiToUnicode(char * szAnsiString, size_t sAnsiStringLength, wchar_t * wszUnicodeString, size_t sUnicodeStringLength, DWORD dwFlags)
+int AnsiToUnicode(const char * szAnsiString, size_t sAnsiStringLength, wchar_t * wszUnicodeString, size_t sUnicodeStringLength, DWORD dwFlags)
 {
 	return MultiByteToWideChar(CP_ACP, dwFlags, szAnsiString, sAnsiStringLength, wszUnicodeString, sUnicodeStringLength);
 }
 
-int UnicodeToAnsi(wchar_t * wszUnicodeString, size_t sUnicodeStringLength, char * szAnsiString, size_t sAnsiStringLength, DWORD dwFlags)
+int UnicodeToAnsi(const wchar_t * wszUnicodeString, size_t sUnicodeStringLength, char * szAnsiString, size_t sAnsiStringLength, DWORD dwFlags)
 {
 	return WideCharToMultiByte(CP_UTF8, dwFlags, wszUnicodeString, sUnicodeStringLength, szAnsiString, sAnsiStringLength, NULL, NULL);
 }
@@ -297,5 +297,47 @@ int CreateDirectory(const char * szPath)
 
 	// Failed to create the directory
 	return 0;
+}
+
+unsigned int IVHash(std::string strString, unsigned int uiInitialHash, bool bEnsureLowercase)
+{
+	// Ensure the string is lowercase if needed
+	if(bEnsureLowercase)
+	{
+		for(size_t i = 0; i < strString.size(); i++)
+			strString[i] = tolower(strString[i]);
+	}
+
+	// Set the initial hash value
+	unsigned int uiValue = uiInitialHash;
+	unsigned int uiTemp = 0;
+	int iCurrent = 0;
+
+	for(size_t sIndex = 0; sIndex < strString.size(); sIndex++)
+	{
+		iCurrent = strString[sIndex];
+
+		if(iCurrent == '\\')
+			iCurrent = '/';
+
+		uiTemp = iCurrent;
+		uiTemp = (uiTemp + uiValue);
+		uiValue = (uiTemp << 10);
+		uiTemp += uiValue;
+		uiValue = (uiTemp >> 6);
+		uiValue = (uiValue ^ uiTemp);
+	}
+
+	uiTemp = (uiValue << 3);
+	uiTemp = (uiValue + uiTemp);
+	unsigned int uiTemp2 = (uiTemp >> 11);
+	uiTemp = (uiTemp2 ^ uiTemp);
+	uiTemp2 = (uiTemp << 15);
+	uiValue = (uiTemp2 + uiTemp);
+
+	if(uiValue < 2)
+		uiValue += 2;
+
+	return uiValue;
 }
 };

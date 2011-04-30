@@ -234,24 +234,10 @@ IVTask * CIVTask::GetTask()
 	return m_pTask;
 }
 
-#define VAR_TaskPool 0x164B01C
-#define FUNC_CPool__Allocate 0x439CB0
-
 void CIVTask::Create()
 {
 	if(!m_pTask)
-	{
-		void * g_pTaskPool = *(void **)(g_pClient->GetBaseAddress() + VAR_TaskPool);
-		DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPool__Allocate);
-		IVTask * pTask = NULL;
-		_asm
-		{
-			mov ecx, g_pTaskPool
-			call dwFunc
-			mov pTask, eax
-		}
-		m_pTask = pTask;
-	}	
+		m_pTask = CPools::GetTaskPool()->Allocate();
 }
 
 void CIVTask::Destroy()
@@ -337,13 +323,14 @@ bool CIVTask::MakeAbortable(CIVPed * pPed, int iAbortPriority, void * pEvent)
 
 	if(m_pTask)
 	{
+		IVPed * pGamePed = pPed->GetPed();
 		IVTask * pTask = m_pTask;
 		DWORD dwFunc = m_pTask->m_VFTable->MakeAbortable;
 		_asm
 		{
 			push pEvent
 			push iAbortPriority
-			push pPed
+			push pGamePed
 			mov ecx, pTask
 			call dwFunc
 			mov bReturn, al
@@ -353,8 +340,14 @@ bool CIVTask::MakeAbortable(CIVPed * pPed, int iAbortPriority, void * pEvent)
 	return bReturn;
 }
 
-/*void CIVTask::SetAsPedTask(CIVPed * pPed, int iTaskPriority, bool bForceNewTask)
+void CIVTask::SetAsPedTask(CIVPed * pPed, int iTaskPriority, bool bForceNewTask)
 {
 	if(m_pTask)
-		pPed->GetPedTaskManager()->SetTask(m_pTask, iTaskPriority, bForceNewTask);
-}*/
+	{
+		// Get the game task pointer
+		CIVTask * pGameTask = g_pClient->GetClientTaskManager()->GetClientTaskFromGameTask(m_pTask);
+
+		// Set the task as the ped task
+		pPed->GetPedTaskManager()->SetTask(pGameTask, iTaskPriority, bForceNewTask);
+	}
+}

@@ -56,9 +56,9 @@ void CStreamer::Reset()
 
 inline bool SortStreamableEntites(CStreamableEntity * pEntity, CStreamableEntity * pOther)
 {
-	Vector3 vecPlayerPos;
-	Vector3 vecEntityPos;
-	Vector3 vecOtherEntityPos;
+	CVector3 vecPlayerPos;
+	CVector3 vecEntityPos;
+	CVector3 vecOtherEntityPos;
 	g_pClient->GetPlayerManager()->GetLocalPlayer()->GetPosition(vecPlayerPos);
 	pEntity->GetStreamPosition(vecEntityPos);
 	pOther->GetStreamPosition(vecOtherEntityPos);
@@ -77,7 +77,7 @@ void CStreamer::Process()
 
 		std::list<CStreamableEntity *> newEntities[ENTITY_TYPE_MAX];
 
-		Vector3 vecPlayerPos;
+		CVector3 vecPlayerPos;
 		g_pClient->GetPlayerManager()->GetLocalPlayer()->GetPosition(vecPlayerPos);
 
 		// Loop through all streamable elements
@@ -86,7 +86,7 @@ void CStreamer::Process()
 			if((*iter)->CanBeStreamedIn())
 			{
 				// check distance
-				Vector3 vecPos;
+				CVector3 vecPos;
 				(*iter)->GetStreamPosition(vecPos);
 				float fDistance = GetDistanceBetweenPoints3D(vecPlayerPos.fX, vecPlayerPos.fY, vecPlayerPos.fZ, vecPos.fX, vecPos.fY, vecPos.fZ);
 				bool bInRange = (fDistance <= (*iter)->GetStreamingDistance());
@@ -113,6 +113,19 @@ void CStreamer::Process()
 						// flag it for being streamed in (important to have gta's hardcoded limits enforced)
 						newEntities[(*iter)->GetType()].push_back(*iter);
 					}
+				}
+			}
+			else
+			{
+				if((*iter)->IsStreamedIn())
+				{
+					CLogFile::Printf("Streamout due to not being allowed to be streamed in\n");
+
+					// remove it from the list of streamed in elements
+					m_streamedElements[(*iter)->GetType()].remove(*iter);
+
+					// stream it out
+					(*iter)->StreamOutInternal();
 				}
 			}
 		}
@@ -197,7 +210,7 @@ void CStreamer::UpdateInterior(unsigned int uiInterior)
 
 void CStreamer::ForceStreamIn(CStreamableEntity * pEntity, bool bInstantly)
 {
-	// TODO: Implement bInstantly
+	// TODO: Implement bInstantly (If false done next tick, if true done now)
 	// not enough space to stream it in?
 	if(m_streamedElements[pEntity->GetType()].size() > m_uiStreamingLimits[pEntity->GetType()])
 	{

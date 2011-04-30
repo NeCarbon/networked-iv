@@ -16,9 +16,9 @@ class CServer : public CServerInterface
 private:
 	bool               m_bActive;
 	bool               m_bShowFPS;
-	DWORD              m_dwLastFPSUpdateTickCount;
-	DWORD              m_dwFrameCount;
-	DWORD              m_dwFramesPerSecond;
+	unsigned long      m_ulLastFPSUpdateTime;
+	unsigned long      m_ulFrameCount;
+	unsigned long      m_ulFramesPerSecond;
 	CMutex             m_inputQueueMutex; // Mutex for m_inputQueue
 	std::queue<String> m_inputQueue;
 	CServerLister    * m_pServerLister;

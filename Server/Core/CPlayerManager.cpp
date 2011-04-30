@@ -11,8 +11,8 @@
 
 CPlayerManager::CPlayerManager()
 {
-	for(EntityId playerId = 0; playerId < PLAYER_MAX; playerId++)
-		m_pPlayers[playerId] = NULL;
+	for(EntityId i = 0; i < PLAYER_MAX; i++)
+		m_pPlayers[i] = NULL;
 }
 
 CPlayerManager::~CPlayerManager()
@@ -36,7 +36,7 @@ bool CPlayerManager::Add(EntityId playerId, String strName)
 		return false;
 
 	// Create the player instance
-	m_pPlayers[playerId] = new CClientPlayer(playerId, strName);
+	m_pPlayers[playerId] = new CPlayer(playerId, strName);
 
 	// Was the player instance created?
 	if(m_pPlayers[playerId])
@@ -46,7 +46,6 @@ bool CPlayerManager::Add(EntityId playerId, String strName)
 
 		// Trigger the connection event
 		m_pPlayers[playerId]->CallEvent("playerConnect", NULL);
-
 		return true;
 	}
 
@@ -70,7 +69,6 @@ bool CPlayerManager::Delete(EntityId playerId)
 
 	// Set the player pointer to NULL
 	m_pPlayers[playerId] = NULL;
-
 	return true;
 }
 
@@ -83,7 +81,7 @@ bool CPlayerManager::IsActive(EntityId playerId)
 	return (m_pPlayers[playerId] != NULL);
 }
 
-CClientPlayer * CPlayerManager::Get(EntityId playerId)
+CPlayer * CPlayerManager::Get(EntityId playerId)
 {
 	// Is this player not active?
 	if(!IsActive(playerId))
@@ -94,7 +92,7 @@ CClientPlayer * CPlayerManager::Get(EntityId playerId)
 
 EntityId CPlayerManager::GetCount()
 {
-	EntityId count = 0;
+	EntityId playerCount = 0;
 
 	// Loop through all players
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
@@ -103,11 +101,11 @@ EntityId CPlayerManager::GetCount()
 		if(IsActive(i))
 		{
 			// Increment the player count
-			count++;
+			playerCount++;
 		}
 	}
 
-	return count;
+	return playerCount;
 }
 
 void CPlayerManager::HandlePlayerJoin(EntityId playerId)

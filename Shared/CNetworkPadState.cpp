@@ -26,14 +26,14 @@ bool CNetworkPadState::operator!= (const CNetworkPadState& o) const
 	return (memcmp(this, &o, sizeof(CNetworkPadState)) != 0);
 }
 
-void CNetworkPadState::Write(CNetBitStreamInterface * pBitStream) const
+void CNetworkPadState::Serialize(CNetBitStreamInterface * pBitStream) const
 {
 	pBitStream->Write((char *)byteLeftAnalogLR, sizeof(byteLeftAnalogLR));
 	pBitStream->Write((char *)byteLeftAnalogUD, sizeof(byteLeftAnalogUD));
 	pBitStream->WriteBits((unsigned char *)&keys, KEY_COUNT);
 }
 
-bool CNetworkPadState::Read(CNetBitStreamInterface * pBitStream)
+bool CNetworkPadState::Deserialize(CNetBitStreamInterface * pBitStream)
 {
 	if(!pBitStream->Read((char *)byteLeftAnalogLR, sizeof(byteLeftAnalogLR)))
 		return false;

@@ -41,7 +41,7 @@ String::~String()
 
 }
 
-String::operator const char * ()
+String::operator const char * () const
 {
 	return Get();
 }
@@ -76,67 +76,67 @@ String& String::operator += (const unsigned char ucChar)
 	return *this;
 }
 
-unsigned char String::operator [] (size_t sOffset)
+unsigned char String::operator [] (size_t sOffset) const
 {
 	return GetChar(sOffset);
 }
 
-bool String::operator == (const char * szString)
+bool String::operator == (const char * szString) const
 {
 	return (Compare(szString) == 0);
 }
 
-bool String::operator == (const String strString)
+bool String::operator == (const String strString) const
 {
 	return (Compare(strString.Get()) == 0);
 }
 
-bool String::operator != (const char * szString)
+bool String::operator != (const char * szString) const
 {
 	return (Compare(szString) != 0);
 }
 
-bool String::operator != (const String strString)
+bool String::operator != (const String strString) const
 {
 	return (Compare(strString.Get()) != 0);
 }
 
-bool String::operator > (const char * szString)
+bool String::operator > (const char * szString) const
 {
 	return (Compare(szString) > 0);
 }
 
-bool String::operator > (const String strString)
+bool String::operator > (const String strString) const
 {
 	return (Compare(strString.Get()) > 0);
 }
 
-bool String::operator >= (const char * szString)
+bool String::operator >= (const char * szString) const
 {
 	return (Compare(szString) >= 0);
 }
 
-bool String::operator >= (const String strString)
+bool String::operator >= (const String strString) const
 {
 	return (Compare(strString.Get()) >= 0);
 }
 
-bool String::operator < (const char * szString)
+bool String::operator < (const char * szString) const
 {
 	return (Compare(szString) < 0);
 }
 
-bool String::operator < (const String strString)
+bool String::operator < (const String strString) const
 {
 	return (Compare(strString.Get()) < 0);
 }
 
-bool String::operator <= (const char * szString)
+bool String::operator <= (const char * szString) const
 {
 	return (Compare(szString) <= 0);
 }
 
-bool String::operator <= (const String strString)
+bool String::operator <= (const String strString) const
 {
 	return (Compare(strString.Get()) <= 0);
 }
@@ -201,7 +201,7 @@ void String::ToLower()
 		m_strString[i] = tolower(m_strString[i]);
 }
 
-bool String::IsLower()
+bool String::IsLower() const
 {
 	for(size_t i = 0; i < GetLength(); i++)
 	{
@@ -220,7 +220,7 @@ void String::ToUpper()
 		m_strString[i] = toupper(m_strString[i]);
 }
 
-bool String::IsUpper()
+bool String::IsUpper() const
 {
 	for(size_t i = 0; i < GetLength(); i++)
 	{
@@ -249,32 +249,32 @@ void String::Clear()
 	m_strString.clear();
 }
 
-int String::Compare(const char * szString)
+int String::Compare(const char * szString) const
 {
 	return strcmp(Get(), szString);
 }
 
-int String::Compare(const String strString)
+int String::Compare(const String strString) const
 {
 	return strcmp(Get(), strString.Get());
 }
 
-int String::ICompare(const char * szString)
+int String::ICompare(const char * szString) const
 {
 	return stricmp(Get(), szString);
 }
 
-int String::ICompare(const String strString)
+int String::ICompare(const String strString) const
 {
 	return stricmp(Get(), strString.Get());
 }
 
-int String::ToInteger()
+int String::ToInteger() const
 {
 	return atoi(Get());
 }
 
-bool String::ToBoolean()
+bool String::ToBoolean() const
 {
 	return (ToInteger() != 0);
 }
@@ -283,18 +283,14 @@ void String::SetChar(size_t sOffset, unsigned char cChar)
 {
 	// TODO: Use allocated size instead of/aswell as the string length?
 	if(sOffset < GetLength())
-	{
 		m_strString[sOffset] = cChar;
-	}
 }
 
-unsigned char String::GetChar(size_t sOffset)
+unsigned char String::GetChar(size_t sOffset) const
 {
 	// TODO: Use allocated size instead of/aswell as the string length?
 	if(sOffset < GetLength())
-	{
 		return m_strString[sOffset];
-	}
 
 	return 0;
 }
@@ -427,7 +423,7 @@ bool String::SetLimit(size_t sLimit)
 	return true;
 }
 
-size_t String::GetLimit()
+size_t String::GetLimit() const
 {
 	return m_sLimit;
 }

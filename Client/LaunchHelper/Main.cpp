@@ -13,7 +13,7 @@ typedef BOOL (WINAPI * CreateProcessW_t)(LPCWSTR, LPWSTR, LPSECURITY_ATTRIBUTES,
 
 CreateProcessW_t g_pfnCreateProcessW;
 
-int ShowMessageBox(char * szText, UINT uType = (MB_ICONEXCLAMATION | MB_OK))
+int ShowMessageBox(const char * szText, UINT uType = (MB_ICONEXCLAMATION | MB_OK))
 {
 	return MessageBox(NULL, szText, MOD_NAME, uType);
 }
@@ -72,11 +72,10 @@ BOOL WINAPI CreateProcessW_Hook(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 	}
 
 	// Get the full path to GTAIV.exe
-	char szApplicationPath[MAX_PATH];
-	sprintf(szApplicationPath, "%s\\GTAIV.exe", szInstallDirectory);
+	String strApplicationPath("%s\\GTAIV.exe", szInstallDirectory);
 
 	// Make sure the GTAIV.exe path is valid
-	if(!SharedUtility::Exists(szApplicationPath))
+	if(!SharedUtility::Exists(strApplicationPath.Get()))
 	{
 		ShowMessageBox("Failed to find GTAIV.exe. Cannot launch Networked: IV.");
 		return FALSE;
@@ -93,7 +92,7 @@ BOOL WINAPI CreateProcessW_Hook(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 
 	// Convert the application path to unicode
 	wchar_t wszApplicationPath[MAX_PATH];
-	int iApplicationPathLength = SharedUtility::AnsiToUnicode(szApplicationPath, strlen(szApplicationPath), wszApplicationPath, sizeof(wszApplicationPath));
+	int iApplicationPathLength = SharedUtility::AnsiToUnicode(strApplicationPath.Get(), strApplicationPath.GetLength(), wszApplicationPath, sizeof(wszApplicationPath));
 	wszApplicationPath[iApplicationPathLength] = '\0';
 
 	// Create the process
@@ -102,25 +101,26 @@ BOOL WINAPI CreateProcessW_Hook(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
 	if(bReturn)
 	{
 		// Get the full path of the client dll
-		char szLibraryPath[MAX_PATH];
-		sprintf(szLibraryPath, "%s" CLIENT_CORE_NAME DEBUG_SUFFIX ".dll", SharedUtility::GetAppPath());
+		String strLibraryPath("%s" CLIENT_CORE_NAME DEBUG_SUFFIX ".dll", SharedUtility::GetAppPath());
 
 		// Inject Client.dll into GTAIV.exe
-		int iReturn = SharedUtility::InjectLibraryIntoProcess(lpProcessInformation->hProcess, szLibraryPath);
+		int iReturn = SharedUtility::InjectLibraryIntoProcess(lpProcessInformation->hProcess, strLibraryPath.Get());
 
 		// Did the injection fail?
 		if(iReturn > 0)
 		{
 			// Terminate the process
 			TerminateProcess(lpProcessInformation->hProcess, 0);
+			String strError("Unknown error. Cannot launch Networked: IV.");
 
 			if(iReturn == 1)
-				ShowMessageBox("Failed to write library path into remote process. Cannot launch Networked: IV.");
+				strError = "Failed to write library path into remote process. Cannot launch Networked: IV.";
 			else if(iReturn == 2)
-				ShowMessageBox("Failed to create remote thread in remote process. Cannot launch Networked: IV.");
+				strError = "Failed to create remote thread in remote process. Cannot launch Networked: IV.";
 			else if(iReturn == 3)
-				ShowMessageBox("Failed to open the remote process, Cannot launch Networked: IV.");
+				strError = "Failed to open the remote process, Cannot launch Networked: IV.";
 
+			ShowMessageBox(strError.Get());
 			return FALSE;
 		}
 

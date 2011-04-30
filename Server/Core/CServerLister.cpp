@@ -31,6 +31,7 @@ CServerLister::CServerLister(unsigned short usPort)
 	m_strUpdatePath.Format(SERVER_LIST_PATH, usPort);
 
 	m_bWaitingForData = false;
+	m_bSentFailedMessage = false;
 	m_bSentListedMessage = false;
 	m_bSentBannedMessage = false;
 }
@@ -50,14 +51,20 @@ void CServerLister::Process()
 	if((ulTime - m_ulLastUpdate) >= SERVER_LIST_TIMEOUT)
 	{
 		// Is this the first post?
-		if(!m_bSentListedMessage && !m_bSentBannedMessage)
+		if(!m_bSentListedMessage && !m_bSentBannedMessage && !m_bSentFailedMessage)
 			CLogFile::Printf("Posting server to server list.\n");
 
 		// Post the update
 		if(m_pHttpClient->Post(true, m_strUpdatePath))
 			m_bWaitingForData = true;
 		else
-			CLogFile::Printf("Failed to post server to server list (%s)!\n", m_pHttpClient->GetLastErrorString().C_String());
+		{
+			if(!m_bSentFailedMessage)
+			{
+				CLogFile::Printf("Failed to post server to server list (%s)!\n", m_pHttpClient->GetLastErrorString().C_String());
+				m_bSentFailedMessage = true;
+			}
+		}
 
 		// Set the last update time
 		m_ulLastUpdate = ulTime;
@@ -81,6 +88,9 @@ void CServerLister::Process()
 					m_bSentListedMessage = true;
 				}
 
+				if(m_bSentFailedMessage)
+					m_bSentFailedMessage = false;
+
 				if(m_bSentBannedMessage)
 					m_bSentBannedMessage = false;
 			}
@@ -92,6 +102,9 @@ void CServerLister::Process()
 					CLogFile::Printf("Failed to post server to server list (You are banned from listing your server)!\n");
 					m_bSentBannedMessage = true;
 				}
+
+				if(m_bSentFailedMessage)
+					m_bSentFailedMessage = false;
 
 				if(m_bSentListedMessage)
 					m_bSentListedMessage = false;

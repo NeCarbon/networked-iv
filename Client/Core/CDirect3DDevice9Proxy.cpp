@@ -142,7 +142,6 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Reset(D3DPRESENT_PARAMETERS * p
 
 	// Call the reset device client event
 	g_pClient->OnD3DResetDevice(m_pD3DDevice);
-
 	return hResult;
 }
 

@@ -40,10 +40,10 @@ void CIVEntity::SetMatrix(Matrix * matMatrix)
 {
 	if(m_pEntity && m_pEntity->m_pMatrix)
 	{
-		memcpy(&m_pEntity->m_pMatrix->vecRight, &matMatrix->vecRight, sizeof(Vector3));
-		memcpy(&m_pEntity->m_pMatrix->vecFront, &matMatrix->vecFront, sizeof(Vector3));
-		memcpy(&m_pEntity->m_pMatrix->vecUp, &matMatrix->vecUp, sizeof(Vector3));
-		memcpy(&m_pEntity->m_pMatrix->vecPosition, &matMatrix->vecPosition, sizeof(Vector3));
+		memcpy(&m_pEntity->m_pMatrix->vecRight, &matMatrix->vecRight, sizeof(CVector3));
+		memcpy(&m_pEntity->m_pMatrix->vecFront, &matMatrix->vecFront, sizeof(CVector3));
+		memcpy(&m_pEntity->m_pMatrix->vecUp, &matMatrix->vecUp, sizeof(CVector3));
+		memcpy(&m_pEntity->m_pMatrix->vecPosition, &matMatrix->vecPosition, sizeof(CVector3));
 	}
 }
 
@@ -51,57 +51,57 @@ void CIVEntity::GetMatrix(Matrix * matMatrix)
 {
 	if(m_pEntity && m_pEntity->m_pMatrix)
 	{
-		memcpy(&matMatrix->vecRight, &m_pEntity->m_pMatrix->vecRight, sizeof(Vector3));
-		memcpy(&matMatrix->vecFront, &m_pEntity->m_pMatrix->vecFront, sizeof(Vector3));
-		memcpy(&matMatrix->vecUp, &m_pEntity->m_pMatrix->vecUp, sizeof(Vector3));
-		memcpy(&matMatrix->vecPosition, &m_pEntity->m_pMatrix->vecPosition, sizeof(Vector3));
+		memcpy(&matMatrix->vecRight, &m_pEntity->m_pMatrix->vecRight, sizeof(CVector3));
+		memcpy(&matMatrix->vecFront, &m_pEntity->m_pMatrix->vecFront, sizeof(CVector3));
+		memcpy(&matMatrix->vecUp, &m_pEntity->m_pMatrix->vecUp, sizeof(CVector3));
+		memcpy(&matMatrix->vecPosition, &m_pEntity->m_pMatrix->vecPosition, sizeof(CVector3));
 	}
 }
 
-void CIVEntity::SetPosition(Vector3 * vecPosition)
+void CIVEntity::SetPosition(CVector3 * vecPosition)
 {
 	if(m_pEntity)
 	{
 		if(m_pEntity->m_pMatrix)
-			memcpy(&m_pEntity->m_pMatrix->vecPosition, vecPosition, sizeof(Vector3));
+			memcpy(&m_pEntity->m_pMatrix->vecPosition, vecPosition, sizeof(CVector3));
 		else
-			memcpy(&m_pEntity->m_vecPosition, vecPosition, sizeof(Vector3));
+			memcpy(&m_pEntity->m_vecPosition, vecPosition, sizeof(CVector3));
 	}
 }
 
-void CIVEntity::GetPosition(Vector3 * vecPosition)
+void CIVEntity::GetPosition(CVector3 * vecPosition)
 {
 	if(m_pEntity)
 	{
 		if(m_pEntity->m_pMatrix)
-			memcpy(vecPosition, &m_pEntity->m_pMatrix->vecPosition, sizeof(Vector3));
+			memcpy(vecPosition, &m_pEntity->m_pMatrix->vecPosition, sizeof(CVector3));
 		else
-			memcpy(vecPosition, &m_pEntity->m_vecPosition, sizeof(Vector3));
+			memcpy(vecPosition, &m_pEntity->m_vecPosition, sizeof(CVector3));
 	}
 }
 
-void CIVEntity::SetRoll(Vector3 * vecRoll)
+void CIVEntity::SetRoll(CVector3 * vecRoll)
 {
 	if(m_pEntity && m_pEntity->m_pMatrix)
-			memcpy(&m_pEntity->m_pMatrix->vecRight, vecRoll, sizeof(Vector3));
+			memcpy(&m_pEntity->m_pMatrix->vecRight, vecRoll, sizeof(CVector3));
 }
 
-void CIVEntity::GetRoll(Vector3 * vecRoll)
+void CIVEntity::GetRoll(CVector3 * vecRoll)
 {
 	if(m_pEntity && m_pEntity->m_pMatrix)
-		memcpy(vecRoll, &m_pEntity->m_pMatrix->vecRight, sizeof(Vector3));
+		memcpy(vecRoll, &m_pEntity->m_pMatrix->vecRight, sizeof(CVector3));
 }
 
-void CIVEntity::SetDirection(Vector3 * vecDirection)
+void CIVEntity::SetDirection(CVector3 * vecDirection)
 {
 	if(m_pEntity && m_pEntity->m_pMatrix)
-		memcpy(&m_pEntity->m_pMatrix->vecFront, vecDirection, sizeof(Vector3));
+		memcpy(&m_pEntity->m_pMatrix->vecFront, vecDirection, sizeof(CVector3));
 }
 
-void CIVEntity::GetDirection(Vector3 * vecDirection)
+void CIVEntity::GetDirection(CVector3 * vecDirection)
 {
 	if(m_pEntity && m_pEntity->m_pMatrix)
-		memcpy(vecDirection, &m_pEntity->m_pMatrix->vecFront, sizeof(Vector3));
+		memcpy(vecDirection, &m_pEntity->m_pMatrix->vecFront, sizeof(CVector3));
 }
 
 void CIVEntity::SetModelIndex(WORD wModelIndex)

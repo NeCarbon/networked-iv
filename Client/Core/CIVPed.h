@@ -11,6 +11,9 @@
 
 #include <StdInc.h>
 
+#define FUNC_CPed__SetDucking 0x8A70C0
+#define FUNC_CPed__IsDucking 0x89C780
+
 enum ePedType
 {
 	PED_TYPE_PLAYER,
@@ -50,46 +53,6 @@ public:
 	PAD(IVPedIntelligence, pad0, 0x44);
 	IVPedTaskManager * m_pPedTaskManager;
 	// TODO: Find size
-};
-
-class IVPedWeapon
-{
-public:
-	DWORD m_dwWeaponType;          // 00-04 // TODO: Weapon type enum
-	FakeProtectedBuffer * m_pAmmo; // 04-08
-	BYTE m8;                       // 08-09 // WeaponState?
-	PAD(IVPedWeapon, pad0, 0x3);   // 09-0C
-
-	void SetAmmo(DWORD dwAmmo)
-	{
-		if(dwAmmo > 25000)
-			dwAmmo = 25000;
-
-		XLivePBufferSetDWORD(m_pAmmo, 0, dwAmmo);
-	}
-
-	DWORD GetAmmo()
-	{
-		DWORD dwAmmo;
-		XLivePBufferGetDWORD(m_pAmmo, 0, &dwAmmo);
-		return dwAmmo;
-	}
-};
-
-// From aru's GTAIV C++ ScriptHook
-enum eWeaponSlot
-{
-	WEAPON_SLOT_UNARMED,
-	WEAPON_SLOT_MELEE,
-	WEAPON_SLOT_HANDGUN,
-	WEAPON_SLOT_SHOTGUN,
-	WEAPON_SLOT_SMG,
-	WEAPON_SLOT_RIFLE,
-	WEAPON_SLOT_SNIPER,
-	WEAPON_SLOT_HEAVY,
-	WEAPON_SLOT_THROWN,
-	WEAPON_SLOT_SPECIAL,
-	WEAPON_SLOT_MAX
 };
 
 class IVPedWeapons
@@ -184,6 +147,12 @@ public:
 	void           SetPlayerInfo(IVPlayerInfo * pPlayerInfo);
 	IVPlayerInfo * GetPlayerInfo();
 	bool           IsInVehicle();
+	void           SetCurrentHeading(float fCurrentHeading);
+	float          GetCurrentHeading();
+	void           SetDesiredHeading(float fDesiredHeading);
+	float          GetDesiredHeading();
 	void           SetCurrentVehicle(IVVehicle * pVehicle);
 	IVVehicle *    GetCurrentVehicle();
+	void           SetDucking(bool bDucking, int iUnknown = -1);
+	bool           IsDucking();
 };

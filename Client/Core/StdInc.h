@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <dinput.h>
 #include <list>
 #include <mmsystem.h>
 #include <map>
@@ -30,7 +31,9 @@
 #include <PacketIdentifiers.h>
 #include <PacketPriorities.h>
 #include <PacketReliabilities.h>
+#include <PacketChannels.h>
 #include <RPCIdentifiers.h>
+#include <CVector3.h>
 #include <CMath.h>
 #include <CNetworkPadState.h>
 #include <CNetBitStreamInterface.h>
@@ -42,7 +45,7 @@
 #include <CNetClientInterface.h>
 #include <CNetServerInterface.h>
 #include <CLibrary.h>
-#include <CNetModule.h>
+#include <CNetworkModule.h>
 #include <CLogFile.h>
 #include <CExceptionHandler.h>
 
@@ -55,6 +58,9 @@
 #include "CDirect3D9Hook.h"
 #include "CDirect3D9Proxy.h"
 #include "CDirect3DDevice9Proxy.h"
+#include "CDirectInput8Hook.h"
+#include "CDirectInput8Proxy.h"
+#include "CDirectInputDevice8Proxy.h"
 #include "CWindowSubclass.h"
 #include "CXLiveHook.h"
 #include "CFont.h"
@@ -78,13 +84,19 @@
 #include "CPools.h"
 #include "CIVWorld.h"
 #include "CIVModelInfo.h"
-#include "CGame.h"
+#include "CPatches.h"
 #include "COffsets.h"
 #include "KeySync.h"
 #include "CIVPad.h"
+#include "CStreaming.h"
+#include "CIVWeaponInfo.h"
+#include "CIVWeapon.h"
+#include "CGame.h"
 #include "CClientPadState.h"
 #include "CContextDataManager.h"
 #include "CClientTaskManager.h"
+#include "CClientInputManager.h"
+#include "IVTasks.h"
 
 // Project
 #include "CBitStream.h"
@@ -99,7 +111,11 @@
 #include "CStreamer.h"
 #include "CClientNetworkManager.h"
 #include "CClientPlayerManager.h"
+#include "CClientVehicleManager.h"
 #include "CClient.h"
+
+// IV
+#include "CIVPool.h"
 
 // Scripting
 #include <scripting/CSquirrelArguments.h>

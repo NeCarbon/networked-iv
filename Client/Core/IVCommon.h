@@ -39,7 +39,7 @@ protected:
 	DWORD m_pArgs;				  // 08-0C
 
 	unsigned int m_nDataCount;	  // 0C-10
-	Vector3 * m_pOriginalData[4]; // 10-40
+	CVector3 * m_pOriginalData[4]; // 10-40
 	Vector4 m_TemporaryData[4];	  // 40-80
 };
 

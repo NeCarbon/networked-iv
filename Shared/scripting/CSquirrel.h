@@ -22,8 +22,11 @@ public:
 	bool		LoadScript(String script);
 	bool		LoadScripts(std::list<String> scripts);
 
-	void		RegisterFunction(const char* szFunctionName, SQFUNCTION pfnFunction, int iParameterCount = -1, const char* szFunctionTemplate = NULL, bool bPushRootTable = false );
+	void		RegisterFunction(const char* szFunctionName, SQFUNCTION pfnFunction, int iParameterCount = -1, const char* szFunctionTemplate = NULL, bool bPushRootTable = false);
 	bool		Call(CEntity* pEntity, SQObjectPtr& pFunction, CSquirrelArguments* pArguments);
+
+	bool        RegisterClassStart(const char * szClassName, const char * szBaseClassName = NULL);
+	void        RegisterClassFinish();
 
 	SQVM*		GetVM();
 private:

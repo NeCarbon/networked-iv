@@ -272,5 +272,5 @@ public:
 	int          GetType();
 	const char * GetName();
 	bool         MakeAbortable(CIVPed * pPed, int iAbortPriority, void * pEvent = NULL); // TODO: CIVEvent
-	//void     SetAsPedTask(CIVPed * pPed, int iTaskPriority, bool bForceNewTask = false);
+	void         SetAsPedTask(CIVPed * pPed, int iTaskPriority, bool bForceNewTask = false);
 };

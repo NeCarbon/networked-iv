@@ -124,9 +124,7 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
 		*ppReturnedDeviceInterface = new CDirect3DDevice9Proxy(this, *ppReturnedDeviceInterface);
 	}
 	else
-	{
 		CLogFile::Printf("CDirect3D9Proxy::CreateDevice Call Failed!\n");
-	}
 
 	// Store the hwnd
 	//g_hFocusWindow = hFocusWindow;

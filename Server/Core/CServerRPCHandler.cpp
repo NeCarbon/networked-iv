@@ -10,7 +10,8 @@
 #include <StdInc.h>
 
 extern CNetworkManager * g_pNetworkManager;
-extern CPlayerManager *  g_pPlayerManager;
+extern CPlayerManager  * g_pPlayerManager;
+extern CVehicleManager * g_pVehicleManager;
 
 void CServerRPCHandler::InitialData(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
 {
@@ -45,6 +46,9 @@ void CServerRPCHandler::InitialData(CBitStreamInterface * pBitStream, CPlayerSoc
 	// Send them all current players
 	g_pPlayerManager->HandlePlayerJoin(senderSocket.playerId);
 
+	// Send them all current vehicles
+	g_pVehicleManager->HandlePlayerJoin(senderSocket.playerId);
+
 	// Spawn them for all current players
 	g_pPlayerManager->Get(senderSocket.playerId)->SpawnForWorld();
 
@@ -62,42 +66,203 @@ void CServerRPCHandler::ChatInput(CBitStreamInterface * pBitStream, CPlayerSocke
 		return;
 	}
 
-	// Read the data they sent us
-	bool bIsCommand;
-	String strInput;
+	// Get the player pointer
+	CPlayer * pPlayer = g_pPlayerManager->Get(senderSocket.playerId);
 
-	// Read if its a command or not
-	bIsCommand = pBitStream->ReadBit();
-
-	// Read the input
-	if(!pBitStream->Read(strInput))
-		return;
-
-	// Is it not a command?
-	if(!bIsCommand)
+	// Is the player pointer valid?
+	if(pPlayer)
 	{
-		// Trigger the event, if it is canceled, don't output the line to other players
-		CClientPlayer* pPlayer = g_pPlayerManager->Get(senderSocket.playerId);
-		CSquirrelArguments* pArguments = new CSquirrelArguments();
-		pArguments->push(strInput);
-		if(pPlayer && pPlayer->CallEvent("playerChat", pArguments))
+		// Read the data they sent us
+		bool bIsCommand;
+		String strInput;
+
+		// Read if its a command or not
+		bIsCommand = pBitStream->ReadBit();
+
+		// Read the input
+		if(!pBitStream->Read(strInput))
+			return;
+
+		// Prepare the event arguments
+		CSquirrelArguments arguments;
+		arguments.push(strInput);
+
+		// Is it not a command?
+		if(!bIsCommand)
 		{
-			// Construct the chat input bit stream
-			CBitStream bitStream;
+			// Trigger the event, if it is canceled, don't output the line to other players
+			if(pPlayer->CallEvent("playerChat", &arguments))
+			{
+				// Construct the chat input bit stream
+				CBitStream bitStream;
 
-			// Write the player id
-			bitStream.WriteCompressed(senderSocket.playerId);
+				// Write the player id
+				bitStream.WriteCompressed(senderSocket.playerId);
 
-			// Write the input
-			bitStream.Write(strInput);
+				// Write the input
+				bitStream.Write(strInput);
 
-			// Send it to all other players
-			g_pNetworkManager->RPC(RPC_CHAT_INPUT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, INVALID_ENTITY_ID, true);
+				// Send it to all other players
+				g_pNetworkManager->RPC(RPC_CHAT_INPUT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, INVALID_ENTITY_ID, true);
+			}
 		}
-		delete pArguments;
+		else
+		{
+			// Trigger the event
+			pPlayer->CallEvent("playerCommand", &arguments);
+		}
+
+		CLogFile::Printf("Recieved chat input from player %d (Command?: %s, Input: %s)\n", senderSocket.playerId, bIsCommand ? "Yes" : "No", strInput.C_String());
+	}
+}
+
+void CServerRPCHandler::VehicleEnterExit(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+{
+	CLogFile::Printf("Got VehicleEnterExit RPC from player %d\n", senderSocket.playerId);
+
+	// Ensure we have a valid bitstream
+	if(!pBitStream)
+	{
+		CLogFile::Printf("Warning: Invalid bitstream for VehicleEnterExit RPC\n");
+		return;
 	}
 
-	CLogFile::Printf("Recieved chat input from player %d (Command?: %s, Input: %s)\n", senderSocket.playerId, bIsCommand ? "Yes" : "No", strInput.C_String());
+	// Get the player pointer
+	CPlayer * pPlayer = g_pPlayerManager->Get(senderSocket.playerId);
+
+	// Is the player pointer valid?
+	if(pPlayer)
+	{
+		// Read the vehicle entry/exit type
+		BYTE byteVehicleEntryExitType;
+
+		if(!pBitStream->Read(byteVehicleEntryExitType))
+			return;
+
+		// Read the vehicle id
+		EntityId vehicleId;
+
+		if(!pBitStream->ReadCompressed(vehicleId))
+			return;
+
+		// Get the vehicle
+		CVehicle * pVehicle = g_pVehicleManager->Get(vehicleId);
+
+		// Does the vehicle not exist?
+		if(!pVehicle)
+			return;
+
+		// Is this an entry request?
+		if(byteVehicleEntryExitType == VEHICLE_ENTRY_REQUEST)
+		{
+			// Read the seat id
+			BYTE byteSeatId;
+
+			if(!pBitStream->Read(byteSeatId))
+				return;
+
+			// Get the reply
+			CSquirrelArguments arguments;
+			arguments.push(vehicleId);
+			arguments.push(byteSeatId);
+			bool bReply = pPlayer->CallEvent("vehicleEntryRequest", &arguments);
+
+			// Reply to the vehicle entry request
+			CBitStream bitStream;
+			bitStream.WriteCompressed(senderSocket.playerId);
+			bitStream.WriteBit(bReply);
+
+			// Was the reply ok?
+			if(bReply)
+			{
+				bitStream.Write((BYTE)VEHICLE_ENTRY_RETURN);
+				bitStream.Write(vehicleId);
+				bitStream.Write(byteSeatId);
+				g_pNetworkManager->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, INVALID_ENTITY_ID, true);
+			}
+		}
+		// Is this an entry cancellation?
+		if(byteVehicleEntryExitType == VEHICLE_ENTRY_CANCELLED)
+		{
+			// Read the seat id
+			BYTE byteSeatId;
+
+			if(!pBitStream->Read(byteSeatId))
+				return;
+
+			// Call the event
+			CSquirrelArguments arguments;
+			arguments.push(vehicleId);
+			arguments.push(byteSeatId);
+			pPlayer->CallEvent("vehicleEntryCancelled", &arguments);
+
+			CBitStream bitStream;
+			bitStream.WriteCompressed(senderSocket.playerId);
+			bitStream.WriteBit(true);
+			bitStream.Write((BYTE)VEHICLE_ENTRY_CANCELLED);
+			bitStream.Write(vehicleId);
+			g_pNetworkManager->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, senderSocket.playerId, true);
+		}
+		// Is this an entry completion?
+		else if(byteVehicleEntryExitType == VEHICLE_ENTRY_COMPLETE)
+		{
+			// Read the seat id
+			BYTE byteSeatId;
+
+			if(!pBitStream->Read(byteSeatId))
+				return;
+
+			// Call the event
+			CSquirrelArguments arguments;
+			arguments.push(vehicleId);
+			arguments.push(byteSeatId);
+			pPlayer->CallEvent("vehicleEntryComplete", &arguments);
+
+			// Set the player vehicle and seat id
+			pPlayer->SetVehicle(pVehicle);
+			pPlayer->SetVehicleSeatId(byteSeatId);
+
+			// Set the vehicle occupant
+			pVehicle->SetOccupant(byteSeatId, pPlayer);
+		}
+		// Is this an exit request?
+		else if(byteVehicleEntryExitType == VEHICLE_EXIT_REQUEST)
+		{
+			// Get the reply
+			CSquirrelArguments arguments;
+			arguments.push(vehicleId);
+			bool bReply = pPlayer->CallEvent("vehicleExitRequest", &arguments);
+
+			// Reply to the vehicle exit request
+			CBitStream bitStream;
+			bitStream.WriteCompressed(senderSocket.playerId);
+			bitStream.WriteBit(bReply);
+
+			// Was the reply ok?
+			if(bReply)
+			{
+				bitStream.Write((BYTE)VEHICLE_EXIT_RETURN);
+				bitStream.Write(vehicleId);
+				g_pNetworkManager->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, INVALID_ENTITY_ID, true);
+			}
+		}
+		// Is this an exit completion?
+		else if(byteVehicleEntryExitType == VEHICLE_EXIT_COMPLETE)
+		{
+			// Call the event
+			CSquirrelArguments arguments;
+			arguments.push(vehicleId);
+			arguments.push(pPlayer->GetVehicleSeatId());
+			pPlayer->CallEvent("vehicleExitComplete", &arguments);
+
+			// Reset the vehicle occupant
+			pVehicle->SetOccupant(pPlayer->GetVehicleSeatId(), NULL);
+
+			// Reset the player vehicle and seat id
+			pPlayer->SetVehicle(NULL);
+			pPlayer->SetVehicleSeatId(0);
+		}
+	}
 }
 
 void CServerRPCHandler::PlayerSync(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
@@ -110,61 +275,19 @@ void CServerRPCHandler::PlayerSync(CBitStreamInterface * pBitStream, CPlayerSock
 	}
 
 	// Get the player pointer
-	CClientPlayer * pPlayer = g_pPlayerManager->Get(senderSocket.playerId);
+	CPlayer * pPlayer = g_pPlayerManager->Get(senderSocket.playerId);
 
 	// Is the player pointer valid?
 	if(pPlayer)
 	{
-		// Read the player net pad state
-		CNetworkPadState netPadState;
-
-		if(!pBitStream->Read(netPadState))
-			return;
-
-		// Read the player position
-		Vector3 vecPosition;
-
-		if(!pBitStream->Read(vecPosition))
-			return;
-
-		// Read the player rotation
-		Vector3 vecRotation;
-
-		if(!pBitStream->Read(vecRotation))
-			return;
-
-		// Read the player move speed
-		Vector3 vecMoveSpeed;
-
-		if(!pBitStream->Read(vecMoveSpeed))
-			return;
-
-		// Read the player turn speed
-		Vector3 vecTurnSpeed;
-
-		if(!pBitStream->Read(vecTurnSpeed))
-			return;
+		// Deserialize the player from the bit stream
+		//pPlayer->Deserialize(pBitStream); // TODO
 
 		// Construct the bit stream
 		CBitStream bitStream;
-
-		// Write the player id
-		bitStream.WriteCompressed(senderSocket.playerId);
-
-		// Write the player net pad state
-		bitStream.Write(netPadState);
-
-		// Write the player position
-		bitStream.Write(vecPosition);
-
-		// Write the player rotation
-		bitStream.Write(vecRotation);
-
-		// Write the player move speed
-		bitStream.Write(vecMoveSpeed);
-
-		// Write the player turn speed
-		bitStream.Write(vecTurnSpeed);
+		bitStream.WriteCompressed(pPlayer->GetPlayerId());
+		// TODO: CBitStream::Write(CBitStreamInterface * pBitStream) that uses the code below
+		bitStream.Write((char *)pBitStream->GetData(), pBitStream->GetNumberOfBytesUsed());
 
 		// Send it to all other players
 		g_pNetworkManager->RPC(RPC_PLAYER_SYNC, &bitStream, PRIORITY_LOW, RELIABILITY_UNRELIABLE_SEQUENCED, senderSocket.playerId, true);
@@ -176,6 +299,7 @@ void CServerRPCHandler::Register()
 	CLogFile::Printf("Registering server RPCs\n");
 	AddFunction(RPC_INITIAL_DATA, InitialData);
 	AddFunction(RPC_CHAT_INPUT, ChatInput);
+	AddFunction(RPC_VEHICLE_ENTER_EXIT, VehicleEnterExit);
 	AddFunction(RPC_PLAYER_SYNC, PlayerSync);
 	CLogFile::Printf("Server RPCs registered\n");
 }
@@ -185,6 +309,7 @@ void CServerRPCHandler::Unregister()
 	CLogFile::Printf("Unregistering server RPCs\n");
 	RemoveFunction(RPC_INITIAL_DATA);
 	RemoveFunction(RPC_CHAT_INPUT);
+	RemoveFunction(RPC_VEHICLE_ENTER_EXIT);
 	RemoveFunction(RPC_PLAYER_SYNC);
 	CLogFile::Printf("Server RPCs unregistered\n");
 }

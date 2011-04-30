@@ -1,6 +1,6 @@
 //============== Networked: IV - http://code.networked-iv.com ==============
 //
-// File: CNetModule.h
+// File: CNetworkModule.h
 // Project: Shared
 // Author(s): jenksta
 // License: See LICENSE in root directory
@@ -13,15 +13,15 @@
 
 typedef bool                     (* VerifyVersion_t)(BYTE byteVersion);
 typedef CNetServerInterface *    (* GetNetServerInterface_t)();
-typedef void                     (* DestroyNetServerInterface_t)(CNetServerInterface * pRakServer);
+typedef void                     (* DestroyNetServerInterface_t)(CNetServerInterface * pNetServer);
 typedef CNetClientInterface *    (* GetNetClientInterface_t)();
-typedef void                     (* DestroyNetClientInterface_t)(CNetClientInterface * pRakClient);
+typedef void                     (* DestroyNetClientInterface_t)(CNetClientInterface * pNetClient);
 typedef CNetBitStreamInterface * (* GetBitStreamInterface1_t)();
 typedef CNetBitStreamInterface * (* GetBitStreamInterface2_t)(const unsigned int initialBytesToAllocate);
 typedef CNetBitStreamInterface * (* GetBitStreamInterface3_t)(unsigned char* _data, const unsigned int lengthInBytes, bool _copyData);
 typedef void                     (* DestroyBitStreamInterface_t)(CNetBitStreamInterface * pBitStream);
 
-class CNetModule
+class CNetworkModule
 {
 private:
 	static CLibrary *                  m_pLibrary;
@@ -35,8 +35,8 @@ private:
 	static DestroyBitStreamInterface_t m_pfnDestroyBitStreamInterface;
 
 public:
-	CNetModule();
-	~CNetModule();
+	CNetworkModule();
+	~CNetworkModule();
 
 	static bool                     Init();
 	static void                     Shutdown();

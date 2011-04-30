@@ -42,7 +42,7 @@ CClientPlayerManager::~CClientPlayerManager()
 	SAFE_DELETE(m_pLocalPlayer);
 }
 
-bool CClientPlayerManager::Add(EntityId playerId, String strName)
+CClientPlayer * CClientPlayerManager::Add(EntityId playerId, String strName)
 {
 	// Is this player already added?
 	if(IsActive(playerId))
@@ -59,10 +59,10 @@ bool CClientPlayerManager::Add(EntityId playerId, String strName)
 
 		// Set the players name
 		m_pNetworkPlayers[playerId]->SetPlayerName(strName);
-		return true;
+		return m_pNetworkPlayers[playerId];
 	}
 
-	return false;
+	return NULL;
 }
 
 bool CClientPlayerManager::Delete(EntityId playerId)
@@ -88,8 +88,8 @@ void CClientPlayerManager::Process()
 	// Loop through all players
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
 	{
-		// Is the current player active?
-		if(IsActive(i) && !m_pNetworkPlayers[i]->IsLocalPlayer())
+		// Is this network player pointer valid and not the local player?
+		if(m_pNetworkPlayers[i] && !m_pNetworkPlayers[i]->IsLocalPlayer())
 		{
 			// Process the current player
 			m_pNetworkPlayers[i]->Process();
@@ -117,20 +117,20 @@ CClientPlayer * CClientPlayerManager::Get(EntityId playerId)
 
 EntityId CClientPlayerManager::GetCount()
 {
-	EntityId count = 0;
+	EntityId playerCount = 0;
 
 	// Loop through all players
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
 	{
-		// Is the current player active?
-		if(IsActive(i))
+		// Is this network player pointer valid?
+		if(m_pNetworkPlayers[i])
 		{
 			// Increment the player count
-			count++;
+			playerCount++;
 		}
 	}
 
-	return count;
+	return playerCount;
 }
 
 void CClientPlayerManager::SetLocalPlayerId(EntityId localPlayerId)

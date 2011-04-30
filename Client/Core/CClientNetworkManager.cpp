@@ -14,7 +14,7 @@ extern CClient * g_pClient;
 CClientNetworkManager::CClientNetworkManager()
 {
 	// Create the net client instance
-	m_pNetClient = CNetModule::GetNetClientInterface();
+	m_pNetClient = CNetworkModule::GetNetClientInterface();
 
 	// Set the net client packet handler function
 	m_pNetClient->SetPacketHandler(PacketHandler);
@@ -46,7 +46,7 @@ CClientNetworkManager::~CClientNetworkManager()
 	m_pNetClient->Shutdown(0);
 
 	// Destroy the net client instance
-	CNetModule::DestroyNetClientInterface(m_pNetClient);
+	CNetworkModule::DestroyNetClientInterface(m_pNetClient);
 }
 
 void CClientNetworkManager::Startup(String strHost, unsigned short usPort, String strPassword)
@@ -115,48 +115,17 @@ void CClientNetworkManager::ProcessSync(CClientPlayer * pPlayer)
 		// Get the current time
 		unsigned long ulCurrentTime = SharedUtility::GetTime();
 
-		// Is a full sync needed (It has been NETWORK_TICK_RATE or more ms since our
-		// last full sync)?
+		// Is a full sync needed?
 		if((ulCurrentTime - m_ulLastFullSyncTime) >= NETWORK_TICK_RATE)
 		{
-			// Are we in a vehicle?
-			if(pPlayer->IsInVehicle())
-			{
-				
-			}
-			else
-			{
-				// Construct the bit stream
-				CBitStream bitStream;
+			// Construct the bit stream
+			CBitStream bitStream;
 
-				// Write the player net pad state
-				CNetworkPadState netPadState;
-				pPlayer->GetNetPadState(netPadState);
-				bitStream.Write(netPadState);
+			// Serialize the player to the bit stream
+			pPlayer->Serialize(&bitStream);
 
-				// Write the player position
-				Vector3 vecPosition;
-				pPlayer->GetPosition(vecPosition);
-				bitStream.Write(vecPosition);
-
-				// Write the player rotation
-				Vector3 vecRotation;
-				pPlayer->GetRotation(vecRotation);
-				bitStream.Write(vecRotation);
-
-				// Write the player move speed
-				Vector3 vecMoveSpeed;
-				pPlayer->GetMoveSpeed(vecMoveSpeed);
-				bitStream.Write(vecMoveSpeed);
-
-				// Write the player turn speed
-				Vector3 vecTurnSpeed;
-				pPlayer->GetTurnSpeed(vecTurnSpeed);
-				bitStream.Write(vecTurnSpeed);
-
-				// Send the packet
-				g_pClient->GetNetworkManager()->RPC(RPC_PLAYER_SYNC, &bitStream, PRIORITY_LOW, RELIABILITY_UNRELIABLE_SEQUENCED);
-			}
+			// Send the packet
+			g_pClient->GetNetworkManager()->RPC(RPC_PLAYER_SYNC, &bitStream, PRIORITY_LOW, RELIABILITY_UNRELIABLE_SEQUENCED);
 
 			// Update the last full sync time
 			m_ulLastFullSyncTime = ulCurrentTime;

@@ -2,7 +2,8 @@
 //
 // File: CServer.cpp
 // Project: Server
-// Author(s): jenksta, mabako
+// Author(s): jenksta
+//            mabako
 // License: See LICENSE in root directory
 //
 //==========================================================================
@@ -11,19 +12,70 @@
 
 #define SERVER_TITLE MOD_NAME " v" MOD_VERSION_STRING " Server [" MOD_OS_STRING "]"
 
-CConfig *          g_pConfig = NULL;
-CNetworkManager *  g_pNetworkManager = NULL;
-CPlayerManager *   g_pPlayerManager = NULL;
-CRootEntity *      g_pRootEntity = NULL;
+CConfig          * g_pConfig = NULL;
+CNetworkManager  * g_pNetworkManager = NULL;
+CPlayerManager   * g_pPlayerManager = NULL;
+CVehicleManager  * g_pVehicleManager = NULL;
+CRootEntity      * g_pRootEntity = NULL;
 CResourceManager * g_pResourceManager = NULL;
 
 CServer::CServer()
 {
+#if 0
+	//RakNet::BitStream
+	CBuffer buffer;
+	int iWrite = 5;
+	printf("Writing an integer (%d) to the buffer\n", iWrite);
+	buffer.Write(iWrite);
+	printf("Done\n");
+	printf("Reading an integer from the buffer\n");
+	int iRead = 0;
+	bool bRead = buffer.Read(iRead);
+	if(bRead)
+		printf("Done (Read %d, should be %d)\n", iRead, iWrite);
+	else
+		printf("Failed\n");
+	float fWrite = 3.0f;
+	printf("Writing a float (%f) to the buffer\n", fWrite);
+	buffer.Write((char)1);
+	buffer.Write(fWrite);
+	buffer.Write((long)3);
+	buffer.Write((short)7);
+	printf("Done\n");
+	printf("Reading a float from the buffer\n");
+	float fRead = 0.0f;
+	char cValue;
+	buffer.Read(cValue);
+	bRead = buffer.Read(fRead);
+	long lValue;
+	buffer.Read(lValue);
+	short sValue;
+	buffer.Read(sValue);
+	if(bRead)
+		printf("Done (Read %f, should be %f)\n", fRead, fWrite);
+	else
+		printf("Failed\n");
+	printf("Result (%d, %f, %d, %d)\n", cValue, fWrite, lValue, sValue);
+	buffer.Write((double)5.0);
+	buffer.Write((long)8);
+	buffer.Write((short)9);
+	buffer.Write("Hello World", sizeof("Hello World"));
+	buffer.Write((float)4.0f);
+	buffer.Write((bool)false);
+	double dValue;
+	buffer.Read(dValue);
+	buffer.Read(lValue);
+	buffer.Read(sValue);
+	char szBuf[12];
+	buffer.Read(szBuf, sizeof("Hello World"));
+	printf("szBuf[%s]\n", szBuf);
+#endif
+	//DoVirtualFileSystemTest();
 	m_bActive = true;
 	m_bShowFPS = true;
-	m_dwLastFPSUpdateTickCount = 0;
-	m_dwFrameCount = 0;
-	m_dwFramesPerSecond = 0;
+	m_ulLastFPSUpdateTime = 0;
+	m_ulFrameCount = 0;
+	m_ulFramesPerSecond = 0;
 }
 
 CServer::~CServer()
@@ -59,7 +111,7 @@ bool CServer::OnLoad()
 		CLogFile::Printf("Config file opened\n");
 
 	// Initialize the net module
-	if(!CNetModule::Init())
+	if(!CNetworkModule::Init())
 	{
 		CLogFile::Printf("Failed to initialize the net module!\n");
 		return false;
@@ -87,6 +139,16 @@ bool CServer::OnLoad()
 	}
 
 	CLogFile::Printf("Player manager instance created\n");
+
+	// Create the vehicle manager instance
+	g_pVehicleManager = new CVehicleManager();
+
+	if(!g_pVehicleManager)
+	{
+		CLogFile::Printf("Failed to create vehicle manager instance!\n");
+	}
+
+	CLogFile::Printf("Vehicle manager instance created\n");
 
 	// Get server port
 	int iServerPort = GetConfigInteger("port", 9999);
@@ -143,54 +205,67 @@ bool CServer::OnLoad()
 
 	CLogFile::Printf("Server started on port %d\n", iServerPort);
 
+	// Temporary code
+	CVehicle * pVehicle = g_pVehicleManager->Add(174);
+	pVehicle->SetPosition(CVector3(-341.36f, 1144.80f, 14.79f));
+	pVehicle->SetRotation(CVector3(0.0f, 0.0f, 40.114815f));
+	pVehicle->SpawnForWorld();
 	return true;
 }
 
 void CServer::Process()
 {
 	// Get the current tick count
-	DWORD dwTickCount = GetTickCount();
+	unsigned long ulTime = SharedUtility::GetTime();
 
 	// Is show fps enabled?
 	if(m_bShowFPS)
 	{
 		// Get the amount of time elapsed since the last fps update
-		DWORD dwTimeElapsed = (dwTickCount - m_dwLastFPSUpdateTickCount);
+		unsigned long ulTimeElapsed = (ulTime - m_ulLastFPSUpdateTime);
 
 		// Update the fps if a second or more has passed
-		if(dwTimeElapsed >= 1000)
+		if(ulTimeElapsed >= 1000)
 		{
 			// Set the fps
-			m_dwFramesPerSecond = m_dwFrameCount;
+			m_ulFramesPerSecond = m_ulFrameCount;
 
 			// Set the server title
 #ifdef WIN32
-			String strTitle(SERVER_TITLE " - FPS: %d", m_dwFramesPerSecond);
+			String strTitle(SERVER_TITLE " - FPS: %d", m_ulFramesPerSecond);
 			SetTitle(strTitle.C_String());
 #endif
 
 			// Reset the frame count
-			m_dwFrameCount = 0;
+			m_ulFrameCount = 0;
 
 			// Set the last fps update tick count
-			m_dwLastFPSUpdateTickCount = dwTickCount;
+			m_ulLastFPSUpdateTime = ulTime;
 		}
 
 		// Increment the frame count
-		m_dwFrameCount++;
+		m_ulFrameCount++;
 	}
 
 	// Process the network manager
 	g_pNetworkManager->Process();
 
 	// Process the resource manager
-	g_pResourceManager->Process(dwTickCount);
+	g_pResourceManager->Process(ulTime);
 
 	// Process the server lister
 	m_pServerLister->Process();
 
 	// Process the input queue
 	ProcessInputQueue();
+
+	/*if(GetAsyncKeyState(VK_F1) & 1)
+	{
+		MemoryInfo memoryInfo;
+		GetMemoryInformation(memoryInfo);
+#define BTOMB(bytes) (((bytes) / 1024) / 1024)
+		printf("Total memory %dmb, avaiable memory %dmb, used memory %d, process used memory %dmb\n", BTOMB(memoryInfo.ulPhysicalTotalMemory), BTOMB(memoryInfo.ulPhysicalAvaliableMemory), BTOMB(memoryInfo.ulPhysicalUsedMemory), BTOMB(memoryInfo.ulProcessUsedMemory));
+	}*/
 }
 
 void CServer::OnUnload()
@@ -206,6 +281,9 @@ void CServer::OnUnload()
 	// Delete the scripting manager
 	SAFE_DELETE(g_pRootEntity);
 
+	// Delete the vehicle manager instance
+	SAFE_DELETE(g_pVehicleManager);
+
 	// Delete the player manager instance
 	SAFE_DELETE(g_pPlayerManager);
 
@@ -213,7 +291,7 @@ void CServer::OnUnload()
 	SAFE_DELETE(g_pNetworkManager);
 
 	// Shutdown the net module
-	CNetModule::Shutdown();
+	CNetworkModule::Shutdown();
 
 	// Delete the config instance
 	SAFE_DELETE(g_pConfig);

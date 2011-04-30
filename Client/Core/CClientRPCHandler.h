@@ -19,7 +19,10 @@ private:
 	static void DeletePlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
 	static void SpawnPlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
 	static void DestroyPlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+	static void SpawnVehicle(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+	static void DestroyVehicle(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
 	static void ChatInput(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+	static void VehicleEnterExit(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
 	static void PlayerSync(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
 
 public:

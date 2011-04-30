@@ -70,6 +70,6 @@ public:
 	bool IsJumping() const { return (keys.bJump); }
 	bool IsUsingHandbrake() { return (keys.bHandbrake || keys.bHandbrake2); }
 	bool IsUsingEnterExitVehicle() { return (keys.bEnterExitVehicle); }
-	void Write(CNetBitStreamInterface * pBitStream) const;
-	bool Read(CNetBitStreamInterface * pBitStream);
+	void Serialize(CNetBitStreamInterface * pBitStream) const;
+	bool Deserialize(CNetBitStreamInterface * pBitStream);
 };

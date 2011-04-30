@@ -48,7 +48,7 @@ public:
 	// 0x140 - BYTE m_byteAttachedToEntity;
 	// 0x150 - IVEntity * m_pCollidedEntity;
 	// 0x1AA - BYTE m_byteHasDamageEntity;
-	// 0x1C0 - Vector3 vecAttachedOffset;
+	// 0x1C0 - CVector3 vecAttachedOffset;
 	// 0x1D0 - Quaternion quatAttachedOffset;
 	IVEntity * m_pLastDamageEntity; // 1E4-1E8
 	PAD(IVPhysical, pad1, 0x4);     // 1E8-1EC
@@ -67,10 +67,10 @@ public:
 	void         SetPhysical(IVPhysical * pPhysical);
 	IVPhysical * GetPhysical();
 
-	void         SetMoveSpeed(Vector3 * vecMoveSpeed);
-	void         GetMoveSpeed(Vector3 * vecMoveSpeed);
-	void         SetTurnSpeed(Vector3 * vecTurnSpeed);
-	void         GetTurnSpeed(Vector3 * vecTurnSpeed);
+	void         SetMoveSpeed(CVector3 * vecMoveSpeed);
+	void         GetMoveSpeed(CVector3 * vecMoveSpeed);
+	void         SetTurnSpeed(CVector3 * vecTurnSpeed);
+	void         GetTurnSpeed(CVector3 * vecTurnSpeed);
 	void         SetLastDamageEntity(IVEntity * pLastDamageEntity);
 	IVEntity *   GetLastDamageEntity();
 	void         SetHealth(float fHealth);

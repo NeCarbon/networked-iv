@@ -46,5 +46,8 @@ enum ePacketIdentfiers
 	PACKET_PASSWORD_INVALID,
 
 	// Remote procedure call
-	PACKET_RPC
+	PACKET_RPC,
+
+	// Number of packet identifiers
+	PACKET_COUNT
 };

@@ -38,6 +38,7 @@
 
 // Shared
 #include <Common.h>
+#include <CString.h>
 #include <SharedUtility.h>
 
 #if defined _M_IX86

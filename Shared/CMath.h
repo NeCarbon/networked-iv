@@ -33,10 +33,26 @@ static float ConvertRadiansToDegrees(float fRotation)
 	return WrapAround((float)(fRotation * 180.0f / PI + 360.0f), 360.0f);
 }
 
+static CVector3 ConvertRadiansToDegrees(CVector3& vecRotation)
+{
+	vecRotation.fX = ConvertRadiansToDegrees(vecRotation.fX);
+	vecRotation.fY = ConvertRadiansToDegrees(vecRotation.fY);
+	vecRotation.fZ = ConvertRadiansToDegrees(vecRotation.fZ);
+	return vecRotation;
+}
+
 // From Multi Theft Auto
 static float ConvertDegreesToRadians(float fRotation)
 {
 	return WrapAround((float)(fRotation * PI / 180.0f + 2 * PI), (float)(2 * PI));
+}
+
+static CVector3 ConvertDegreesToRadians(CVector3& vecRotation)
+{
+	vecRotation.fX = ConvertDegreesToRadians(vecRotation.fX);
+	vecRotation.fY = ConvertDegreesToRadians(vecRotation.fY);
+	vecRotation.fZ = ConvertDegreesToRadians(vecRotation.fZ);
+	return vecRotation;
 }
 
 // From Multi Theft Auto
@@ -88,134 +104,6 @@ static float GetDistanceBetweenPoints3D(float x, float y, float z, float xx, flo
 }
 
 // TODO: Class'ify in its own file
-class Vector3
-{
-public:
-	float fX;
-	float fY;
-	float fZ;
-
-	Vector3()
-	{
-		fX = fY = fZ = 0.0f;
-	}
-
-	Vector3(float _fX, float _fY, float _fZ)
-	{
-		fX = _fX; fY = _fY; fZ = _fZ;
-	}
-
-	bool IsEmpty() const
-	{
-		return (fX == 0 && fY == 0 && fZ == 0);
-	}
-
-	float Length() const
-	{
-		return sqrt((fX * fX) + (fY * fY) + (fZ * fZ));
-	}
-
-	Vector3 ToRadians()
-	{
-		return Vector3(ConvertDegreesToRadians(fX), ConvertDegreesToRadians(fY), ConvertDegreesToRadians(fZ));
-	}
-
-	Vector3 ToDegrees()
-	{
-		return Vector3(ConvertRadiansToDegrees(fX), ConvertRadiansToDegrees(fY), ConvertRadiansToDegrees(fZ));
-	}
-
-	Vector3 ConvertToRadians()
-	{
-		fX = ConvertDegreesToRadians(fX);
-		fY = ConvertDegreesToRadians(fY);
-		fZ = ConvertDegreesToRadians(fZ);
-		return *this;
-	}
-
-	Vector3 ConvertToDegrees()
-	{
-		fX = ConvertRadiansToDegrees(fX);
-		fY = ConvertRadiansToDegrees(fY);
-		fZ = ConvertRadiansToDegrees(fZ);
-		return *this;
-	}
-
-	Vector3 operator+ (const Vector3& vecRight) const
-	{
-		return Vector3(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ);
-	}
-
-	Vector3 operator+ (float fRight) const
-	{
-		return Vector3(fX + fRight, fY + fRight, fZ + fRight);
-	}
-
-	Vector3 operator- (const Vector3& vecRight) const
-	{
-		return Vector3(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ);
-	}
-
-	Vector3 operator- (float fRight) const
-	{
-		return Vector3(fX - fRight, fY - fRight, fZ - fRight);
-	}
-
-	Vector3 operator* (const Vector3& vecRight) const
-	{
-		return Vector3(fX * vecRight.fX, fY * vecRight.fY, fZ * vecRight.fZ);
-	}
-
-	Vector3 operator* (float fRight) const
-	{
-		return Vector3(fX * fRight, fY * fRight, fZ * fRight);
-	}
-
-	Vector3 operator/ (const Vector3& vecRight) const
-	{
-		return Vector3(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ);
-	}
-
-	Vector3 operator/ (float fRight) const
-	{
-		return Vector3(fX / fRight, fY / fRight, fZ / fRight);
-	}
-
-	Vector3 operator - () const
-	{
-		return Vector3(-fX, -fY, -fZ);
-	}
-
-	void operator += (float fRight)
-	{
-		fX += fRight;
-		fY += fRight;
-		fZ += fRight;
-	}
-
-	void operator -= (float fRight)
-	{
-		fX -= fRight;
-		fY -= fRight;
-		fZ -= fRight;
-	}
-
-	void operator *= (float fRight)
-	{
-		fX *= fRight;
-		fY *= fRight;
-		fZ *= fRight;
-	}
-
-	void operator /= (float fRight)
-	{
-		fX /= fRight;
-		fY /= fRight;
-		fZ /= fRight;
-	}
-};
-
-// TODO: Class'ify in its own file
 class Vector4
 {
 public:
@@ -239,17 +127,17 @@ public:
 class Matrix
 {
 public:
-	Vector3 vecRight;
-	Vector3 vecFront;
-	Vector3 vecUp;
-	Vector3 vecPosition;
+	CVector3 vecRight;
+	CVector3 vecFront;
+	CVector3 vecUp;
+	CVector3 vecPosition;
 
 	Matrix()
 	{
 		Identity();
 	}
 
-	Matrix(Vector3 _vecRight, Vector3 _vecFront, Vector3 _vecUp, Vector3 _vecPosition)
+	Matrix(CVector3 _vecRight, CVector3 _vecFront, CVector3 _vecUp, CVector3 _vecPosition)
 	{
 		vecRight = _vecRight;
 		vecFront = _vecFront;
@@ -259,10 +147,10 @@ public:
 
 	void Identity()
 	{
-		vecRight = Vector3(1.0f, 0.0f, 0.0f);
-		vecFront = Vector3(0.0f, 1.0f, 0.0f);
-		vecUp = Vector3(0.0f, 0.0f, 1.0f);
-		vecPosition = Vector3(0.0f, 0.0f, 0.0f);
+		vecRight = CVector3(1.0f, 0.0f, 0.0f);
+		vecFront = CVector3(0.0f, 1.0f, 0.0f);
+		vecUp = CVector3(0.0f, 0.0f, 1.0f);
+		vecPosition = CVector3(0.0f, 0.0f, 0.0f);
 	}
 };
 
@@ -270,14 +158,14 @@ public:
 class Matrix34
 {
 public:
-	Vector3 vecRight;		// 00-0C
-	DWORD	dwPadRight;		// 0C-10
-	Vector3	vecFront;		// 10-1C
-	DWORD	dwPadFront;		// 1C-20
-	Vector3	vecUp;			// 20-2C
-	DWORD	dwPadUp;		// 2C-30
-	Vector3	vecPosition;	// 30-3C
-	DWORD	dwPadPosition;	// 3C-40
+	CVector3 vecRight;      // 00-0C
+	DWORD    dwPadRight;    // 0C-10
+	CVector3 vecFront;      // 10-1C
+	DWORD    dwPadFront;    // 1C-20
+	CVector3 vecUp;         // 20-2C
+	DWORD    dwPadUp;       // 2C-30
+	CVector3 vecPosition;   // 30-3C
+	DWORD    dwPadPosition; // 3C-40
 
 	Matrix34()
 	{
@@ -286,17 +174,17 @@ public:
 
 	void ToMatrix(Matrix * matMatrix) const
 	{
-		memcpy(&matMatrix->vecRight, &vecRight, sizeof(Vector3));
-		memcpy(&matMatrix->vecFront, &vecFront, sizeof(Vector3));
-		memcpy(&matMatrix->vecUp, &vecUp, sizeof(Vector3));
-		memcpy(&matMatrix->vecPosition, &vecPosition, sizeof(Vector3));
+		memcpy(&matMatrix->vecRight, &vecRight, sizeof(CVector3));
+		memcpy(&matMatrix->vecFront, &vecFront, sizeof(CVector3));
+		memcpy(&matMatrix->vecUp, &vecUp, sizeof(CVector3));
+		memcpy(&matMatrix->vecPosition, &vecPosition, sizeof(CVector3));
 	}
 
 	void FromMatrix(Matrix * matMatrix)
 	{
-		memcpy(&vecRight, &matMatrix->vecRight, sizeof(Vector3));
-		memcpy(&vecFront, &matMatrix->vecFront, sizeof(Vector3));
-		memcpy(&vecUp, &matMatrix->vecUp, sizeof(Vector3));
-		memcpy(&vecPosition, &matMatrix->vecPosition, sizeof(Vector3));
+		memcpy(&vecRight, &matMatrix->vecRight, sizeof(CVector3));
+		memcpy(&vecFront, &matMatrix->vecFront, sizeof(CVector3));
+		memcpy(&vecUp, &matMatrix->vecUp, sizeof(CVector3));
+		memcpy(&vecPosition, &matMatrix->vecPosition, sizeof(CVector3));
 	}
 };

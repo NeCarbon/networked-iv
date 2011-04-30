@@ -15,6 +15,10 @@ class CPlayerNatives
 {
 public:
 	static void LoadFunctions(CSquirrel* pSquirrel);
+	static int  GetId(SQVM * pVM);
 	static int  GetName(SQVM* pVM);
 	static int  GetIP(SQVM* pVM);
+	static int  IsSpawned(SQVM * pVM);
+	static int  GetVehicle(SQVM * pVM);
+	static int  GetVehicleSeatId(SQVM * pVM);
 };

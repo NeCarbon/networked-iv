@@ -33,4 +33,16 @@ public:
 		usPort = 0xFFFF;
 		strSerial.Set("0000000000000000");
 	}
+
+	EntityId       GetPlayerId() { return playerId; }
+	unsigned long  GetBinaryAdress() { return ulBinaryAddress; }
+	String         GetAddress()
+	{
+		in_addr in;
+		memset(&in, 0, sizeof(in));
+		in.s_addr = ulBinaryAddress;
+		return String(inet_ntoa(in));
+	}
+	unsigned short GetPort() { return usPort; }
+	String         GetSerial() { return strSerial; }
 };

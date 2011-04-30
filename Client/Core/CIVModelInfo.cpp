@@ -14,7 +14,6 @@ extern CClient * g_pClient;
 
 CIVModelInfo::CIVModelInfo()
 {
-	m_pModelInfo = NULL;
 	m_iModelIndex = -1;
 }
 
@@ -28,45 +27,82 @@ CIVModelInfo::~CIVModelInfo()
 	
 }
 
+IVBaseModelInfo * CIVModelInfo::GetModelInfo()
+{
+	if(m_iModelIndex >= 0 && m_iModelIndex < NUM_ModelInfos)
+		return *(IVBaseModelInfo **)((g_pClient->GetBaseAddress() + ARRAY_ModelInfos) + (m_iModelIndex * 4));
+
+	return NULL;
+}
+
 void CIVModelInfo::SetIndex(int iModelIndex)
 {
-	m_pModelInfo = g_pClient->GetGame()->GetModelInfoFromIndex(iModelIndex);
 	m_iModelIndex = iModelIndex;
 }
 
-bool CIVModelInfo::IsValid()
+BYTE CIVModelInfo::GetType()
 {
-	return (g_pClient->GetGame()->GetModelInfoFromIndex(m_iModelIndex) != NULL);
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(pModelInfo)
+	{
+		DWORD dwFunc = pModelInfo->m_VFTable->GetType;
+		BYTE byteType = 0;
+		_asm
+		{
+			mov ecx, pModelInfo
+			call dwFunc
+			mov byteType, al
+		}
+		return byteType;
+	}
+
+	return 0;
 }
 
 bool CIVModelInfo::IsLoaded()
 {
-	return g_pClient->GetGame()->HasModelLoaded(m_iModelIndex);
+	if(IsValid())
+		return g_pClient->GetGame()->GetStreaming()->HasModelLoaded(m_iModelIndex);
+
+	return false;
 }
 
 void CIVModelInfo::Load(bool bWaitForLoad)
 {
+	// Is the model invalid?
+	if(!IsValid())
+		return;
+
 	// Are we already loaded?
 	if(IsLoaded())
 		return;
 
+	CLogFile::Printf("Reference count before load is %d\n", GetReferenceCount());
+
 	// Request the model
-	g_pClient->GetGame()->RequestModel(m_iModelIndex);
+	g_pClient->GetGame()->GetStreaming()->RequestModel(m_iModelIndex);
 
 	// Do we need to wait for the model load?
 	if(bWaitForLoad)
 	{
 		// Load all requested models
-		g_pClient->GetGame()->LoadRequestedModels();
+		g_pClient->GetGame()->GetStreaming()->LoadRequestedModels();
 
 		// Loop until the model is loaded
 		while(!IsLoaded())
-			Sleep(5);
+			Sleep(10);
 	}
+
+	CLogFile::Printf("Reference count after load is %d\n", GetReferenceCount());
 }
 
 void CIVModelInfo::Unload()
 {
+	// Is the model invalid?
+	if(!IsValid())
+		return;
+
 	// Are we not already loaded?
 	if(!IsLoaded())
 		return;
@@ -76,64 +112,106 @@ void CIVModelInfo::Unload()
 
 DWORD CIVModelInfo::GetHash()
 {
-	if(m_pModelInfo)
-		return m_pModelInfo->dwHash;
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(pModelInfo)
+		return pModelInfo->dwHash;
+
+	return NULL;
+}
+
+void CIVModelInfo::AddReference()
+{
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(pModelInfo)
+		pModelInfo->dwReferenceCount++;
+}
+
+void CIVModelInfo::RemoveReference()
+{
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(pModelInfo)
+		pModelInfo->dwReferenceCount--;
+}
+
+DWORD CIVModelInfo::GetReferenceCount()
+{
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(pModelInfo)
+		return pModelInfo->dwReferenceCount;
 
 	return NULL;
 }
 
 WORD CIVModelInfo::GetAnimIndex()
 {
-	if(m_pModelInfo)
-		return m_pModelInfo->wAnimIndex;
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(pModelInfo)
+		return pModelInfo->wAnimIndex;
 
 	return NULL;
 }
 
 bool CIVModelInfo::IsAutomobile()
 {
-	if(m_pModelInfo)
-		return (m_pModelInfo->dwVehicleType == VEHICLE_TYPE_AUTOMOBILE);
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(IsVehicle() && pModelInfo)
+		return (pModelInfo->dwVehicleType == VEHICLE_TYPE_AUTOMOBILE);
 
 	return false;
 }
 
 bool CIVModelInfo::IsBike()
 {
-	if(m_pModelInfo)
-		return (m_pModelInfo->dwVehicleType == VEHICLE_TYPE_BIKE);
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(IsVehicle() && pModelInfo)
+		return (pModelInfo->dwVehicleType == VEHICLE_TYPE_BIKE);
 
 	return false;
 }
 
 bool CIVModelInfo::IsBoat()
 {
-	if(m_pModelInfo)
-		return (m_pModelInfo->dwVehicleType == VEHICLE_TYPE_BOAT);
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(IsVehicle() && pModelInfo)
+		return (pModelInfo->dwVehicleType == VEHICLE_TYPE_BOAT);
 
 	return false;
 }
 
 bool CIVModelInfo::IsTrain()
 {
-	if(m_pModelInfo)
-		return (m_pModelInfo->dwVehicleType == VEHICLE_TYPE_TRAIN);
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(IsVehicle() && pModelInfo)
+		return (pModelInfo->dwVehicleType == VEHICLE_TYPE_TRAIN);
 
 	return false;
 }
 
 bool CIVModelInfo::IsHeli()
 {
-	if(m_pModelInfo)
-		return (m_pModelInfo->dwVehicleType == VEHICLE_TYPE_HELI);
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(IsVehicle() && pModelInfo)
+		return (pModelInfo->dwVehicleType == VEHICLE_TYPE_HELI);
 
 	return false;
 }
 
 bool CIVModelInfo::IsPlane()
 {
-	if(m_pModelInfo)
-		return (m_pModelInfo->dwVehicleType == VEHICLE_TYPE_PLANE);
+	IVBaseModelInfo * pModelInfo = GetModelInfo();
+
+	if(IsVehicle() && pModelInfo)
+		return (pModelInfo->dwVehicleType == VEHICLE_TYPE_PLANE);
 
 	return false;
 }

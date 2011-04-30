@@ -11,45 +11,45 @@
 
 CTimer::CTimer(CResource* pResource, SQObjectPtr pFunction, unsigned long ulInterval, unsigned int uiAmountRepeating, CSquirrelArguments* pArguments) : CEntity(ENTITY_TYPE_TIMER, pResource, "timer")
 {
-	this->pFunction = pFunction;
-	this->ulInterval = ulInterval;
-	this->uiAmountRepeating = uiAmountRepeating;
-	this->pArguments = pArguments;
+	this->m_pFunction = pFunction;
+	this->m_ulInterval = ulInterval;
+	this->m_uiAmountRepeating = uiAmountRepeating;
+	this->m_pArguments = pArguments;
 
 	Reset();
 }
 
 CTimer::~CTimer()
 {
-	delete pArguments;
+	delete m_pArguments;
 }
 
 void CTimer::Reset()
 {
-	ulNextExecution = GetTickCount() + ulInterval;
+	m_ulNextExecution = (SharedUtility::GetTime() + m_ulInterval);
 }
 
 bool CTimer::Process(unsigned long ulTickCount)
 {
-	if(ulTickCount >= ulNextExecution)
+	if(ulTickCount >= m_ulNextExecution)
 	{
 		CResource* pResource = dynamic_cast< CResource* >(GetParent());
 		assert(pResource);
 
-		pResource->GetVM()->Call(NULL, pFunction, pArguments);
+		pResource->GetVM()->Call(NULL, m_pFunction, m_pArguments);
 
 		// reset the time left for the next execution
 		Reset();
 
-		if(uiAmountRepeating == 0)
+		if(m_uiAmountRepeating == 0)
 			// infinite timer, so never delete
 			return true;
-		else if(uiAmountRepeating == 1)
+		else if(m_uiAmountRepeating == 1)
 			// had only one remaining run (0 now), so delete it now
 			return false;
 		else
 		{
-			--uiAmountRepeating;
+			--m_uiAmountRepeating;
 			return true;
 		}
 

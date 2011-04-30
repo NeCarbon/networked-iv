@@ -82,7 +82,7 @@ bool CConfig::GetValueAsBoolean(String strKey, bool bDefaultValue, bool * bValue
 		}
 		else
 		{
-			*bValue = atob(m_pXML->nodeContent());
+			*bValue = (atoi(m_pXML->nodeContent()) != 0);
 		}
 
 		m_pXML->nodeToRoot();

@@ -11,17 +11,17 @@
 
 CBitStream::CBitStream()
 {
-	m_pBitStream = CNetModule::GetBitStreamInterface1();
+	m_pBitStream = CNetworkModule::GetBitStreamInterface1();
 }
 
 CBitStream::CBitStream(const unsigned int initialBytesToAllocate)
 {
-	m_pBitStream = CNetModule::GetBitStreamInterface2(initialBytesToAllocate);
+	m_pBitStream = CNetworkModule::GetBitStreamInterface2(initialBytesToAllocate);
 }
 
 CBitStream::CBitStream(unsigned char* _data, const unsigned int lengthInBytes, bool _copyData)
 {
-	m_pBitStream = CNetModule::GetBitStreamInterface3(_data, lengthInBytes, _copyData);
+	m_pBitStream = CNetworkModule::GetBitStreamInterface3(_data, lengthInBytes, _copyData);
 }
 
 CBitStream::~CBitStream()
@@ -109,7 +109,7 @@ void CBitStream::Write(const String &inString)
 	m_pBitStream->Write(inString);
 }
 
-void CBitStream::Write(const Vector3 &inVar)
+void CBitStream::Write(const CVector3 &inVar)
 {
 	m_pBitStream->Write(inVar);
 }
@@ -234,7 +234,7 @@ bool CBitStream::Read(String &outString)
 	return m_pBitStream->Read(outString);
 }
 
-bool CBitStream::Read(Vector3 &outVar)
+bool CBitStream::Read(CVector3 &outVar)
 {
 	return m_pBitStream->Read(outVar);
 }

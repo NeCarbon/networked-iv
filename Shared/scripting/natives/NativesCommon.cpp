@@ -21,14 +21,6 @@ CEntity* sq_toentity(SQVM* pVM, int idx)
 	return NULL;	
 }
 
-CClientPlayer* sq_toplayer(SQVM* pVM, int idx)
-{
-	CEntity* pEntity = sq_toentity(pVM, idx);
-	if( pEntity && pEntity->GetType() == ENTITY_TYPE_PLAYER )
-		return dynamic_cast< CClientPlayer* >( pEntity );
-	return NULL;
-}
-
 CResource* sq_toresource(SQVM* pVM, int idx)
 {
 	CEntity* pEntity = sq_toentity(pVM, idx);

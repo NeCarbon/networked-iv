@@ -65,14 +65,14 @@ CEntity::CEntity(eEntityType EntityType, CEntity* pParent, String strTag)
 	m_pParent = NULL;
 	SetParent(pParent);
 
-#if 0 && defined(_DEBUG)
+#if 0 && defined(NIV_DEBUG)
 	CLogFile::Printf("CEntity[%d]::CEntity(%d,0x%08x:%s,%s)\n",m_ID,EntityType,pParent,pParent?pParent->GetTag().Get():"[none]",strTag.Get());
 #endif
 }
 
 CEntity::~CEntity()
 {
-#if 0 && defined(_DEBUG)
+#if 0 && defined(NIV_DEBUG)
 	CLogFile::Printf("CEntity[%d]::~CEntity()\n",m_ID);
 #endif
 

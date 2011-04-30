@@ -14,8 +14,8 @@
 class CClientPadState
 {
 public:
-	BYTE byteCurrentKeys[INPUT_MAX];
-	BYTE bytePreviousKeys[INPUT_MAX];
+	BYTE byteCurrentKeys[INPUT_COUNT];
+	BYTE bytePreviousKeys[INPUT_COUNT];
 
 	CClientPadState();
 

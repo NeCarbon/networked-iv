@@ -55,7 +55,7 @@ public:
 		while(m_nDataCount > 0)
 		{
 			m_nDataCount--;
-			Vector3 * pVec3 = m_pOriginalData[m_nDataCount];
+			CVector3 * pVec3 = m_pOriginalData[m_nDataCount];
 			Vector4 * pVec4 = &m_TemporaryData[m_nDataCount];
 			pVec3->fX = pVec4->fX;
 			pVec3->fY = pVec4->fY;

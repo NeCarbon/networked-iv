@@ -80,7 +80,7 @@ class CCamData
 {
 public:
 	Matrix34 m_matMatrix;     // 00-40
-	Vector3 m_vecUnknown;     // 40-4C
+	CVector3 m_vecUnknown;     // 40-4C
 	float m_fUnknown;         // 4C-50
 	float m_fFOV;             // 50-54
 	float m_fNear;            // 54-58
@@ -109,12 +109,9 @@ class IVPad;
 class CClientPadState;
 
 IVPad * GetGamePad();
-void    ResetGamePadState();
 void    SetGamePadState(CClientPadState * padState);
 void    GetGamePadState(CClientPadState * padState);
 CCam *  GetGameCam();
 void    SetGameCameraMatrix(Matrix * matMatrix);
 void    GetGameCameraMatrix(Matrix * matMatrix);
-BYTE    GetCurrentGameControlValue(BYTE byteControlId);
-BYTE    GetPreviousGameControlValue(BYTE byteControlId);
 void    InstallKeySyncHooks();

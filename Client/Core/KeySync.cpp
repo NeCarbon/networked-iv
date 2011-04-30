@@ -9,12 +9,14 @@
 
 #include <StdInc.h>
 
-IVPed * m_pPed;
-IVVehicle * m_pKeySyncIVVehicle;
-unsigned int m_uiLocalPlayerIndex;
+IVPed         * m_pPed = NULL;
+IVVehicle     * m_pKeySyncIVVehicle = NULL;
+unsigned int    m_uiLocalPlayerIndex = 0;
 CClientPadState m_localClientPadState;
-Matrix m_matLocalCameraMatrix;
-//BYTE m_byteEnterExitVehicleKey[2];
+Matrix          m_matLocalCameraMatrix;
+IVPlayerInfo  * __pPlayerInfo = NULL;
+BYTE            byteValue[INPUT_COUNT];
+bool            bInLocalContext = true;
 
 extern CClient * g_pClient;
 
@@ -23,18 +25,13 @@ IVPad * GetGamePad()
 	return (IVPad *)COffsets::VAR_Pads;
 }
 
-void ResetGamePadState()
-{
-	SetGamePadState(&CClientPadState());
-}
-
 void SetGamePadState(CClientPadState * padState)
 {
 	IVPad * pPad = GetGamePad();
 
 	if(pPad)
 	{
-		for(int i = 0; i < INPUT_MAX; i++)
+		for(int i = 0; i < INPUT_COUNT; i++)
 		{
 			pPad->m_padData[i].m_byteUnknown6 = padState->byteCurrentKeys[i];
 			pPad->m_padData[i].m_byteUnknown7 = padState->bytePreviousKeys[i];
@@ -48,7 +45,7 @@ void GetGamePadState(CClientPadState * padState)
 
 	if(pPad)
 	{
-		for(int i = 0; i < INPUT_MAX; i++)
+		for(int i = 0; i < INPUT_COUNT; i++)
 		{
 			padState->byteCurrentKeys[i] = pPad->m_padData[i].m_byteUnknown6;
 			padState->bytePreviousKeys[i] = pPad->m_padData[i].m_byteUnknown7;
@@ -67,10 +64,10 @@ void SetGameCameraMatrix(Matrix * matMatrix)
 
 	if(pCam)
 	{
-		memcpy(&pCam->m_data1.m_matMatrix.vecRight, &matMatrix->vecRight, sizeof(Vector3));
-		memcpy(&pCam->m_data1.m_matMatrix.vecFront, &matMatrix->vecFront, sizeof(Vector3));
-		memcpy(&pCam->m_data1.m_matMatrix.vecUp, &matMatrix->vecUp, sizeof(Vector3));
-		memcpy(&pCam->m_data1.m_matMatrix.vecPosition, &matMatrix->vecPosition, sizeof(Vector3));
+		memcpy(&pCam->m_data1.m_matMatrix.vecRight, &matMatrix->vecRight, sizeof(CVector3));
+		memcpy(&pCam->m_data1.m_matMatrix.vecFront, &matMatrix->vecFront, sizeof(CVector3));
+		memcpy(&pCam->m_data1.m_matMatrix.vecUp, &matMatrix->vecUp, sizeof(CVector3));
+		memcpy(&pCam->m_data1.m_matMatrix.vecPosition, &matMatrix->vecPosition, sizeof(CVector3));
 	}
 }
 
@@ -80,58 +77,21 @@ void GetGameCameraMatrix(Matrix * matMatrix)
 
 	if(pCam)
 	{
-		memcpy(&matMatrix->vecRight, &pCam->m_data1.m_matMatrix.vecRight, sizeof(Vector3));
-		memcpy(&matMatrix->vecFront, &pCam->m_data1.m_matMatrix.vecFront, sizeof(Vector3));
-		memcpy(&matMatrix->vecUp, &pCam->m_data1.m_matMatrix.vecUp, sizeof(Vector3));
-		memcpy(&matMatrix->vecPosition, &pCam->m_data1.m_matMatrix.vecPosition, sizeof(Vector3));
+		memcpy(&matMatrix->vecRight, &pCam->m_data1.m_matMatrix.vecRight, sizeof(CVector3));
+		memcpy(&matMatrix->vecFront, &pCam->m_data1.m_matMatrix.vecFront, sizeof(CVector3));
+		memcpy(&matMatrix->vecUp, &pCam->m_data1.m_matMatrix.vecUp, sizeof(CVector3));
+		memcpy(&matMatrix->vecPosition, &pCam->m_data1.m_matMatrix.vecPosition, sizeof(CVector3));
 	}
 }
 
-IVPlayerInfo * __pPlayerInfo = NULL;
-BYTE byteValue[INPUT_MAX];
-bool bInLocalContext = true;
-
 void ContextSwitch(IVPed * pPed, bool bPost)
 {
+	// Do we have a valid ped pointer?
 	if(pPed)
 	{
-		if((IVPlayerPed *)pPed == CPools::GetPlayerInfoFromIndex(0)->m_pPlayerPed)
+		// Is this not the local player ped?
+		if((IVPlayerPed *)pPed != CPools::GetPlayerInfoFromIndex(0)->m_pPlayerPed)
 		{
-			/*if(!bUsingLocalKeys)
-			{
-				SetGamePadState(&m_localClientPadState);
-				bUsingLocalKeys = true;
-			}*/
-			// Local player ped
-			//CLogFile::Printf("ContextSwitch(0x%p, %d) (Local Player Ped)\n", pPed, bPost);
-
-			// Get the local players keys
-			/*CClientPadState padState;
-			GetGamePadState(&padState);
-
-			// Don't process enter/exit vehicle key as we handle vehicle entry/exit ourselves
-			if(!bPost)
-			{
-				m_byteEnterExitVehicleKey[0] = padState.byteCurrentKeys[GTA_KEY_ENTEREXIT_VEHICLE];
-				m_byteEnterExitVehicleKey[1] = padState.bytePreviousKeys[GTA_KEY_ENTEREXIT_VEHICLE];
-				padState.byteCurrentKeys[GTA_KEY_ENTEREXIT_VEHICLE] = 0;
-				padState.bytePreviousKeys[GTA_KEY_ENTEREXIT_VEHICLE] = 0;
-			}
-			else
-			{
-				padState.byteCurrentKeys[GTA_KEY_ENTEREXIT_VEHICLE] = m_byteEnterExitVehicleKey[0];
-				padState.bytePreviousKeys[GTA_KEY_ENTEREXIT_VEHICLE] = m_byteEnterExitVehicleKey[1];
-			}
-
-			// Set the local players keys
-			SetGamePadState(&padState);*/
-		}
-		else
-		{
-			CContextData * pContextInfo = CContextDataManager::GetContextData((IVPlayerPed *)pPed);
-
-			CLogFile::Printf("ContextSwitch(0x%p, %d) (Player Ped %d)\n", pPed, bPost, pContextInfo->GetPlayerInfo()->GetPlayerNumber());
-
 			if(!bPost && !bInLocalContext)
 			{
 				CLogFile::Printf("Not switching due to not being in local context!\n");
@@ -143,25 +103,28 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 				return;
 			}
 
+			CContextData * pContextInfo = CContextDataManager::GetContextData((IVPlayerPed *)pPed);
+
 			if(pContextInfo)
 			{
+				CLogFile::SetUseCallback(false);
+				CLogFile::Printf("ContextSwitch(0x%p, %d) (Player Ped %d)\n", pPed, bPost, pContextInfo->GetPlayerInfo()->GetPlayerNumber());
+				CLogFile::SetUseCallback(true);
+
 				if(!bPost)
 				{
 					if(!bInLocalContext)
 						CLogFile::Printf("Not in local context when we should be!\n");
 
-					// TODO: Context switch current/desired move states?
 					// Context switch the local player id with the remote players
 					m_uiLocalPlayerIndex = CPools::GetLocalPlayerIndex();
-					// NOTE: Without the local player ped checks for key/camera tasks e.t.c. disabled, the below will
-					// stop other players responding to key/camera stuff altogether
 					CPools::SetLocalPlayerIndex(pContextInfo->GetPlayerInfo()->GetPlayerNumber());
 
 					// Context switch the local players keys with the remote players
 					GetGamePadState(&m_localClientPadState);
 					SetGamePadState(pContextInfo->GetPadState());
 					IVPad * pGamePad = GetGamePad();
-					for(int i = 0; i < INPUT_MAX; i++)
+					for(int i = 0; i < INPUT_COUNT; i++)
 					{
 						if(pGamePad->m_padData[i].m_pUnknown)
 						{
@@ -174,6 +137,7 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 					GetGameCameraMatrix(&m_matLocalCameraMatrix);
 					SetGameCameraMatrix(pContextInfo->GetCameraMatrix());
 
+					// Flag ourselves as no longer in local context
 					bInLocalContext = false;
 				}
 				else
@@ -187,7 +151,7 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 					// Restore the local players keys
 					SetGamePadState(&m_localClientPadState);
 					IVPad * pGamePad = GetGamePad();
-					for(int i = 0; i < INPUT_MAX; i++)
+					for(int i = 0; i < INPUT_COUNT; i++)
 					{
 						if(pGamePad->m_padData[i].m_pUnknown)
 						{
@@ -199,6 +163,7 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 					// Restore the local player id
 					CPools::SetLocalPlayerIndex(m_uiLocalPlayerIndex);
 
+					// Flag ourselves as back in local context
 					bInLocalContext = true;
 				}
 			}
@@ -559,22 +524,6 @@ void _declspec(naked) CTaskSimpleFireGun__SetPedPosition_Hook()
 	}
 }
 
-BYTE GetCurrentGameControlValue(BYTE byteControlId)
-{
-	CClientPadState padState;
-	GetGamePadState(&padState);
-	//return (padState.byteKeys1[byteControlId] ^ padState.byteKeys2[byteControlId]);
-	return padState.byteCurrentKeys[byteControlId];
-}
-
-BYTE GetPreviousGameControlValue(BYTE byteControlId)
-{
-	CClientPadState padState;
-	GetGamePadState(&padState);
-	//return (padState.byteKeys1[byteControlId] ^ padState.byteKeys2[byteControlId]);
-	return padState.bytePreviousKeys[byteControlId];
-}
-
 void InstallKeySyncHooks()
 {
 	// CPlayerPed::ProcessInput
@@ -610,8 +559,8 @@ void InstallKeySyncHooks()
 	dwCTaskComplexGun__ControlSubTask = (g_pClient->GetBaseAddress() + 0xA61440);
 	CPatcher::InstallMethodPatch((g_pClient->GetBaseAddress() + 0xD8C4D4), (DWORD)CTaskComplexGun__ControlSubTask_Hook);*/
 	// CTaskSimpleFireGun::SetPedPosition
-	dwCTaskSimpleFireGun__SetPedPosition = (g_pClient->GetBaseAddress() + 0xCCA0E0);
-	CPatcher::InstallMethodPatch((g_pClient->GetBaseAddress() + 0xDCD8C0), (DWORD)CTaskSimpleFireGun__SetPedPosition_Hook);
+	//dwCTaskSimpleFireGun__SetPedPosition = (g_pClient->GetBaseAddress() + 0xCCA0E0);
+	//CPatcher::InstallMethodPatch((g_pClient->GetBaseAddress() + 0xDCD8C0), (DWORD)CTaskSimpleFireGun__SetPedPosition_Hook);
 
 	//dwTaskHookFunc = (g_pClient->GetBaseAddress() + 0xCC8140);
 	//CPatcher::InstallMethodPatch((g_pClient->GetBaseAddress() + 0xDCD6C0), (DWORD)TaskHookFunc);

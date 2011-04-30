@@ -36,7 +36,7 @@ IVPhysical * CIVPhysical::GetPhysical()
 	return (IVPhysical *)GetDynamicEntity();
 }
 
-void CIVPhysical::SetMoveSpeed(Vector3 * vecMoveSpeed)
+void CIVPhysical::SetMoveSpeed(CVector3 * vecMoveSpeed)
 {
 	IVPhysical * pPhysical = (IVPhysical *)GetEntity();
 
@@ -52,7 +52,7 @@ void CIVPhysical::SetMoveSpeed(Vector3 * vecMoveSpeed)
 	}
 }
 
-void CIVPhysical::GetMoveSpeed(Vector3 * vecMoveSpeed)
+void CIVPhysical::GetMoveSpeed(CVector3 * vecMoveSpeed)
 {
 	IVPhysical * pPhysical = (IVPhysical *)GetEntity();
 
@@ -68,7 +68,7 @@ void CIVPhysical::GetMoveSpeed(Vector3 * vecMoveSpeed)
 	}
 }
 
-void CIVPhysical::SetTurnSpeed(Vector3 * vecTurnSpeed)
+void CIVPhysical::SetTurnSpeed(CVector3 * vecTurnSpeed)
 {
 	IVPhysical * pPhysical = (IVPhysical *)GetEntity();
 
@@ -84,7 +84,7 @@ void CIVPhysical::SetTurnSpeed(Vector3 * vecTurnSpeed)
 	}
 }
 
-void CIVPhysical::GetTurnSpeed(Vector3 * vecTurnSpeed)
+void CIVPhysical::GetTurnSpeed(CVector3 * vecTurnSpeed)
 {
 	IVPhysical * pPhysical = (IVPhysical *)GetEntity();
 	

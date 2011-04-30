@@ -77,6 +77,7 @@ void CClientPacketHandler::PasswordInvalid(CBitStreamInterface * pBitStream, CPl
 
 void CClientPacketHandler::Register()
 {
+	AddFunction(PACKET_CONNECTION_REJECTED, ConnectionRejected);
 	AddFunction(PACKET_CONNECTION_SUCCEEDED, ConnectionSucceeded);
 	AddFunction(PACKET_CONNECTION_FAILED, ConnectionFailed);
 	AddFunction(PACKET_ALREADY_CONNECTED, AlreadyConnected);
@@ -89,6 +90,7 @@ void CClientPacketHandler::Register()
 
 void CClientPacketHandler::Unregister()
 {
+	RemoveFunction(PACKET_CONNECTION_REJECTED);
 	RemoveFunction(PACKET_CONNECTION_SUCCEEDED);
 	RemoveFunction(PACKET_CONNECTION_FAILED);
 	RemoveFunction(PACKET_ALREADY_CONNECTED);

@@ -14,7 +14,7 @@ extern CNetworkManager * g_pNetworkManager;
 CNetworkManager::CNetworkManager()
 {
 	// Create the net server instance
-	m_pNetServer = CNetModule::GetNetServerInterface();
+	m_pNetServer = CNetworkModule::GetNetServerInterface();
 
 	// Set the net server packet handler function
 	m_pNetServer->SetPacketHandler(PacketHandler);
@@ -44,7 +44,7 @@ CNetworkManager::~CNetworkManager()
 	m_pNetServer->Shutdown(500);
 
 	// Delete the net server instance
-	CNetModule::DestroyNetServerInterface(m_pNetServer);
+	CNetworkModule::DestroyNetServerInterface(m_pNetServer);
 }
 
 void CNetworkManager::Startup(int iPort, int iMaxPlayers, String strPassword, String strHostAddress)

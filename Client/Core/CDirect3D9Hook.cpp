@@ -24,7 +24,7 @@ IDirect3D9 * WINAPI CDirect3D9Hook::Direct3DCreate9_Hook(UINT SDKVersion)
 		return new CDirect3D9Proxy(pD3D);
 	}
 
-	CLogFile::Printf("Direct3DCreate9 Returned Invalid Pointer!\n");
+	CLogFile::Printf("Direct3DCreate9 Call Failed!\n");
 
 	return NULL;
 }

@@ -21,9 +21,9 @@ public:
 	CD3DXFont(IDirect3DDevice9 * pD3DDevice, int iHeight, int iWidth, int iWeight, char * szFontName);
 	~CD3DXFont();
 
-	void  Draw(char * szText, DWORD dwColor, float fPosX, float fPosY);
+	void  Draw(const char * szText, DWORD dwColor, float fPosX, float fPosY);
 	float GetHeight();
-	float GetTextExtent(char * szText);
+	float GetTextExtent(const char * szText);
 	void  OnDeviceLost();
 	void  OnDeviceReset();
 };

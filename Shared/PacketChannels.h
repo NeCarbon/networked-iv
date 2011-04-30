@@ -1,7 +1,7 @@
 //============== Networked: IV - http://code.networked-iv.com ==============
 //
-// File: Hooks.h
-// Project: Client
+// File: PacketChannels.h
+// Project: Shared
 // Author(s): jenksta
 // License: See LICENSE in root directory
 //
@@ -11,4 +11,14 @@
 
 #include <StdInc.h>
 
-void ApplyHooks();
+enum ePacketChannels
+{
+	// Default packet channel
+	PACKET_CHANNEL_DEFAULT,
+
+	// Packet channel used for input
+	PACKET_CHANNEL_INPUT,
+
+	// Number of packet channels
+	PACKET_CHANNEL_COUNT
+};

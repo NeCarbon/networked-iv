@@ -11,10 +11,8 @@
 
 #include <StdInc.h>
 
-#define VAR_ModelInfos 0x15F73B0
-
+#define NUM_ModelInfos 65535
 #define MODEL_PLAYER 0x6F0783F5
-
 #define NATIVE_SET_CHAR_HEALTH 0x575E2880
 #define NATIVE_GET_CHAR_HEALTH 0x4B6C2256
 #define NATIVE_CHANGE_PLAYER_MODEL 0x232F1A85
@@ -37,11 +35,6 @@
 #define NATIVE_WARP_CHAR_INTO_CAR 0x73D3504A
 #define NATIVE_WARP_CHAR_INTO_CAR_AS_PASSENGER 0x172376FE
 
-enum eResourceType
-{
-	RESOURCE_TYPE_WDR
-};
-
 enum eFadeType
 {
 	FADE_TYPE_IN_UNHACKED,
@@ -52,24 +45,25 @@ enum eFadeType
 
 class CGame
 {
+private:
+	CIVPad      * m_pPad;
+	CStreaming  * m_pStreaming;
+	CIVModelInfo  m_modelInfos[NUM_ModelInfos];
+	CIVWeaponInfo m_weaponInfos[NUM_WeaponInfos];
+
 public:
 	CGame();
 	~CGame();
 
-	void          ApplyPatches();
-	unsigned int  GetResourceTypeIndex(eResourceType fileType);
-	IVModelInfo * GetModelInfoFromIndex(int iModelIndex);
-	int           GetModelIndexFromHash(DWORD dwModelHash);
-	DWORD         GetHashFromModelIndex(int iModelIndex);
-	void          RequestModel(int iModelIndex);
-	int           RequestModelFromHash(DWORD dwModelHash);
-	void          LoadRequestedModels();
-	bool          HasModelLoaded(int iModelIndex);
-	bool          HasModelLoadedFromHash(DWORD dwModelHash);
-	void          UnloadModel(DWORD dwModelHash);
-	void          LoadModel(int iModelIndex);
-	int           LoadModelFromHash(DWORD dwModelHash);
-	void          FadeScreen(eFadeType fadeType, int iTime);
-	void          ConvertRotationMatrixToEulerAngles(Matrix * matRotation, Vector3 * vecRotation);
-	void          ConvertEulerAnglesToRotationMatrix(Vector3 * vecRotation, Matrix * matRotation);
+	CIVPad        * GetPad() { return m_pPad; }
+	CStreaming    * GetStreaming() { return m_pStreaming; }
+	CIVModelInfo  * GetModelInfo(int iModelIndex);
+	CIVWeaponInfo * GetWeaponInfo(eWeaponType weaponType);
+	static void     GameLoadCallback_Static();
+	void            GameLoadCallback();
+	static void     GameProcessCallback_Static();
+	void            GameProcessCallback();
+	void            FadeScreen(eFadeType fadeType, int iTime);
+	void            ConvertRotationMatrixToEulerAngles(Matrix& matRotation, CVector3& vecRotation);
+	void            ConvertEulerAnglesToRotationMatrix(CVector3& vecRotation, Matrix& matRotation);
 };

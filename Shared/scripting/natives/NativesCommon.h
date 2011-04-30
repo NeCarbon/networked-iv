@@ -12,7 +12,6 @@
 #include <StdInc.h>
 
 CEntity*	sq_toentity(SQVM* pVM, int idx);
-CClientPlayer*	sq_toplayer(SQVM* pVM, int idx);
 CResource*	sq_toresource(SQVM* pVM, int idx);
 CTimer*		sq_totimer(SQVM* pVM, int idx);
 

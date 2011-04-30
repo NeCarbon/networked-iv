@@ -97,6 +97,42 @@ bool CIVPed::IsInVehicle()
 	return false;
 }
 
+void CIVPed::SetCurrentHeading(float fCurrentHeading)
+{
+	IVPed * pPed = GetPed();
+
+	if(pPed)
+		pPed->m_fCurrentHeading = fCurrentHeading;
+}
+
+float CIVPed::GetCurrentHeading()
+{
+	IVPed * pPed = GetPed();
+
+	if(pPed)
+		return pPed->m_fCurrentHeading;
+
+	return false;
+}
+
+void CIVPed::SetDesiredHeading(float fDesiredHeading)
+{
+	IVPed * pPed = GetPed();
+
+	if(pPed)
+		pPed->m_fDesiredHeading = fDesiredHeading;
+}
+
+float CIVPed::GetDesiredHeading()
+{
+	IVPed * pPed = GetPed();
+
+	if(pPed)
+		return pPed->m_fDesiredHeading;
+
+	return false;
+}
+
 void CIVPed::SetCurrentVehicle(IVVehicle * pVehicle)
 {
 	IVPed * pPed = GetPed();
@@ -113,4 +149,41 @@ IVVehicle * CIVPed::GetCurrentVehicle()
 		return pPed->m_pCurrentVehicle;
 
 	return NULL;
+}
+
+void CIVPed::SetDucking(bool bDucking, int iUnknown)
+{
+	IVPed * pPed = GetPed();
+
+	if(pPed)
+	{
+		DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPed__SetDucking);
+		_asm
+		{
+			push iUnknown
+			push bDucking
+			mov ecx, pPed
+			call dwFunc
+		}
+	}
+}
+
+bool CIVPed::IsDucking()
+{
+	IVPed * pPed = GetPed();
+
+	if(pPed)
+	{
+		DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPed__IsDucking);
+		bool bDucking = false;
+		_asm
+		{
+			mov ecx, pPed
+			call dwFunc
+			mov bDucking, al
+		}
+		return bDucking;
+	}
+
+	return false;
 }

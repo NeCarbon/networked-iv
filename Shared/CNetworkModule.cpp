@@ -1,6 +1,6 @@
 //============== Networked: IV - http://code.networked-iv.com ==============
 //
-// File: CNetModule.cpp
+// File: CNetworkModule.cpp
 // Project: Shared
 // Author(s): jenksta
 // License: See LICENSE in root directory
@@ -9,27 +9,27 @@
 
 #include <StdInc.h>
 
-CLibrary *                  CNetModule::m_pLibrary;
-GetNetServerInterface_t     CNetModule::m_pfnGetNetServerInterface;
-DestroyNetServerInterface_t CNetModule::m_pfnDestroyNetServerInterface;
-GetNetClientInterface_t     CNetModule::m_pfnGetNetClientInterface;
-DestroyNetClientInterface_t CNetModule::m_pfnDestroyNetClientInterface;
-GetBitStreamInterface1_t    CNetModule::m_pfnGetBitStreamInterface1;
-GetBitStreamInterface2_t    CNetModule::m_pfnGetBitStreamInterface2;
-GetBitStreamInterface3_t    CNetModule::m_pfnGetBitStreamInterface3;
-DestroyBitStreamInterface_t CNetModule::m_pfnDestroyBitStreamInterface;
+CLibrary *                  CNetworkModule::m_pLibrary;
+GetNetServerInterface_t     CNetworkModule::m_pfnGetNetServerInterface;
+DestroyNetServerInterface_t CNetworkModule::m_pfnDestroyNetServerInterface;
+GetNetClientInterface_t     CNetworkModule::m_pfnGetNetClientInterface;
+DestroyNetClientInterface_t CNetworkModule::m_pfnDestroyNetClientInterface;
+GetBitStreamInterface1_t    CNetworkModule::m_pfnGetBitStreamInterface1;
+GetBitStreamInterface2_t    CNetworkModule::m_pfnGetBitStreamInterface2;
+GetBitStreamInterface3_t    CNetworkModule::m_pfnGetBitStreamInterface3;
+DestroyBitStreamInterface_t CNetworkModule::m_pfnDestroyBitStreamInterface;
 
-CNetModule::CNetModule()
+CNetworkModule::CNetworkModule()
 {
 
 }
 
-CNetModule::~CNetModule()
+CNetworkModule::~CNetworkModule()
 {
 
 }
 
-bool CNetModule::Init()
+bool CNetworkModule::Init()
 {
 	// Create the library instance
 	m_pLibrary = new CLibrary();
@@ -40,7 +40,7 @@ bool CNetModule::Init()
 	// Load the net module
 	if(!m_pLibrary->Load(strPath.C_String()))
 	{
-		CLogFile::Printf("Failed to load net module!\n");
+		CLogFile::Printf("Failed to load network module!\n");
 		return false;
 	}
 
@@ -73,7 +73,7 @@ bool CNetModule::Init()
 	return true;
 }
 
-void CNetModule::Shutdown()
+void CNetworkModule::Shutdown()
 {
 	// Unload the net module
 	m_pLibrary->Unload();
@@ -82,7 +82,7 @@ void CNetModule::Shutdown()
 	SAFE_DELETE(m_pLibrary);
 }
 
-bool CNetModule::VerifyVersion(BYTE byteVersion)
+bool CNetworkModule::VerifyVersion(BYTE byteVersion)
 {
 	// Get a pointer to the VerifyVersion function
 	VerifyVersion_t pfnVerifyVersion = (VerifyVersion_t)m_pLibrary->GetProcedureAddress("VerifyVersion");
@@ -95,7 +95,7 @@ bool CNetModule::VerifyVersion(BYTE byteVersion)
 	return pfnVerifyVersion(byteVersion);
 }
 
-CNetServerInterface * CNetModule::GetNetServerInterface()
+CNetServerInterface * CNetworkModule::GetNetServerInterface()
 {
 	// Call the GetNetServerInterface function
 	CNetServerInterface * pRakServer = m_pfnGetNetServerInterface();
@@ -104,13 +104,13 @@ CNetServerInterface * CNetModule::GetNetServerInterface()
 	return pRakServer;
 }
 
-void CNetModule::DestroyNetServerInterface(CNetServerInterface * pNetServer)
+void CNetworkModule::DestroyNetServerInterface(CNetServerInterface * pNetServer)
 {
 	// Call the DestroyNetServerInterface function
 	m_pfnDestroyNetServerInterface(pNetServer);
 }
 
-CNetClientInterface * CNetModule::GetNetClientInterface()
+CNetClientInterface * CNetworkModule::GetNetClientInterface()
 {
 	// Call the GetNetClientInterface function
 	CNetClientInterface * pRakClient = m_pfnGetNetClientInterface();
@@ -119,13 +119,13 @@ CNetClientInterface * CNetModule::GetNetClientInterface()
 	return pRakClient;
 }
 
-void CNetModule::DestroyNetClientInterface(CNetClientInterface * pNetClient)
+void CNetworkModule::DestroyNetClientInterface(CNetClientInterface * pNetClient)
 {
 	// Call the DestroyNetClientInterface function
 	m_pfnDestroyNetClientInterface(pNetClient);
 }
 
-CNetBitStreamInterface * CNetModule::GetBitStreamInterface1()
+CNetBitStreamInterface * CNetworkModule::GetBitStreamInterface1()
 {
 	// Call the GetBitStreamInterface1 function
 	CNetBitStreamInterface * pBitStream = m_pfnGetBitStreamInterface1();
@@ -134,7 +134,7 @@ CNetBitStreamInterface * CNetModule::GetBitStreamInterface1()
 	return pBitStream;
 }
 
-CNetBitStreamInterface * CNetModule::GetBitStreamInterface2(const unsigned int initialBytesToAllocate)
+CNetBitStreamInterface * CNetworkModule::GetBitStreamInterface2(const unsigned int initialBytesToAllocate)
 {
 	// Call the GetBitStreamInterface2 function
 	CNetBitStreamInterface * pBitStream = m_pfnGetBitStreamInterface2(initialBytesToAllocate);
@@ -143,7 +143,7 @@ CNetBitStreamInterface * CNetModule::GetBitStreamInterface2(const unsigned int i
 	return pBitStream;
 }
 
-CNetBitStreamInterface * CNetModule::GetBitStreamInterface3(unsigned char* _data, const unsigned int lengthInBytes, bool _copyData)
+CNetBitStreamInterface * CNetworkModule::GetBitStreamInterface3(unsigned char* _data, const unsigned int lengthInBytes, bool _copyData)
 {
 	// Call the GetBitStreamInterface3 function
 	CNetBitStreamInterface * pBitStream = m_pfnGetBitStreamInterface3(_data, lengthInBytes, _copyData);
@@ -152,7 +152,7 @@ CNetBitStreamInterface * CNetModule::GetBitStreamInterface3(unsigned char* _data
 	return pBitStream;
 }
 
-void CNetModule::DestroyBitStreamInterface(CNetBitStreamInterface * pBitStream)
+void CNetworkModule::DestroyBitStreamInterface(CNetBitStreamInterface * pBitStream)
 {
 	// Call the DestroyNetClientInterface function
 	m_pfnDestroyBitStreamInterface(pBitStream);

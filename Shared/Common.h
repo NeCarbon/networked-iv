@@ -52,11 +52,16 @@
 // Max player limit
 #define PLAYER_MAX 32
 
+// Max vehicle limit
+#define VEHICLE_MAX 100
+
 // Max name length
 #define NICK_MAX 32
 
-// Type used for entity ids
-// NOTE: Must be unsigned
+// Max vehicle passengers (This is also a GTA limit)
+#define MAX_VEHICLE_PASSENGERS 8
+
+// Type used for entity ids (Must be unsigned)
 typedef unsigned char EntityId;
 
 // Invalid entity id value
@@ -76,12 +81,28 @@ enum eEntityType
 };
 
 // brandnew and sexy: Element ID
+// todo: revert name to ElementId?
 typedef unsigned short EntityID;
 #define MAX_ENTITIES           0xFFFE
 #define INVALID_ENTITY_ID_LONG 0xFFFF
 
-// Safe memory deletion macro
+// Vehicle entry/exit rpc types
+enum eVehicleEntryExit
+{
+	VEHICLE_ENTRY_REQUEST,
+	VEHICLE_ENTRY_RETURN,
+	VEHICLE_ENTRY_CANCELLED,
+	VEHICLE_ENTRY_COMPLETE,
+	VEHICLE_EXIT_REQUEST,
+	VEHICLE_EXIT_RETURN,
+	VEHICLE_EXIT_COMPLETE,
+	VEHICLE_EXIT_FORCEFUL, // TODO: Implement (Look at last part of CClientPlayer::ProcessVehicleEntryExit)
+	VEHICLE_ENTRY_EXIT_INVALID = 255
+};
+
+// Safe memory macros
 #define SAFE_DELETE(memory) if(memory) { delete memory; memory = NULL; }
+#define SAFE_FREE(memory) if(memory) { free(memory); memory = NULL; }
 
 // Simple Bit Manipulation
 #define SET_BIT(a, b) a |= b
@@ -90,9 +111,9 @@ typedef unsigned short EntityID;
 
 // Library Names
 #define CLIENT_CORE_NAME "Client.Core"
-#define CLIENT_LAUNCH_HELPER "Client.LaunchHelper"
+#define CLIENT_LAUNCH_HELPER_NAME "Client.LaunchHelper"
 #define SERVER_CORE_NAME "Server.Core"
-#define NETWORK_MODULE_NAME "Net.Core"
+#define NETWORK_MODULE_NAME "Network.Core"
 
 // Library Exports
 #ifdef EXPORT

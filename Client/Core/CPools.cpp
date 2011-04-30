@@ -11,64 +11,22 @@
 
 extern CClient * g_pClient;
 
-unsigned int CPools::GetHandleFromPed(IVPed * pPed)
+CIVPool<IVPed>     * CPools::m_pPedPool;
+CIVPool<IVVehicle> * CPools::m_pVehiclePool;
+CIVPool<IVTask>    * CPools::m_pTaskPool;
+
+void CPools::Init()
 {
-	DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPool__HandleOf_7);
-	DWORD dwPedPool = *(DWORD *)(g_pClient->GetBaseAddress() + VAR_PedPool_7);
-	unsigned int uiHandle = 0;
-	_asm
-	{
-		mov ecx, dwPedPool
-		push pPed
-		call dwFunc
-		mov uiHandle, eax
-	}
-	return uiHandle;
+	m_pPedPool = new CIVPool<IVPed>(*(IVPool **)(g_pClient->GetBaseAddress() + VAR_PedPool_7));
+	m_pVehiclePool = new CIVPool<IVVehicle>(*(IVPool **)(g_pClient->GetBaseAddress() + VAR_VehiclePool_7));
+	m_pTaskPool = new CIVPool<IVTask>(*(IVPool **)(g_pClient->GetBaseAddress() + VAR_TaskPool_7));
 }
 
-IVPed * CPools::GetPedFromHandle(unsigned int uiHandle)
+void CPools::Shutdown()
 {
-	DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPool__AtHandle_7);
-	DWORD dwPedPool = *(DWORD *)(g_pClient->GetBaseAddress() + VAR_PedPool_7);
-	IVPed * pPed = NULL;
-	_asm
-	{
-		mov ecx, dwPedPool
-		push uiHandle
-		call dwFunc
-		mov pPed, eax
-	}
-	return pPed;
-}
-
-unsigned int CPools::GetHandleFromVehicle(IVVehicle * pVehicle)
-{
-	DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPool__HandleOf_7);
-	DWORD dwVehiclePool = *(DWORD *)(g_pClient->GetBaseAddress() + VAR_VehiclePool_7);
-	unsigned int uiHandle = 0;
-	_asm
-	{
-		mov ecx, dwVehiclePool
-		push pVehicle
-		call dwFunc
-		mov uiHandle, eax
-	}
-	return uiHandle;
-}
-
-IVVehicle * CPools::GetVehicleFromHandle(unsigned int uiHandle)
-{
-	DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPool__AtHandle_7);
-	DWORD dwVehiclePool = *(DWORD *)(g_pClient->GetBaseAddress() + VAR_VehiclePool_7);
-	IVVehicle * pVehicle = NULL;
-	_asm
-	{
-		mov ecx, dwVehiclePool
-		push uiHandle
-		call dwFunc
-		mov pVehicle, eax
-	}
-	return pVehicle;
+	SAFE_DELETE(m_pTaskPool);
+	SAFE_DELETE(m_pVehiclePool);
+	SAFE_DELETE(m_pPedPool);
 }
 
 IVPlayerInfo * CPools::GetPlayerInfoFromIndex(unsigned int uiIndex)

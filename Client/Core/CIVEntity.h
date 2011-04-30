@@ -75,7 +75,7 @@ public:
 	IVEntityVFTable * m_VFTable; // 00-04
 	// 0x8 = DWORD
 	PAD(IVEntity, pad0, 0xC);    // 04-10
-	Vector3 m_vecPosition;       // 10-1C
+	CVector3 m_vecPosition;       // 10-1C
 	float m_fHeading;            // 1C-20
 	Matrix34 * m_pMatrix;        // 20-24
 	DWORD m_dwFlags1;            // 24-28 - Bits 0: has collision model, 1: use collision, 3: don't load collisions, 4: fixed, 5: is visible, 8: fixed waiting for collision, 12: draw last, 32: visible
@@ -121,12 +121,12 @@ public:
 
 	void       SetMatrix(Matrix * matMatrix);
 	void       GetMatrix(Matrix * matMatrix);
-	void       SetPosition(Vector3 * vecPosition);
-	void       GetPosition(Vector3 * vecPosition);
-	void       SetRoll(Vector3 * vecRoll);
-	void       GetRoll(Vector3 * vecRoll);
-	void       SetDirection(Vector3 * vecDirection);
-	void       GetDirection(Vector3 * vecDirection);
+	void       SetPosition(CVector3 * vecPosition);
+	void       GetPosition(CVector3 * vecPosition);
+	void       SetRoll(CVector3 * vecRoll);
+	void       GetRoll(CVector3 * vecRoll);
+	void       SetDirection(CVector3 * vecDirection);
+	void       GetDirection(CVector3 * vecDirection);
 	void       SetModelIndex(WORD wModelIndex);
 	WORD       GetModelIndex();
 	void       SetAlpha(BYTE byteAlpha);
