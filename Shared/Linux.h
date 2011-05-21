@@ -16,6 +16,10 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <stdarg.h>
 
 #define MAX_PATH PATH_MAX
 #define Sleep(ms) usleep((ms) * 1000)
