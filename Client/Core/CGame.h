@@ -59,6 +59,7 @@ public:
 	CStreaming    * GetStreaming() { return m_pStreaming; }
 	CIVModelInfo  * GetModelInfo(int iModelIndex);
 	CIVWeaponInfo * GetWeaponInfo(eWeaponType weaponType);
+	DWORD           GetTime();
 	static void     GameLoadCallback_Static();
 	void            GameLoadCallback();
 	static void     GameProcessCallback_Static();

@@ -13,7 +13,7 @@ extern CNetworkManager * g_pNetworkManager;
 extern CPlayerManager  * g_pPlayerManager;
 extern CVehicleManager * g_pVehicleManager;
 
-void CServerRPCHandler::InitialData(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CServerRPCHandler::InitialData(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	CLogFile::Printf("Got InitialData RPC from player %d\n", senderSocket.playerId);
 
@@ -55,7 +55,7 @@ void CServerRPCHandler::InitialData(CBitStreamInterface * pBitStream, CPlayerSoc
 	CLogFile::Printf("Player %d has joined the game (Name: %s)\n", senderSocket.playerId, strName.C_String());
 }
 
-void CServerRPCHandler::ChatInput(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CServerRPCHandler::ChatInput(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	CLogFile::Printf("Got ChatInput RPC from player %d\n", senderSocket.playerId);
 
@@ -116,7 +116,7 @@ void CServerRPCHandler::ChatInput(CBitStreamInterface * pBitStream, CPlayerSocke
 	}
 }
 
-void CServerRPCHandler::VehicleEnterExit(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CServerRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	CLogFile::Printf("Got VehicleEnterExit RPC from player %d\n", senderSocket.playerId);
 
@@ -262,10 +262,26 @@ void CServerRPCHandler::VehicleEnterExit(CBitStreamInterface * pBitStream, CPlay
 			pPlayer->SetVehicle(NULL);
 			pPlayer->SetVehicleSeatId(0);
 		}
+		// Is this a forceful exit?
+		else if(byteVehicleEntryExitType == VEHICLE_EXIT_FORCEFUL)
+		{
+			// Call the event
+			CSquirrelArguments arguments;
+			arguments.push(vehicleId);
+			arguments.push(pPlayer->GetVehicleSeatId());
+			pPlayer->CallEvent("vehicleForcefulExit", &arguments);
+
+			// Reset the vehicle occupant
+			pVehicle->SetOccupant(pPlayer->GetVehicleSeatId(), NULL);
+
+			// Reset the player vehicle and seat id
+			pPlayer->SetVehicle(NULL);
+			pPlayer->SetVehicleSeatId(0);
+		}
 	}
 }
 
-void CServerRPCHandler::PlayerSync(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CServerRPCHandler::PlayerSync(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
@@ -281,13 +297,16 @@ void CServerRPCHandler::PlayerSync(CBitStreamInterface * pBitStream, CPlayerSock
 	if(pPlayer)
 	{
 		// Deserialize the player from the bit stream
-		//pPlayer->Deserialize(pBitStream); // TODO
+		pPlayer->Deserialize(pBitStream);
 
 		// Construct the bit stream
 		CBitStream bitStream;
+
+		// Write the player id
 		bitStream.WriteCompressed(pPlayer->GetPlayerId());
-		// TODO: CBitStream::Write(CBitStreamInterface * pBitStream) that uses the code below
-		bitStream.Write((char *)pBitStream->GetData(), pBitStream->GetNumberOfBytesUsed());
+
+		// Serialize the player to the bit stream
+		pPlayer->Serialize(&bitStream);
 
 		// Send it to all other players
 		g_pNetworkManager->RPC(RPC_PLAYER_SYNC, &bitStream, PRIORITY_LOW, RELIABILITY_UNRELIABLE_SEQUENCED, senderSocket.playerId, true);

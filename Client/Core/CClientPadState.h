@@ -14,8 +14,7 @@
 class CClientPadState
 {
 public:
-	BYTE byteCurrentKeys[INPUT_COUNT];
-	BYTE bytePreviousKeys[INPUT_COUNT];
+	BYTE byteKeys[INPUT_COUNT];
 
 	CClientPadState();
 
@@ -24,5 +23,4 @@ public:
 	void FromNetPadState(const CNetworkPadState& netPadState, bool bOnFoot);
 	void ToNetPadState(CNetworkPadState& netPadState, bool bOnFoot);
 	void Reset();
-	void Invalidate();
 };

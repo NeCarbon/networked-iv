@@ -14,10 +14,6 @@ GetNetServerInterface_t     CNetworkModule::m_pfnGetNetServerInterface;
 DestroyNetServerInterface_t CNetworkModule::m_pfnDestroyNetServerInterface;
 GetNetClientInterface_t     CNetworkModule::m_pfnGetNetClientInterface;
 DestroyNetClientInterface_t CNetworkModule::m_pfnDestroyNetClientInterface;
-GetBitStreamInterface1_t    CNetworkModule::m_pfnGetBitStreamInterface1;
-GetBitStreamInterface2_t    CNetworkModule::m_pfnGetBitStreamInterface2;
-GetBitStreamInterface3_t    CNetworkModule::m_pfnGetBitStreamInterface3;
-DestroyBitStreamInterface_t CNetworkModule::m_pfnDestroyBitStreamInterface;
 
 CNetworkModule::CNetworkModule()
 {
@@ -56,15 +52,10 @@ bool CNetworkModule::Init()
 	m_pfnDestroyNetServerInterface = (DestroyNetServerInterface_t)m_pLibrary->GetProcedureAddress("DestroyNetServerInterface");
 	m_pfnGetNetClientInterface = (GetNetClientInterface_t)m_pLibrary->GetProcedureAddress("GetNetClientInterface");
 	m_pfnDestroyNetClientInterface = (DestroyNetClientInterface_t)m_pLibrary->GetProcedureAddress("DestroyNetClientInterface");
-	m_pfnGetBitStreamInterface1 = (GetBitStreamInterface1_t)m_pLibrary->GetProcedureAddress("GetBitStreamInterface1");
-	m_pfnGetBitStreamInterface2 = (GetBitStreamInterface2_t)m_pLibrary->GetProcedureAddress("GetBitStreamInterface2");
-	m_pfnGetBitStreamInterface3 = (GetBitStreamInterface3_t)m_pLibrary->GetProcedureAddress("GetBitStreamInterface3");
-	m_pfnDestroyBitStreamInterface = (DestroyBitStreamInterface_t)m_pLibrary->GetProcedureAddress("DestroyBitStreamInterface");
 
 	// Verify the pointers to the net module functions
 	if(!m_pfnGetNetServerInterface || !m_pfnDestroyNetServerInterface || !m_pfnGetNetClientInterface || 
-		!m_pfnDestroyNetClientInterface || !m_pfnGetBitStreamInterface1 || !m_pfnGetBitStreamInterface2 || 
-		!m_pfnGetBitStreamInterface3 || !m_pfnDestroyBitStreamInterface)
+		!m_pfnDestroyNetClientInterface)
 	{
 		CLogFile::Printf("Net module is corrupt!\n");
 		return false;
@@ -123,37 +114,4 @@ void CNetworkModule::DestroyNetClientInterface(CNetClientInterface * pNetClient)
 {
 	// Call the DestroyNetClientInterface function
 	m_pfnDestroyNetClientInterface(pNetClient);
-}
-
-CNetBitStreamInterface * CNetworkModule::GetBitStreamInterface1()
-{
-	// Call the GetBitStreamInterface1 function
-	CNetBitStreamInterface * pBitStream = m_pfnGetBitStreamInterface1();
-
-	// Return the BitStream instance
-	return pBitStream;
-}
-
-CNetBitStreamInterface * CNetworkModule::GetBitStreamInterface2(const unsigned int initialBytesToAllocate)
-{
-	// Call the GetBitStreamInterface2 function
-	CNetBitStreamInterface * pBitStream = m_pfnGetBitStreamInterface2(initialBytesToAllocate);
-
-	// Return the BitStream instance
-	return pBitStream;
-}
-
-CNetBitStreamInterface * CNetworkModule::GetBitStreamInterface3(unsigned char* _data, const unsigned int lengthInBytes, bool _copyData)
-{
-	// Call the GetBitStreamInterface3 function
-	CNetBitStreamInterface * pBitStream = m_pfnGetBitStreamInterface3(_data, lengthInBytes, _copyData);
-
-	// Return the BitStream instance
-	return pBitStream;
-}
-
-void CNetworkModule::DestroyBitStreamInterface(CNetBitStreamInterface * pBitStream)
-{
-	// Call the DestroyNetClientInterface function
-	m_pfnDestroyBitStreamInterface(pBitStream);
 }

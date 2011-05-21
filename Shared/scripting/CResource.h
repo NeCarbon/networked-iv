@@ -22,14 +22,14 @@ public:
 		STATE_STARTUP_CANCELLED
 	};
 
-					CResource(String name);
+					CResource(String strDirectory, String strName);
 					~CResource();
 
 	bool			Reload();
 	bool			Start();
 	bool			Stop();
 	bool			IsValidMeta();
-	void			Process(DWORD dwTickCount);
+	void			Process(unsigned long ulTime);
 
 	eResourceState	GetState();
 	String			GetName();

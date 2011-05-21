@@ -30,6 +30,7 @@ public:
 	void                             UpdateInterior(unsigned int uiInterior);
 	void                             ForceStreamIn(CStreamableEntity * pEntity, bool bInstantly = false);
 	void                             remove(CStreamableEntity * pEntity);
+	void                             NotifyDimensionChange(CStreamableEntity * pEntity);
 	std::list<CStreamableEntity *> * GetStreamedInEntitiesOfType(eEntityType eType);
 	CClientPlayer                  * GetPlayerFromGamePlayerPed(IVPlayerPed * pGamePlayerPed);
 	CClientVehicle                 * GetVehicleFromGameVehicle(IVVehicle * pGameVehicle);

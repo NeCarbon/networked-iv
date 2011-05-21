@@ -14,9 +14,9 @@
 class CServerPacketHandler : public CPacketHandler
 {
 private:
-	static void NewConnection(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void Disconnected(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void LostConnection(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+	static void NewConnection(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void Disconnected(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void LostConnection(CBitStream * pBitStream, CPlayerSocket senderSocket);
 
 public:
 	void        Register();

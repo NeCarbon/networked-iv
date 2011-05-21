@@ -11,13 +11,14 @@
 
 #include <StdInc.h>
 
-#define FUNC_CPedTaskManager__SetTask 0x9E58B0
+#define FUNC_CPedTaskManager__SetTask          0x9E58B0
+#define FUNC_CPedTaskManager__SetTaskSecondary 0x9E5AC0
 
 // From Multi Theft Auto
 // Priority Task Types
 enum eTaskPriority
 {
-	TASK_PRIORITY_PHYSICAL_RESPONSE = 0,
+	TASK_PRIORITY_PHYSICAL_RESPONSE,
 	TASK_PRIORITY_EVENT_RESPONSE_TEMP,
 	TASK_PRIORITY_EVENT_RESPONSE_NONTEMP,
 	TASK_PRIORITY_PRIMARY,
@@ -29,8 +30,8 @@ enum eTaskPriority
 // Secondary Task Types
 enum eTaskSecondary
 {
-	TASK_SECONDARY_ATTACK = 0,              // want duck to be after attack
-	TASK_SECONDARY_DUCK,                    // because attack controls ducking movement
+	TASK_SECONDARY_ATTACK,              // want duck to be after attack
+	TASK_SECONDARY_DUCK,                // because attack controls ducking movement
 	TASK_SECONDARY_SAY,
 	TASK_SECONDARY_FACIAL_COMPLEX,
 	TASK_SECONDARY_PARTIAL_ANIM,
@@ -40,13 +41,14 @@ enum eTaskSecondary
 
 class IVTask;
 class CIVTask;
+class CIVPed;
 
 class IVPedTaskManager
 {
 public:
-	IVTask * m_tasks[TASK_PRIORITY_MAX];
-	IVTask * m_secondaryTasks[TASK_SECONDARY_MAX];
-	PAD(IVTask, pad0, (3 * 4)); // 3 * (IVTask *) (Natural Motion Perhaps?)?
+	IVTask * m_primaryTasks[TASK_PRIORITY_MAX];    // 00-14
+	IVTask * m_secondaryTasks[TASK_SECONDARY_MAX]; // 14-2C
+	IVTask * m_unknownTasks[3];                    // 2C-38 (Natural Motion Perhaps?)
 	// TODO: Find size
 };
 
@@ -54,18 +56,28 @@ class CIVPedTaskManager
 {
 private:
 	IVPedTaskManager * m_pPedTaskManager;
+	CIVPed           * m_pPed;
 
 public:
-	CIVPedTaskManager(IVPedTaskManager * pPedTaskManager);
+	CIVPedTaskManager(IVPedTaskManager * pPedTaskManager, CIVPed * pPed);
 
-	void               SetPedTaskManager(IVPedTaskManager * pPedTaskManager);
-	IVPedTaskManager * GetPedTaskManager();
+	void               SetPedTaskManager(IVPedTaskManager * pPedTaskManager) { m_pPedTaskManager = pPedTaskManager; }
+	IVPedTaskManager * GetPedTaskManager() { return m_pPedTaskManager; }
+	void               SetPed(CIVPed * pPed) { m_pPed = pPed; }
+	CIVPed           * GetPed() { return m_pPed; }
 
-	// Priority tasks
+	// Primary tasks
 	void               SetTask(CIVTask * pTask, int iTaskPriority, bool bForceNewTask = false);
 	void               RemoveTask(int iTaskPriority);
 	CIVTask          * GetTask(int iTaskPriority);
 
 	// Secondary tasks
+	void               SetTaskSecondary(CIVTask * pTask, int iType);
+	void               RemoveTaskSecondary(int iType);
 	CIVTask          * GetTaskSecondary(int iType);
+
+	// Unknown tasks
+	// TODO
+
+	void               ClearTasks(int iAbortPriority);
 };

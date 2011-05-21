@@ -11,10 +11,11 @@
 
 #include <StdInc.h>
 
-// Analog values
-#define MIN_ANALOG_VALUE 0
-#define DEFAULT_ANALOG_VALUE 128
-#define MAX_ANALOG_VALUE 255
+// Input values
+#define MIN_INPUT_VALUE 0
+#define DEFAULT_BINARY_INPUT_VALUE 0
+#define DEFAULT_ANALOG_INPUT_VALUE 128
+#define MAX_INPUT_VALUE 255
 
 // Enum from 0xF132F8 (char szControlNames[187][44])
 enum eInput
@@ -209,30 +210,109 @@ enum eInput
 	INPUT_COUNT
 };
 
+// TODO: Move these functions to somewhere more appropriate
+static bool IsAnalogInput(eInput input)
+{
+	switch(input)
+	{
+	case INPUT_MOVE_LEFT:
+	case INPUT_MOVE_RIGHT:
+	case INPUT_MOVE_UP:
+	case INPUT_MOVE_DOWN:
+	case INPUT_LOOK_LEFT:
+	case INPUT_LOOK_RIGHT:
+	case INPUT_LOOK_UP:
+	case INPUT_LOOK_DOWN:
+	case INPUT_SNIPER_ZOOM_IN:
+	case INPUT_SNIPER_ZOOM_OUT:
+	case INPUT_SNIPER_ZOOM_IN_ALTERNATE:
+	case INPUT_SNIPER_ZOOM_OUT_ALTERNATE:
+	case INPUT_VEH_MOVE_LEFT:
+	case INPUT_VEH_MOVE_RIGHT:
+	case INPUT_VEH_MOVE_UP:
+	case INPUT_VEH_MOVE_DOWN:
+	case INPUT_MOUSE_UD:
+	case INPUT_MOUSE_LR:
+	case INPUT_MOVE_KEY_STUNTJUMP:
+	case INPUT_FRONTEND_AXIS_UD:
+	case INPUT_FRONTEND_AXIS_LR:
+	case INPUT_FE_MOUSE_UD:
+	case INPUT_FE_MOUSE_LR:
+	case INPUT_VEH_MOVE_LEFT_2:
+	case INPUT_VEH_MOVE_RIGHT_2:
+		return true;
+	}
+
+	return false;
+}
+
+static bool IsBinaryInput(eInput input)
+{
+	return (!IsAnalogInput(input));
+}
+
+static bool InputHasHistoryData(eInput input)
+{
+	switch(input)
+	{
+	case INPUT_AIM: // On Foot - Lock On 2
+	case INPUT_MOVE_LEFT: // On Foot - Move Left
+	case INPUT_MOVE_RIGHT: // On Foot - Move Right
+	case INPUT_MOVE_UP: // On Foot - Move Forward
+	case INPUT_MOVE_DOWN: // On Foot - Move Backwards
+	case INPUT_LOOK_LEFT:
+	case INPUT_LOOK_RIGHT:
+	case INPUT_PHONE_PUT_AWAY:
+	case INPUT_VEH_HEADLIGHT: // In Vehicle - Headlight
+	case INPUT_VEH_EXIT:
+	case INPUT_VEH_NEXT_RADIO:
+	case INPUT_VEH_PREV_RADIO:
+	case INPUT_VEH_HORN: // In Vehicle - Horn
+	case INPUT_MELEE_ATTACK1: // On Foot - Combat Punch 1
+	case INPUT_MELEE_ATTACK2: // On Foot - Combat Punch 2
+	case INPUT_MELEE_ATTACK3:
+	case INPUT_MELEE_KICK: // On Foot - Combat Kick
+	case INPUT_MELEE_BLOCK: // On Foot - Combat Block
+	case INPUT_MELEE_ATTACK4:
+	case INPUT_FREE_AIM: // On Foot - Lock On 3
+	case INPUT_MOUSE_LR:
+	case INPUT_TURN_OFF_RADIO: // In Vehicle - Turn Off Radio
+	case INPUT_NEXT_TRACK: // In Vehicle - Next Song
+	case INPUT_PREV_TRACK: // In Vehicle - Previous Song
+	case INPUT_REPLAY_SAVE_TO_HDD: // F2
+	case INPUT_FRONTEND_REPLAY_ADVANCE:
+	case INPUT_FRONTEND_REPLAY_BACK:
+		return true;
+	}
+
+	return false;
+}
+
 // rage::ioManager?
 class IVPad
 {
 public:
-	CPadConfig m_padConfig[5];     // 0000-2698
+	CPadConfig m_padConfig[5];       // 0000-2698
 	CPadData m_padData[INPUT_COUNT]; // 2698-3248
-	CPadData m_otherPadData0;      // 3248-3258
-	CPadData m_otherPadData1;      // 3258-3268
-	CPadData m_otherPadData2;      // 3268-3278
-	CPadData m_otherPadData3;      // 3278-3288
-	PAD(IVPad, pad0, 0x4);         // 3288-328C
-	bool m_bIsUsingController;     // 328C-328D
-	PAD(IVPad, pad1, 0x3);         // 328D-3290
-	CPadData m_otherPadData4;      // 3290-32A0
-	PAD(IVPad, pad2, 0xC);         // 32A0-32AC
-	CPadConfig m_textPadConfig;    // 32AC-3A64
-	PAD(IVPad, pad3, 0x8);         // 3A64-3A6C
-	DWORD m_dwLastUpdateTime;      // 3A6C-3A70
-	PAD(IVPad, pad4, 0x14);        // 3A70-3A84
+	CPadData m_otherPadData0;        // 3248-3258
+	CPadData m_otherPadData1;        // 3258-3268
+	CPadData m_otherPadData2;        // 3268-3278
+	CPadData m_otherPadData3;        // 3278-3288
+	PAD(IVPad, pad0, 0x4);           // 3288-328C
+	bool m_bIsUsingController;       // 328C-328D
+	PAD(IVPad, pad1, 0x3);           // 328D-3290
+	CPadData m_otherPadData4;        // 3290-32A0
+	PAD(IVPad, pad2, 0xC);           // 32A0-32AC
+	CPadConfig m_textPadConfig;      // 32AC-3A64
+	PAD(IVPad, pad3, 0x8);           // 3A64-3A6C
+	DWORD m_dwLastUpdateTime;        // 3A6C-3A70
+	PAD(IVPad, pad4, 0x14);          // 3A70-3A84
 };
 
 class CIVPad
 {
 private:
+	bool    m_bCreatedByUs;
 	IVPad * m_pPad;
 
 public:
@@ -243,6 +323,10 @@ public:
 	void    SetPad(IVPad * pPad);
 	IVPad * GetPad();
 
+	void    SetCurrentClientPadState(CClientPadState clientPadState);
+	void    GetCurrentClientPadState(CClientPadState& clientPadState);
+	void    SetLastClientPadState(CClientPadState clientPadState);
+	void    GetLastClientPadState(CClientPadState& clientPadState);
 	void    SetIsUsingController(bool bIsUsingController);
 	bool    GetIsUsingController();
 	void    SetLastUpdateTime(DWORD dwLastUpdateTime);

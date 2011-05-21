@@ -25,6 +25,7 @@
 
 // Shared
 #include <Common.h>
+#include <MemTrack.h> // Must be included after Common.h for NIV_DEBUG
 #include <CString.h>
 #include <SharedUtility.h>
 #include <CPlayerSocket.h>
@@ -37,8 +38,6 @@
 #include <CVector3.h>
 #include <CMath.h>
 #include <CNetworkPadState.h>
-#include <CNetBitStreamInterface.h>
-#include <CBitStreamInterface.h>
 #include <CBitStream.h>
 #include <CPacketHandler.h>
 #include <CRPCHandler.h>

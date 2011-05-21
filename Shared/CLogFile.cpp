@@ -7,8 +7,6 @@
 //
 //==========================================================================
 
-// TODO: A custom function that gets called after CLogFile::Printf (CLogFile::SetCustomCallback)
-// (Useful for outputting log messages to the chatbox, adding a scripting function, e.t.c.)
 #include <StdInc.h>
 
 FILE * CLogFile::m_fLogFile = NULL;
@@ -36,13 +34,13 @@ void CLogFile::Printf(const char * szFormat, ...)
 {
 	// Collect the arguments
 	va_list vaArgs;
-	char szBuffer[1024];
+	char szBuffer[2048];
 	va_start(vaArgs, szFormat);
 	vsnprintf(szBuffer, sizeof(szBuffer), szFormat, vaArgs);
 	va_end(vaArgs);
 
 	// Print the message
-	printf("%s", szBuffer);
+	printf(szBuffer);
 
 	// If we have a callback and it is enabled call it
 	if(m_bUseCallback && m_pfnCallback)

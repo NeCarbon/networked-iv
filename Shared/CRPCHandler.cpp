@@ -81,7 +81,7 @@ bool CRPCHandler::HandlePacket(CPacket * pPacket)
 	if(pPacket->packetId == PACKET_RPC)
 	{
 		// Construct the bit stream
-		CBitStream bitStream(pPacket->ucData, pPacket->uLength, false);
+		CBitStream bitStream(pPacket->ucData, pPacket->uiLength, false);
 		RPCIdentifier rpcId;
 
 		// Read the rpc id

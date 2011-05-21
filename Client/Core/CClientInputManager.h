@@ -11,13 +11,24 @@
 
 #include <StdInc.h>
 
+// TODO: Control structure and each control type (InputControl, InputGTAControl, InputScriptControl, e.t.c.)
+// inherit from it
+
+enum eInputType
+{
+	INPUT_TYPE_MOUSE,
+	INPUT_TYPE_KEYBOARD,
+	INPUT_TYPE_KEYBOARD_EXTENDED
+};
+
 struct InputControl
 {
 	const char * szName;
 	DWORD dwAction;
 	DWORD dwDIAction;
+	eInputType type;
 	bool bEnabled;
-	bool bState;
+	BYTE byteValue;
 };
 
 enum eInputGTAControlType
@@ -34,7 +45,7 @@ struct InputGTAControl
 	eInput action;
 	eInputGTAControlType type;
 	bool bEnabled;
-	bool bState;
+	BYTE byteValue;
 };
 
 class CInputManager
@@ -43,5 +54,6 @@ public:
 	CInputManager();
 	~CInputManager();
 
+	void PreProcess();
 	void Process();
 };

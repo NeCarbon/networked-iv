@@ -231,6 +231,16 @@ void CChatWindow::ProcessInput()
 				ExitProcess(0);
 				return;
 			}
+			else if(strCommand == "kill")
+			{
+				CClientPlayer * pLocalPlayer = g_pClient->GetPlayerManager()->GetLocalPlayer();
+				pLocalPlayer->Kill();
+			}
+			else if(strCommand == "ikill")
+			{
+				CClientPlayer * pLocalPlayer = g_pClient->GetPlayerManager()->GetLocalPlayer();
+				pLocalPlayer->Kill(true);
+			}
 			else if(strCommand == "light")
 			{
 				CClientVehicle * pVehicle = g_pClient->GetPlayerManager()->GetLocalPlayer()->GetVehicle();

@@ -30,11 +30,17 @@ private:
 	CNetworkPadState m_currentNetPadState;
 	CVehicle       * m_pVehicle;
 	BYTE             m_byteVehicleSeatId;
+	CVector3         m_vecPosition;
+	float            m_fHeading;
+	CVector3         m_vecMoveSpeed;
+	bool             m_bIsDucking;
 
 public:
 	CPlayer(EntityId playerId, String strName);
 	~CPlayer();
 
+	bool       IsOnFoot() { return (m_pVehicle == NULL); }
+	bool       IsInVehicle() { return (m_pVehicle != NULL); }
 	EntityId   GetPlayerId();
 	String     GetName();
 	String     GetIp();
@@ -49,8 +55,14 @@ public:
 	void       SpawnForWorld();
 	void       DestroyForPlayer(EntityId playerId);
 	void       DestroyForWorld();
-	void       SetVehicle(CVehicle * pVehicle);
-	CVehicle * GetVehicle();
-	void       SetVehicleSeatId(BYTE byteSeatId);
-	BYTE       GetVehicleSeatId();
+	void       SetVehicle(CVehicle * pVehicle) { m_pVehicle = pVehicle; }
+	CVehicle * GetVehicle() { return m_pVehicle; }
+	void       SetVehicleSeatId(BYTE byteSeatId) { m_byteVehicleSeatId = byteSeatId; }
+	BYTE       GetVehicleSeatId() { return m_byteVehicleSeatId; }
+	void       SetDucking(bool bIsDucking) { m_bIsDucking = bIsDucking; }
+	bool       IsDucking() { return m_bIsDucking; }
+
+	// Information Serialization/Deserialization
+	void       Serialize(CBitStream * pBitStream);
+	bool       Deserialize(CBitStream * pBitStream);
 };

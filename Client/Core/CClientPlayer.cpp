@@ -3,6 +3,7 @@
 // File: CClientPlayer.cpp
 // Project: Client
 // Author(s): jenksta
+//            Multi Theft Team
 // License: See LICENSE in root directory
 //
 //==========================================================================
@@ -15,7 +16,7 @@
 extern CClient * g_pClient;
 extern CRootEntity * g_pRootEntity;
 
-CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_PLAYER, 200.0f), CEntity(ENTITY_TYPE_PLAYER, g_pRootEntity, "player")
+CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(ENTITY_TYPE_PLAYER, g_pRootEntity, "player", g_pClient->GetStreamer(), 200.0f)
 {
 	m_bIsLocalPlayer = bIsLocalPlayer;
 	m_playerId = INVALID_ENTITY_ID;
@@ -35,6 +36,7 @@ CClientPlayer::CClientPlayer(bool bIsLocalPlayer) : CStreamableEntity(g_pClient-
 	m_byteVehicleSeatId = 0;
 	ResetVehicleEnterExit();
 	m_bDucking = false;
+	m_bSentDeath = false;
 
 	if(bIsLocalPlayer)
 	{
@@ -64,6 +66,9 @@ CClientPlayer::~CClientPlayer()
 {
 	// Notify the streamer that we have been deleted
 	OnDelete();
+
+	// Call the CStreamableEntity destructor
+	CStreamableEntity::~CStreamableEntity();
 }
 
 // TODO: Use this to create local player ped too instead of using scripting natives?
@@ -86,10 +91,6 @@ bool CClientPlayer::Create()
 
 		// Get the model index
 		int iModelIndex = m_pModelInfo->GetIndex();
-
-		// Patch to allow us to create like local player (Only needed if player data is MAKEWORD(1, 1), 
-		// (which crashes anyways))
-		//CPatcher::InstallNopPatch((g_pClient->GetBaseAddress()+ 0x81CD52), 2);
 
 		// Create player info instance
 		m_pPlayerInfo = new CIVPlayerInfo(m_byteInternalPlayerNumber);
@@ -323,6 +324,7 @@ void CClientPlayer::StreamOut()
 
 void CClientPlayer::Process()
 {
+	// Are we spawned?
 	if(IsSpawned())
 	{
 		// Process vehicle entry/exit
@@ -337,9 +339,9 @@ void CClientPlayer::Process()
 			memcpy(&m_previousNetPadState, &m_currentNetPadState, sizeof(CNetworkPadState));
 
 			// Update the current net pad state
-			CClientPadState padState;
-			GetGamePadState(&padState);
-			padState.ToNetPadState(m_currentNetPadState, !IsInVehicle());
+			CClientPadState currentPadState;
+			g_pClient->GetGame()->GetPad()->GetCurrentClientPadState(currentPadState);
+			currentPadState.ToNetPadState(m_currentNetPadState, IsOnFoot());
 		}
 		else
 		{
@@ -429,38 +431,35 @@ void CClientPlayer::SetNetPadState(const CNetworkPadState& netPadState)
 	// Copy the net pad state to the current net pad state
 	memcpy(&m_currentNetPadState, &netPadState, sizeof(CNetworkPadState));
 
-	// Get the appropriate pad state
-	CClientPadState padState;
-
-	// Is this the local player?
-	if(IsLocalPlayer())
+	// Are we spawned?
+	if(IsSpawned())
 	{
+		// Get the game pad
+		CIVPad * pPad = g_pClient->GetGame()->GetPad();
+
+		// Are we not the local player?
+		if(!IsLocalPlayer())
+		{
+			// Do we have a valid context data pointer?
+			if(m_pContextData)
+			{
+				// Get the context data pad
+				pPad = m_pContextData->GetPad();
+			}
+		}
+
 		// Get the current pad state
-		GetGamePadState(&padState);
-	}
-	else
-	{
-		// Get the player pad state
-		if(m_pContextData)
-			memcpy(&padState, m_pContextData->GetPadState(), sizeof(CClientPadState));
-	}
+		CClientPadState currentPadState;
+		pPad->GetCurrentClientPadState(currentPadState);
 
-	// Copy the net pad state to the pad state
-	padState.Invalidate();
-	padState.FromNetPadState(netPadState, !IsInVehicle());
+		// Set the last pad state
+		pPad->SetLastClientPadState(currentPadState);
 
-	// Set the appropriate pad state
-	// Is this the local player?
-	if(IsLocalPlayer())
-	{
+		// Copy the net pad state to the pad state
+		currentPadState.FromNetPadState(netPadState, IsOnFoot());
+
 		// Set the current pad state
-		SetGamePadState(&padState);
-	}
-	else
-	{
-		// Set the player pad state
-		if(m_pContextData)
-			memcpy(m_pContextData->GetPadState(), &padState, sizeof(CClientPadState));
+		pPad->SetCurrentClientPadState(currentPadState);
 	}
 }
 
@@ -498,6 +497,67 @@ void CClientPlayer::GetAimData(Matrix& matAim)
 		else
 			matAim.Identity();
 	}
+}
+
+void CClientPlayer::Kill(bool bInstantly)
+{
+	// Are we spawned and not already dead?
+	if(IsSpawned() && !IsDead())
+	{
+		if(bInstantly)
+		{
+			// Create the dead task
+			// if this doesn't work vary last 2 params (1, 0 : 0, 1 : 1, 1 : 0, 0)
+			CIVTaskSimpleDead * pTask = new CIVTaskSimpleDead(g_pClient->GetGame()->GetTime(), 1, 0);
+
+			// Did the task create successfully?
+			if(pTask)
+			{
+				// Set it as the ped task
+				pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_DEFAULT);
+			}
+		}
+		else
+		{
+			// Create the death task
+			// guess from sa (thx mta)
+			// wep type, body part, anim group, anim id, unknown?
+			CIVTaskComplexDie * pTask = new CIVTaskComplexDie(0, 0, 44, 190, 4.0f, 0.0f, 1);
+
+			// Did the task create successfully?
+			if(pTask)
+			{
+				// Set it as the ped task
+				pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
+			}
+		}
+
+		// Set the health and armour to 0
+		SetHealth(0);
+		//SetArmour(0);
+
+		// Reset the pad state
+		CNetworkPadState padState;
+		SetNetPadState(padState);
+	}
+}
+
+bool CClientPlayer::IsDead()
+{
+	bool bReturn = false;
+
+	if(IsSpawned())
+	{
+		CIVTask * pTask = m_pPlayerPed->GetPedTaskManager()->GetTask(TASK_PRIORITY_PRIMARY);
+
+		if(pTask)
+		{
+			if(pTask->GetType() == TASK_SIMPLE_DEAD)
+				bReturn = true;
+		}
+	}
+
+	return bReturn;
 }
 
 void CClientPlayer::SetHealth(unsigned int uiHealth)
@@ -904,6 +964,7 @@ BYTE GetDoorFromSeat(BYTE byteSeatId)
 	return byteDoorId;
 }
 
+int iProcessFrames = 0;
 
 void CClientPlayer::EnterVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 {
@@ -976,6 +1037,10 @@ void CClientPlayer::EnterVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 
 		// Reset interpolation
 		ResetInterpolation();
+
+		// see ProcessVehicleEntryExit
+		if(IsLocalPlayer())
+			iProcessFrames = 1;
 	}
 }
 
@@ -1223,6 +1288,22 @@ void CClientPlayer::CheckVehicleEntryExitKey()
 
 void CClientPlayer::ProcessVehicleEntryExit()
 {
+	// this hack is needed to make vehicle entry work for network vehicles
+	// (due to the fact when you call task natives the task doesnt apply till next frame)
+	// once we apply vehicle entry/exit tasks properly, this can be removed
+	// note: not safe for more than one player at a time
+	if(IsLocalPlayer())
+	{
+		if(iProcessFrames > 0)
+		{
+			iProcessFrames++;
+			if(iProcessFrames == 4)
+				iProcessFrames = 0;
+			else
+				return;
+		}
+	}
+
 	// Are we spawned?
 	if(IsSpawned())
 	{
@@ -1361,6 +1442,16 @@ void CClientPlayer::ProcessVehicleEntryExit()
 				// Are we flagged as in a vehicle?
 				if(m_pVehicle)
 				{
+					// Is this a network vehicle?
+					if(m_pVehicle->IsNetworkVehicle())
+					{
+						// Send the network rpc
+						CBitStream bitStream;
+						bitStream.Write((BYTE)VEHICLE_EXIT_FORCEFUL);
+						bitStream.WriteCompressed(m_pVehicle->GetVehicleId());
+						g_pClient->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE);
+					}
+
 					// Player has forcefully exited the vehicle (out of windscreen, e.t.c.)
 					m_pVehicle->SetOccupant(m_byteVehicleSeatId, NULL);
 					m_pVehicle = NULL;
@@ -1440,12 +1531,12 @@ void CClientPlayer::Interpolate()
 
 void CClientPlayer::SetTargetPosition(const CVector3& vecPosition, unsigned long ulDelay)
 {
+	// Update our target position
+	UpdateTargetPosition();
+
 	// Are we spawned?
 	if(IsSpawned())
 	{
-		// Update our target position
-		UpdateTargetPosition();
-
 		// Get our position
 		CVector3 vecCurrentPosition;
 		GetPosition(vecCurrentPosition);
@@ -1464,6 +1555,11 @@ void CClientPlayer::SetTargetPosition(const CVector3& vecPosition, unsigned long
 		// Initialize the interpolation
 		m_interp.pos.fLastAlpha = 0.0f;
 	}
+	else
+	{
+		// Set the position
+		SetPosition(vecPosition);
+	}
 }
 
 void CClientPlayer::RemoveTargetPosition()
@@ -1476,7 +1572,7 @@ void CClientPlayer::ResetInterpolation()
 	RemoveTargetPosition();
 }
 
-void CClientPlayer::Serialize(CBitStreamInterface * pBitStream)
+void CClientPlayer::Serialize(CBitStream * pBitStream)
 {
 	// Write the player net pad state
 	CNetworkPadState netPadState;
@@ -1522,24 +1618,40 @@ void CClientPlayer::Serialize(CBitStreamInterface * pBitStream)
 	}
 }
 
-bool CClientPlayer::Deserialize(CBitStreamInterface * pBitStream)
+bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 {
 	// Read the player net pad state
 	CNetworkPadState netPadState;
 
 	if(!pBitStream->Read(netPadState))
+	{
+		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 1)\n");
 		return false;
+	}
 
 	SetNetPadState(netPadState);
 
+	// Read if we are on foot
+	bool bIsOnFoot = pBitStream->ReadBit();
+
+	// Are we on foot or in a vehicle when we are not meant to be?
+	if(bIsOnFoot != IsOnFoot())
+	{
+		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 2)\n");
+		return false;
+	}
+
 	// Are we on foot?
-	if(IsOnFoot())
+	if(bIsOnFoot)
 	{
 		// Read the player position
 		CVector3 vecPosition;
 
 		if(!pBitStream->Read(vecPosition))
+		{
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 3)\n");
 			return false;
+		}
 
 		SetTargetPosition(vecPosition, NETWORK_TICK_RATE);
 
@@ -1548,7 +1660,10 @@ bool CClientPlayer::Deserialize(CBitStreamInterface * pBitStream)
 		float fHeading;
 
 		if(!pBitStream->Read(fHeading))
+		{
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 4)\n");
 			return false;
+		}
 
 		SetCurrentHeading(fHeading);
 
@@ -1556,7 +1671,10 @@ bool CClientPlayer::Deserialize(CBitStreamInterface * pBitStream)
 		CVector3 vecMoveSpeed;
 
 		if(!pBitStream->Read(vecMoveSpeed))
+		{
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 5)\n");
 			return false;
+		}
 
 		SetMoveSpeed(vecMoveSpeed);
 
@@ -1569,20 +1687,31 @@ bool CClientPlayer::Deserialize(CBitStreamInterface * pBitStream)
 		EntityId vehicleId;
 
 		if(!pBitStream->ReadCompressed(vehicleId))
+		{
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 6)\n");
 			return false;
+		}
 
 		// Read the vehicle seat id
 		BYTE byteSeatId;
 
 		if(!pBitStream->Read(byteSeatId))
+		{
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 7)\n");
 			return false;
+		}
+
+		// TODO: Check against vehicle id for validity?
 
 		// Get the vehicle pointer
 		CClientVehicle * pVehicle = g_pClient->GetVehicleManager()->Get(vehicleId);
 
 		// Is the vehicle pointer valid?
 		if(!pVehicle)
+		{
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 8)\n");
 			return false;
+		}
 
 		// Are we not already in the vehicle?
 		if(m_pVehicle != pVehicle)
@@ -1595,7 +1724,11 @@ bool CClientPlayer::Deserialize(CBitStreamInterface * pBitStream)
 		if(byteSeatId == 0)
 		{
 			// Deserialize the vehicle from the bit stream
-			pVehicle->Deserialize(pBitStream);
+			if(!pVehicle->Deserialize(pBitStream))
+			{
+				CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 9)\n");
+				return false;
+			}
 		}
 	}
 

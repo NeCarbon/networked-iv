@@ -208,6 +208,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\MemTrack.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MemTrack.h"
+				>
+			</File>
+			<File
 				RelativePath=".\StdInc.cpp"
 				>
 				<FileConfiguration

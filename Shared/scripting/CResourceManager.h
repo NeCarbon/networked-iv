@@ -26,19 +26,20 @@ class CResourceManager
 		eResourceQueueType eType;
 	};
 public:
-				CResourceManager();
+				CResourceManager(String strResourceDirectory);
 				~CResourceManager();
 
 	CResource*	Get(String name);
 	CResource*	Get(SQVM* pVM);
 
-	bool		Load(String name, bool start = true);
+	bool		Load(String strName, bool bStart = true);
 	bool		Start(CResource* pResource);
 	bool		Stop(CResource* pResource);
 	bool		Restart(CResource* pResource);
 
-	void		Process(DWORD dwTickCount);
+	void		Process(unsigned long ulTime);
 private:
+	String                      m_strResourceDirectory;
 	std::list<CResource*>		m_pResources;
 	std::list<sResourceQueue>	m_pResourceQueue;
 };

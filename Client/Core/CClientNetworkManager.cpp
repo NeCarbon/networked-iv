@@ -109,8 +109,8 @@ void CClientNetworkManager::Process()
 
 void CClientNetworkManager::ProcessSync(CClientPlayer * pPlayer)
 {
-	// Is the player pointer valid?
-	if(pPlayer)
+	// Is the player pointer valid and are are they not dead?
+	if(pPlayer && !pPlayer->IsDead())
 	{
 		// Get the current time
 		unsigned long ulCurrentTime = SharedUtility::GetTime();
@@ -183,7 +183,7 @@ void CClientNetworkManager::Disconnect()
 	}
 }
 
-void CClientNetworkManager::RPC(RPCIdentifier rpcId, CBitStreamInterface * pBitStream, ePacketPriority priority, ePacketReliability reliability, char cOrderingChannel)
+void CClientNetworkManager::RPC(RPCIdentifier rpcId, CBitStream * pBitStream, ePacketPriority priority, ePacketReliability reliability, char cOrderingChannel)
 {
 	m_pNetClient->RPC(rpcId, pBitStream, priority, reliability, cOrderingChannel);
 }

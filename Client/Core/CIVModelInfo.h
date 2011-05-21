@@ -99,6 +99,7 @@ public:
 	// 0x60 in IVWeaponModelInfo is IVWeaponInfo * m_pWeaponInfo
 	PAD(IVBaseModelInfo, pad3, 0x14);   // 58-6C
 	DWORD dwVehicleType;                // 6C-70
+	// 0x8C - DWORD dwHandlingIndex;
 	// 0xCC - IVVehicleStruct * m_pVehicleStruct (Vehicle Struct Size = 0x20C)
 	// TODO: Find size(s)
 };

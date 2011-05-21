@@ -55,6 +55,8 @@ public:
 	// TODO: Find size
 };
 
+// TODO: CIVPedWeapons containing CIVWeapon e.t.c.
+
 class IVPedWeapons
 {
 public:
@@ -102,7 +104,7 @@ public:
 	// 0x338 - BYTE m_byteShootRate;
 	// 0x389 - BYTE m_byteAccuracy;
 	// 0x3A8 - Target Entity?
-	// 0x580 - Voice?
+	// 0x580 - CPedAudio (audPedAudioEntity)
 	PAD(IVPed, pad5, 0x6A6);                // 3CA-A70
 	// 0x61C - DWORD m_dwVoiceHash;
 	// 0x7F1 - BYTE m_byteWeaponObjectVisible;

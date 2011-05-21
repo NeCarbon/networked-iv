@@ -14,15 +14,15 @@
 class CClientPacketHandler : public CPacketHandler
 {
 private:
-	static void ConnectionRejected(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void ConnectionSucceeded(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void ConnectionFailed(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void AlreadyConnected(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void ServerFull(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void Disconnected(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void LostConnection(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void Banned(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void PasswordInvalid(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+	static void ConnectionRejected(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void ConnectionSucceeded(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void ConnectionFailed(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void AlreadyConnected(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void ServerFull(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void Disconnected(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void LostConnection(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void Banned(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void PasswordInvalid(CBitStream * pBitStream, CPlayerSocket senderSocket);
 
 public:
 	void        Register();

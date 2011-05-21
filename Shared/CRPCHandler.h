@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-typedef void (* RPCFunction_t)(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+typedef void (* RPCFunction_t)(CBitStream * pBitStream, CPlayerSocket senderSocket);
 
 // Structure used for rpc functions
 struct RPCFunction

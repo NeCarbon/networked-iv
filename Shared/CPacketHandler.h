@@ -14,7 +14,7 @@
 // Type used for packet ids
 typedef unsigned char PacketIdentifier;
 
-typedef void (* PacketFunction_t)(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+typedef void (* PacketFunction_t)(CBitStream * pBitStream, CPlayerSocket senderSocket);
 
 // Structure used for packet functions
 struct PacketFunction

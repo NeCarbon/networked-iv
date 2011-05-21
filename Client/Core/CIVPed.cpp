@@ -37,7 +37,7 @@ void CIVPed::SetPed(IVPed * pPed)
 	if(pPed)
 	{
 		// Create the ped task manager
-		m_pPedTaskManager = new CIVPedTaskManager((IVPedTaskManager *)&(pPed->m_pPedIntelligence->m_pPedTaskManager));
+		m_pPedTaskManager = new CIVPedTaskManager((IVPedTaskManager *)&(pPed->m_pPedIntelligence->m_pPedTaskManager), this);
 	}
 	else
 	{

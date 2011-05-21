@@ -10,13 +10,13 @@
 
 #include <StdInc.h>
 
-CStreamableEntity::CStreamableEntity(CStreamer * pStreamer, eEntityType eType, float fDistance)
+CStreamableEntity::CStreamableEntity(eEntityType EntityType, CEntity* pParent, String strTag, CStreamer * pStreamer, float fDistance) : CEntity(EntityType, pParent, strTag)
 {
 	// set the streamer
 	m_pStreamer = pStreamer;
 
 	// set the type
-	m_eType = eType;
+	m_eType = EntityType;
 
 	// set the streaming distance
 	m_fStreamingDistance = fDistance;
@@ -36,17 +36,28 @@ CStreamableEntity::CStreamableEntity(CStreamer * pStreamer, eEntityType eType, f
 
 CStreamableEntity::~CStreamableEntity()
 {
+	// Are we streamed in?
 	if(m_bIsStreamedIn)
 	{
 		// Nothing we can do at this point, as it'd go only for pure virtual function call with StreamOut()
 		CLogFile::Printf("CStreamableEntity::Deleting %p (%d) while it is streamed in\n", this, m_eType);
 	}
+
+	// Call the CEntity destructor
+	CEntity::~CEntity();
 }
 
 void CStreamableEntity::SetDimension(DimensionId dimensionId)
 {
-	// NOTE: This should trigger an instant restream of ourselves
-	m_dimensionId = dimensionId;
+	// Is the new dimension different from the old dimension?
+	if(dimensionId != m_dimensionId)
+	{
+		// Set the dimension
+		m_dimensionId = dimensionId;
+
+		// Notify the streamer of the dimension change
+		m_pStreamer->NotifyDimensionChange(this);
+	}
 }
 
 void CStreamableEntity::UpdateInterior(unsigned int uiInterior)

@@ -10,7 +10,8 @@
 #pragma once
 
 #include <StdInc.h>
-#include <CNetBitStreamInterface.h>
+
+class CBitStream;
 
 class CNetworkPadState
 {
@@ -70,6 +71,6 @@ public:
 	bool IsJumping() const { return (keys.bJump); }
 	bool IsUsingHandbrake() { return (keys.bHandbrake || keys.bHandbrake2); }
 	bool IsUsingEnterExitVehicle() { return (keys.bEnterExitVehicle); }
-	void Serialize(CNetBitStreamInterface * pBitStream) const;
-	bool Deserialize(CNetBitStreamInterface * pBitStream);
+	void Serialize(CBitStream * pBitStream) const;
+	bool Deserialize(CBitStream * pBitStream);
 };

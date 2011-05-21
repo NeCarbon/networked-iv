@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-class CClientVehicle : public CStreamableEntity, public CEntity
+class CClientVehicle : public CStreamableEntity
 {
 private:
 	EntityId        m_vehicleId;
@@ -70,6 +70,6 @@ public:
 	BYTE             GetMaxPassengers();
 
 	// Information Serialization/Deserialization
-	void             Serialize(CBitStreamInterface * pBitStream);
-	bool             Deserialize(CBitStreamInterface * pBitStream);
+	void             Serialize(CBitStream * pBitStream);
+	bool             Deserialize(CBitStream * pBitStream);
 };

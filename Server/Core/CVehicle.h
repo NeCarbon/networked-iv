@@ -30,6 +30,7 @@ public:
 	CVehicle(EntityId vehicleId, int iModelIndex);
 	~CVehicle();
 
+	EntityId  GetVehicleId() { return m_vehicleId; }
 	bool      IsSpawned() { return m_bSpawned; }
 	void      Reset();
 	void      SpawnForPlayer(EntityId playerId);

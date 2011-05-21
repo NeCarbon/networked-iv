@@ -233,7 +233,7 @@ bool CClient::OnLoad()
 	// Create the resource and scripting manager
 	CEntityIDs::Initalize();
 	g_pRootEntity = new CRootEntity();
-	g_pResourceManager = new CResourceManager();
+	g_pResourceManager = new CResourceManager("client/resources/");
 
 	// Success!
 	return true;
@@ -715,8 +715,11 @@ int CPadConfig__RemapKey(CPadConfig * pPadConfig, CPadData * pPadData)
 
 bool bPrinted = false;
 
+#define SYNC_DELAY 10000 // how many seconds between us and each mimic
 //#define SYNC_DELAY 5000 // how many seconds between us and each mimic
-#define SYNC_DELAY 1000 // how many seconds between us and each mimic
+//#define SYNC_DELAY 2000 // how many seconds between us and each mimic
+//#define SYNC_DELAY 1000 // how many seconds between us and each mimic
+//#define SYNC_DELAY 0 // how many seconds between us and each mimic
 struct FootSync
 {
 	CVector3 vecPosition;
@@ -828,6 +831,7 @@ void CClient::OnGameProcess()
 #endif
 	// Testing code
 	if(pPlayers[1])
+	//if(0)
 	{
 		CClientPlayer * pLocalPlayer = GetPlayerManager()->GetLocalPlayer();
 

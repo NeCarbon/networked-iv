@@ -10,6 +10,9 @@
 
 #include <StdInc.h>
 
+// TODO: Adjust (Or remove totally)?
+#define STREAMING_TICK 1000
+
 extern CClient * g_pClient;
 
 CStreamer::CStreamer()
@@ -245,6 +248,20 @@ void CStreamer::remove(CStreamableEntity * pEntity)
 
 	// Force streaming out
 	pEntity->StreamOutInternal();
+}
+
+void CStreamer::NotifyDimensionChange(CStreamableEntity * pEntity)
+{
+	// Is the entity streamed in?
+	if(pEntity->IsStreamedIn())
+	{
+		// Is the entity dimension different from our dimension?
+		if(pEntity->GetDimension() != m_dimensionId)
+		{
+			// Stream the entity out
+			pEntity->StreamOutInternal();
+		}
+	}
 }
 
 std::list<CStreamableEntity *> * CStreamer::GetStreamedInEntitiesOfType(eEntityType eType)

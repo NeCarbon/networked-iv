@@ -18,12 +18,9 @@ typedef unsigned char DimensionId;
 // Define used for invalid dimension ids
 #define INVALID_DIMENSION_ID 0xFF
 
-// TODO: Adjust?
-#define STREAMING_TICK 1000
-
 class CStreamer;
 
-class CStreamableEntity
+class CStreamableEntity : public CEntity
 {
 	friend class CStreamer;
 
@@ -39,7 +36,7 @@ private:
 	void              StreamOutInternal();
 
 public:
-	CStreamableEntity(CStreamer * m_pStreamer, eEntityType eType, float fDistance = 200.0f);
+	CStreamableEntity(eEntityType EntityType, CEntity* pParent, String strTag, CStreamer * pStreamer, float fDistance = 200.0f);
 	virtual ~CStreamableEntity();
 
 	float             GetStreamingDistance() { return m_fStreamingDistance; }

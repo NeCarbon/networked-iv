@@ -16,10 +16,6 @@ typedef CNetServerInterface *    (* GetNetServerInterface_t)();
 typedef void                     (* DestroyNetServerInterface_t)(CNetServerInterface * pNetServer);
 typedef CNetClientInterface *    (* GetNetClientInterface_t)();
 typedef void                     (* DestroyNetClientInterface_t)(CNetClientInterface * pNetClient);
-typedef CNetBitStreamInterface * (* GetBitStreamInterface1_t)();
-typedef CNetBitStreamInterface * (* GetBitStreamInterface2_t)(const unsigned int initialBytesToAllocate);
-typedef CNetBitStreamInterface * (* GetBitStreamInterface3_t)(unsigned char* _data, const unsigned int lengthInBytes, bool _copyData);
-typedef void                     (* DestroyBitStreamInterface_t)(CNetBitStreamInterface * pBitStream);
 
 class CNetworkModule
 {
@@ -29,10 +25,6 @@ private:
 	static DestroyNetServerInterface_t m_pfnDestroyNetServerInterface;
 	static GetNetClientInterface_t     m_pfnGetNetClientInterface;
 	static DestroyNetClientInterface_t m_pfnDestroyNetClientInterface;
-	static GetBitStreamInterface1_t    m_pfnGetBitStreamInterface1;
-	static GetBitStreamInterface2_t    m_pfnGetBitStreamInterface2;
-	static GetBitStreamInterface3_t    m_pfnGetBitStreamInterface3;
-	static DestroyBitStreamInterface_t m_pfnDestroyBitStreamInterface;
 
 public:
 	CNetworkModule();
@@ -45,8 +37,4 @@ public:
 	static void                     DestroyNetServerInterface(CNetServerInterface * pNetServer);
 	static CNetClientInterface *    GetNetClientInterface();
 	static void                     DestroyNetClientInterface(CNetClientInterface * pNetClient);
-	static CNetBitStreamInterface * GetBitStreamInterface1();
-	static CNetBitStreamInterface * GetBitStreamInterface2(const unsigned int initialBytesToAllocate);
-	static CNetBitStreamInterface * GetBitStreamInterface3(unsigned char* _data, const unsigned int lengthInBytes, bool _copyData);
-	static void                     DestroyBitStreamInterface(CNetBitStreamInterface * pBitStream);
 };

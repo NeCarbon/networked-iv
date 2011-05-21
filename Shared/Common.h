@@ -41,10 +41,10 @@
 #define MOD_VERSION_STRING "1.0-pre-alpha-1" MOD_VER_DBG
 
 // Network module version
-#define NETWORK_MODULE_VERSION 0x2
+#define NETWORK_MODULE_VERSION 0x3
 
 // Network version
-#define NETWORK_VERSION 0x2
+#define NETWORK_VERSION 0x3
 
 // Network tick rate
 #define NETWORK_TICK_RATE 100
@@ -96,7 +96,7 @@ enum eVehicleEntryExit
 	VEHICLE_EXIT_REQUEST,
 	VEHICLE_EXIT_RETURN,
 	VEHICLE_EXIT_COMPLETE,
-	VEHICLE_EXIT_FORCEFUL, // TODO: Implement (Look at last part of CClientPlayer::ProcessVehicleEntryExit)
+	VEHICLE_EXIT_FORCEFUL,
 	VEHICLE_ENTRY_EXIT_INVALID = 255
 };
 

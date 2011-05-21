@@ -20,7 +20,7 @@ public:
 	CTimer*				Add(SQObjectPtr pFunction, int iInterval, int iAmountRepeating, CSquirrelArguments* pArguments);
 	bool				Remove(CTimer* pTimer);
 
-	void				Process(DWORD dwTickCount);
+	void				Process(unsigned long ulTime);
 private:
 	CResource*			m_pResource;
 	std::list<CTimer*>	m_pTimers;

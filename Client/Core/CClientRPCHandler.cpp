@@ -11,7 +11,7 @@
 
 extern CClient * g_pClient;
 
-void CClientRPCHandler::InitialData(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::InitialData(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got InitialData RPC from server");
 
@@ -38,7 +38,7 @@ void CClientRPCHandler::InitialData(CBitStreamInterface * pBitStream, CPlayerSoc
 	g_pClient->GetGame()->FadeScreen(FADE_TYPE_IN, 0);
 }
 
-void CClientRPCHandler::AddPlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::AddPlayer(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got AddPlayer RPC from server");
 
@@ -68,7 +68,7 @@ void CClientRPCHandler::AddPlayer(CBitStreamInterface * pBitStream, CPlayerSocke
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "%s (Id: %d) has connected to the server", strName.C_String(), playerId);
 }
 
-void CClientRPCHandler::DeletePlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::DeletePlayer(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got DeletePlayer RPC from server");
 
@@ -104,7 +104,7 @@ void CClientRPCHandler::DeletePlayer(CBitStreamInterface * pBitStream, CPlayerSo
 	}
 }
 
-void CClientRPCHandler::SpawnPlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::SpawnPlayer(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got SpawnPlayer RPC from server");
 
@@ -135,12 +135,12 @@ void CClientRPCHandler::SpawnPlayer(CBitStreamInterface * pBitStream, CPlayerSoc
 	}
 }
 
-void CClientRPCHandler::DestroyPlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::DestroyPlayer(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got DestroyPlayer RPC from server");
 }
 
-void CClientRPCHandler::SpawnVehicle(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::SpawnVehicle(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got SpawnVehicle RPC from server");
 
@@ -214,7 +214,7 @@ void CClientRPCHandler::SpawnVehicle(CBitStreamInterface * pBitStream, CPlayerSo
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Spawned vehicle %d (Model %d)", vehicleId, iModelIndex);
 }
 
-void CClientRPCHandler::DestroyVehicle(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::DestroyVehicle(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got DestroyVehicle RPC from server");
 
@@ -241,7 +241,7 @@ void CClientRPCHandler::DestroyVehicle(CBitStreamInterface * pBitStream, CPlayer
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Destroyed vehicle %d", vehicleId);
 }
 
-void CClientRPCHandler::ChatInput(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::ChatInput(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
@@ -273,7 +273,7 @@ void CClientRPCHandler::ChatInput(CBitStreamInterface * pBitStream, CPlayerSocke
 	}
 }
 
-void CClientRPCHandler::VehicleEnterExit(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got VehicleEnterExit RPC from server");
 
@@ -362,7 +362,7 @@ void CClientRPCHandler::VehicleEnterExit(CBitStreamInterface * pBitStream, CPlay
 	}
 }
 
-void CClientRPCHandler::PlayerSync(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientRPCHandler::PlayerSync(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	//g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Got PlayerSync RPC from server");
 

@@ -83,7 +83,7 @@ bool CPacketHandler::HandlePacket(CPacket * pPacket)
 	if(pFunction)
 	{
 		// Construct the bit stream
-		CBitStream bitStream(pPacket->ucData, pPacket->uLength, false);
+		CBitStream bitStream(pPacket->ucData, pPacket->uiLength, false);
 
 		// Call the function
 		pFunction->packetFunction(&bitStream, pPacket->playerSocket);

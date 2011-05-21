@@ -6,7 +6,7 @@
 // License: See LICENSE in root directory
 //
 //==========================================================================
-// TODO: Rename to CIVWorld
+// TODO: Rename to CWorld
 
 #pragma once
 

@@ -12,46 +12,12 @@
 IVPed         * m_pPed = NULL;
 IVVehicle     * m_pKeySyncIVVehicle = NULL;
 unsigned int    m_uiLocalPlayerIndex = 0;
-CClientPadState m_localClientPadState;
+IVPad           m_localPad;
 Matrix          m_matLocalCameraMatrix;
 IVPlayerInfo  * __pPlayerInfo = NULL;
-BYTE            byteValue[INPUT_COUNT];
 bool            bInLocalContext = true;
 
 extern CClient * g_pClient;
-
-IVPad * GetGamePad()
-{
-	return (IVPad *)COffsets::VAR_Pads;
-}
-
-void SetGamePadState(CClientPadState * padState)
-{
-	IVPad * pPad = GetGamePad();
-
-	if(pPad)
-	{
-		for(int i = 0; i < INPUT_COUNT; i++)
-		{
-			pPad->m_padData[i].m_byteUnknown6 = padState->byteCurrentKeys[i];
-			pPad->m_padData[i].m_byteUnknown7 = padState->bytePreviousKeys[i];
-		}
-	}
-}
-
-void GetGamePadState(CClientPadState * padState)
-{
-	IVPad * pPad = GetGamePad();
-
-	if(pPad)
-	{
-		for(int i = 0; i < INPUT_COUNT; i++)
-		{
-			padState->byteCurrentKeys[i] = pPad->m_padData[i].m_byteUnknown6;
-			padState->bytePreviousKeys[i] = pPad->m_padData[i].m_byteUnknown7;
-		}
-	}
-}
 
 CCam * GetGameCam()
 {
@@ -84,11 +50,49 @@ void GetGameCameraMatrix(Matrix * matMatrix)
 	}
 }
 
+/*bool bRecordHistory = false;
+bool bRecordHistory2 = false;*/
+
 void ContextSwitch(IVPed * pPed, bool bPost)
 {
 	// Do we have a valid ped pointer?
 	if(pPed)
 	{
+		// Get the game pad
+		CIVPad * pPad = g_pClient->GetGame()->GetPad();
+
+		/*CContextData * pTestContextInfo = CContextDataManager::GetContextData((IVPlayerPed *)pPed);
+		CIVPad * pTestPad = g_pClient->GetGame()->GetPad();
+		bool bLocalPlayer = ((IVPlayerPed *)pPed == CPools::GetPlayerInfoFromIndex(0)->m_pPlayerPed);
+		if(!bLocalPlayer && pTestContextInfo)
+		{
+			pTestPad = pTestContextInfo->GetPad();
+		}
+		CClientPadState curPad;
+		CClientPadState lasPad;
+		pTestPad->GetCurrentClientPadState(curPad);
+		pTestPad->GetLastClientPadState(lasPad);
+		if(curPad.byteKeys[INPUT_MELEE_KICK] && !lasPad.byteKeys[INPUT_MELEE_KICK])
+		{
+			CLogFile::Printf("(%d) Melee kick start hold\n", bLocalPlayer);
+			if(bLocalPlayer)
+				bRecordHistory = true;
+			else
+				bRecordHistory2 = true;
+		}
+		if(bRecordHistory || bRecordHistory2)
+		{
+			CLogFile::Printf("(%d) Current history taken at %d is %d\n", bLocalPlayer, pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_pHistory->m_historyItems[pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_byteHistoryIndex].m_dwLastUpdateTime, pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_pHistory->m_historyItems[pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_byteHistoryIndex].m_byteValue);
+		}
+		if(!curPad.byteKeys[INPUT_MELEE_KICK] && lasPad.byteKeys[INPUT_MELEE_KICK])
+		{
+			CLogFile::Printf("(%d) Melee kick end hold\n", bLocalPlayer);
+			if(bLocalPlayer)
+				bRecordHistory = false;
+			else
+				bRecordHistory2 = false;
+		}*/
+
 		// Is this not the local player ped?
 		if((IVPlayerPed *)pPed != CPools::GetPlayerInfoFromIndex(0)->m_pPlayerPed)
 		{
@@ -97,70 +101,72 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 				CLogFile::Printf("Not switching due to not being in local context!\n");
 				return;
 			}
+
 			if(bPost && bInLocalContext)
 			{
 				CLogFile::Printf("Not switching due to being in local context!\n");
 				return;
 			}
 
+			// Get the remote players context info
 			CContextData * pContextInfo = CContextDataManager::GetContextData((IVPlayerPed *)pPed);
 
+			// Do we have a valid context info?
 			if(pContextInfo)
 			{
-				CLogFile::SetUseCallback(false);
-				CLogFile::Printf("ContextSwitch(0x%p, %d) (Player Ped %d)\n", pPed, bPost, pContextInfo->GetPlayerInfo()->GetPlayerNumber());
-				CLogFile::SetUseCallback(true);
+				//CLogFile::SetUseCallback(false);
+				//CLogFile::Printf("ContextSwitch(0x%p, %d) (Player Ped %d)\n", pPed, bPost, pContextInfo->GetPlayerInfo()->GetPlayerNumber());
+				//CLogFile::SetUseCallback(true);
 
 				if(!bPost)
 				{
-					if(!bInLocalContext)
-						CLogFile::Printf("Not in local context when we should be!\n");
-
-					// Context switch the local player id with the remote players
+					// Store the local players index
 					m_uiLocalPlayerIndex = CPools::GetLocalPlayerIndex();
+
+					// Store the local players pad
+					memcpy(&m_localPad, pPad->GetPad(), sizeof(IVPad));
+
+					// Store the local players camera matrix
+					GetGameCameraMatrix(&m_matLocalCameraMatrix);
+
+					// Swap the local player index with the remote players index
 					CPools::SetLocalPlayerIndex(pContextInfo->GetPlayerInfo()->GetPlayerNumber());
 
-					// Context switch the local players keys with the remote players
-					GetGamePadState(&m_localClientPadState);
-					SetGamePadState(pContextInfo->GetPadState());
-					IVPad * pGamePad = GetGamePad();
+					// Set the history values
 					for(int i = 0; i < INPUT_COUNT; i++)
 					{
-						if(pGamePad->m_padData[i].m_pUnknown)
+						CPadData * pPadData = &pContextInfo->GetPad()->GetPad()->m_padData[i];
+
+						if(pPadData->m_pHistory)
 						{
-							byteValue[i] = pGamePad->m_padData[i].m_pUnknown->m_unknown[pGamePad->m_padData[i].m_byteUnknown8].m_byteUnknown0;
-							pGamePad->m_padData[i].m_pUnknown->m_unknown[pGamePad->m_padData[i].m_byteUnknown8].m_byteUnknown0 = pContextInfo->GetPadState()->byteCurrentKeys[i];
+							pPadData->m_byteHistoryIndex++;
+
+							if(pPadData->m_byteHistoryIndex >= MAX_HISTORY_ITEMS)
+								pPadData->m_byteHistoryIndex = 0;
+
+							pPadData->m_pHistory->m_historyItems[pPadData->m_byteHistoryIndex].m_byteValue = pContextInfo->GetPad()->GetPad()->m_padData[i].m_byteLastValue;
+							pPadData->m_pHistory->m_historyItems[pPadData->m_byteHistoryIndex].m_dwLastUpdateTime = g_pClient->GetGame()->GetTime();
 						}
 					}
+			
+					// Swap the local players pad with the remote players pad
+					memcpy(pPad->GetPad(), pContextInfo->GetPad()->GetPad(), sizeof(IVPad));
 
-					// Context switch the local players cam matrix with the remote players
-					GetGameCameraMatrix(&m_matLocalCameraMatrix);
-					SetGameCameraMatrix(pContextInfo->GetCameraMatrix());
+					// Swap the local players camera matrix with the remote players camera matrix
+					//SetGameCameraMatrix(pContextInfo->GetCameraMatrix());
 
 					// Flag ourselves as no longer in local context
 					bInLocalContext = false;
 				}
 				else
 				{
-					if(bInLocalContext)
-						CLogFile::Printf("In local context when we shouldn't be!\n");
-
-					// Restore the local players cam matrix
+					// Restore the local players camera matrix
 					SetGameCameraMatrix(&m_matLocalCameraMatrix);
 
-					// Restore the local players keys
-					SetGamePadState(&m_localClientPadState);
-					IVPad * pGamePad = GetGamePad();
-					for(int i = 0; i < INPUT_COUNT; i++)
-					{
-						if(pGamePad->m_padData[i].m_pUnknown)
-						{
-							pGamePad->m_padData[i].m_pUnknown->m_unknown[pGamePad->m_padData[i].m_byteUnknown8].m_byteUnknown0 = byteValue[i];
-							byteValue[i] = 0;
-						}
-					}
+					// Restore the local players pad
+					memcpy(pPad->GetPad(), &m_localPad, sizeof(IVPad));
 
-					// Restore the local player id
+					// Restore the local players index
 					CPools::SetLocalPlayerIndex(m_uiLocalPlayerIndex);
 
 					// Flag ourselves as back in local context

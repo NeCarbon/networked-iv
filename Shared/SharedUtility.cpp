@@ -25,11 +25,7 @@ bool StripPath1(char * szString)
 {
 	for(size_t i = strlen(szString); i > 0; --i)
 	{
-#ifdef WIN32
-		if(szString[i] == '\\')
-#else
-		if(szString[i] == '/')
-#endif
+		if(szString[i] == '\\' || szString[i] == '/')
 		{
 			szString[i + 1] = '\0';
 			return true;
@@ -46,11 +42,7 @@ char * StripPath2(char * szString)
 
 	while(szStrippedPath != szPath)
 	{
-#ifdef WIN32
-		if(*szStrippedPath == '\\')
-#else
-		if(*szStrippedPath == '/')
-#endif
+		if(*szStrippedPath == '\\' || *szStrippedPath == '/')
 			return (szStrippedPath + 1);
 
 		szStrippedPath--;
@@ -244,7 +236,7 @@ bool Exists(const char * szPath)
 	return (stat(szPath, &St) == 0);
 }
 
-bool FileCopy(const char * szSource, const char * szDestination)
+bool CopyFile(const char * szSource, const char * szDestination)
 {
 	// Open the source file
 	FILE * fSource = fopen(szSource, "rb");
@@ -280,6 +272,7 @@ bool FileCopy(const char * szSource, const char * szDestination)
 
 int CreateDirectory(const char * szPath)
 {
+	// Create the directory
 	int 
 #ifdef WIN32
 		iReturn = mkdir(szPath);

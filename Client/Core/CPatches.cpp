@@ -17,7 +17,7 @@ bool                  g_bScriptLoaded = false;
 unsigned int          uiPlayerInfoIndex = 0;
 IVPlayerInfo        * pReturnedPlayerInfo = NULL;
 unsigned int          uiReturnedIndex = 0;
-bool                  bInvalidReturn = false;
+//bool                  bInvalidReturn = false;
 IVPlayerPed         * _pPlayerPed = NULL;
 IVTask              * ___pTask = NULL;
 DWORD                 dwTaskDestructorReturn = NULL;
@@ -147,7 +147,7 @@ void CPatches::Initialize()
 		CPatcher::InstallCallPatch((g_pClient->GetBaseAddress() + 0x424B26), (DWORD)DisableLoadingScreens_Hook);
 
 		// Disable the 'Loading...' text when the screen is faded
-		CPatcher::InstallNopPatch((g_pClient->GetBaseAddress() + 0x7BC874), 5);
+		//CPatcher::InstallNopPatch((g_pClient->GetBaseAddress() + 0x7BC874), 5);
 
 		// Hook GetPlayerInfoFromIndex to use our own function
 		CPatcher::InstallJmpPatch((g_pClient->GetBaseAddress() + 0x817F20), (DWORD)GetPlayerInfoFromIndex_Hook);
@@ -473,7 +473,7 @@ IVPlayerPed * GetLocalPlayerPed()
 		//CLogFile::Printf("GetLocalPlayerPed Invalid Local Player Index\n");
 	}
 
-	if(_pPlayerPed == NULL)
+	/*if(_pPlayerPed == NULL)
 	{
 		if(!bInvalidReturn)
 		{
@@ -488,7 +488,7 @@ IVPlayerPed * GetLocalPlayerPed()
 			CLogFile::Printf("GetLocalPlayerPed Return Is Invalid (End)\n");
 			bInvalidReturn = false;
 		}
-	}
+	}*/
 
 	return _pPlayerPed;
 }

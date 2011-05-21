@@ -25,7 +25,7 @@ public:
 	void           Startup(int iPort, int iMaxPlayers, String strPassword = "", String strHostAddress = "");
 	static void    PacketHandler(CPacket * pPacket);
 	void           Process();
-	void           RPC(RPCIdentifier rpcId, CBitStreamInterface * pBitStream, ePacketPriority priority, ePacketReliability reliability, EntityId playerId, bool bBroadcast, char cOrderingChannel = PACKET_CHANNEL_DEFAULT);
+	void           RPC(RPCIdentifier rpcId, CBitStream * pBitStream, ePacketPriority priority, ePacketReliability reliability, EntityId playerId, bool bBroadcast, char cOrderingChannel = PACKET_CHANNEL_DEFAULT);
 	String         GetPlayerIp(EntityId playerId);
 	unsigned short GetPlayerPort(EntityId playerId);
 };

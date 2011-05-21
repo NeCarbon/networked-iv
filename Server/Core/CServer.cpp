@@ -19,57 +19,26 @@ CVehicleManager  * g_pVehicleManager = NULL;
 CRootEntity      * g_pRootEntity = NULL;
 CResourceManager * g_pResourceManager = NULL;
 
+/*String DumpDataAsHex(char * szData, unsigned int uiLength)
+{
+	String strHex;
+
+	for(unsigned int i = 0; i < uiLength; i++)
+	{
+		if(i != 0)
+			strHex.Append(", ");
+
+		strHex.AppendF("%02X", szData[i]);
+	}
+
+	return strHex;
+}*/
+
 CServer::CServer()
 {
-#if 0
-	//RakNet::BitStream
-	CBuffer buffer;
-	int iWrite = 5;
-	printf("Writing an integer (%d) to the buffer\n", iWrite);
-	buffer.Write(iWrite);
-	printf("Done\n");
-	printf("Reading an integer from the buffer\n");
-	int iRead = 0;
-	bool bRead = buffer.Read(iRead);
-	if(bRead)
-		printf("Done (Read %d, should be %d)\n", iRead, iWrite);
-	else
-		printf("Failed\n");
-	float fWrite = 3.0f;
-	printf("Writing a float (%f) to the buffer\n", fWrite);
-	buffer.Write((char)1);
-	buffer.Write(fWrite);
-	buffer.Write((long)3);
-	buffer.Write((short)7);
-	printf("Done\n");
-	printf("Reading a float from the buffer\n");
-	float fRead = 0.0f;
-	char cValue;
-	buffer.Read(cValue);
-	bRead = buffer.Read(fRead);
-	long lValue;
-	buffer.Read(lValue);
-	short sValue;
-	buffer.Read(sValue);
-	if(bRead)
-		printf("Done (Read %f, should be %f)\n", fRead, fWrite);
-	else
-		printf("Failed\n");
-	printf("Result (%d, %f, %d, %d)\n", cValue, fWrite, lValue, sValue);
-	buffer.Write((double)5.0);
-	buffer.Write((long)8);
-	buffer.Write((short)9);
-	buffer.Write("Hello World", sizeof("Hello World"));
-	buffer.Write((float)4.0f);
-	buffer.Write((bool)false);
-	double dValue;
-	buffer.Read(dValue);
-	buffer.Read(lValue);
-	buffer.Read(sValue);
-	char szBuf[12];
-	buffer.Read(szBuf, sizeof("Hello World"));
-	printf("szBuf[%s]\n", szBuf);
-#endif
+	//ADD_EXPLOSION
+	// 4 hash = 0x10AF5258
+	// 5 hash = 0x32DA5E3A
 	//DoVirtualFileSystemTest();
 	m_bActive = true;
 	m_bShowFPS = true;
@@ -83,8 +52,27 @@ CServer::~CServer()
 
 }
 
+#ifdef NIV_DEBUG
+void MemoryTest()
+{
+	FILE * fp = fopen("MemoryTest.txt", "w");
+
+	if(fp)
+	{
+		MemTrack::TrackDumpBlocks(fp);
+		MemTrack::TrackListMemoryUsage(fp);
+		fclose(fp);
+	}
+}
+#endif
+
 bool CServer::OnLoad()
 {
+	// If in debug mode set memory test function
+#ifdef NIV_DEBUG
+	atexit(MemoryTest);
+#endif
+
 	// Open the log file
 	CLogFile::Open("Server.log", true);
 
@@ -164,7 +152,7 @@ bool CServer::OnLoad()
 	// Create the resource and scripting manager
 	CEntityIDs::Initalize();
 	g_pRootEntity = new CRootEntity();
-	g_pResourceManager = new CResourceManager();
+	g_pResourceManager = new CResourceManager("resources/");
 
 	// Load resources, get the first resource node
 	if(g_pConfig->GetXML()->findNode("resource"))
@@ -215,7 +203,7 @@ bool CServer::OnLoad()
 
 void CServer::Process()
 {
-	// Get the current tick count
+	// Get the current time
 	unsigned long ulTime = SharedUtility::GetTime();
 
 	// Is show fps enabled?
@@ -275,17 +263,17 @@ void CServer::OnUnload()
 	// Delete the server lister instance
 	SAFE_DELETE(m_pServerLister);
 
-	// Delete the resource manager
-	SAFE_DELETE(g_pResourceManager);
-
-	// Delete the scripting manager
-	SAFE_DELETE(g_pRootEntity);
-
 	// Delete the vehicle manager instance
 	SAFE_DELETE(g_pVehicleManager);
 
 	// Delete the player manager instance
 	SAFE_DELETE(g_pPlayerManager);
+
+	// Delete the resource manager
+	SAFE_DELETE(g_pResourceManager);
+
+	// Delete the scripting manager
+	SAFE_DELETE(g_pRootEntity);
 
 	// Delete the network manager instance
 	SAFE_DELETE(g_pNetworkManager);

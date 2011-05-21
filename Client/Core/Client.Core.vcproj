@@ -1046,14 +1046,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\Shared\CBitStreamInterface.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Shared\CNetBitStreamInterface.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\Shared\CNetClientInterface.h"
 						>
 					</File>

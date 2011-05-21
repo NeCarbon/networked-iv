@@ -12,12 +12,12 @@
 extern CNetworkManager * g_pNetworkManager;
 extern CPlayerManager * g_pPlayerManager;
 
-void CServerPacketHandler::NewConnection(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CServerPacketHandler::NewConnection(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	CLogFile::Printf("New connection from IP %s:%d (Player %d, Serial %s)\n", g_pNetworkManager->GetPlayerIp(senderSocket.playerId).Get(), g_pNetworkManager->GetPlayerPort(senderSocket.playerId), senderSocket.playerId, senderSocket.strSerial.Get());
 }
 
-void CServerPacketHandler::Disconnected(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CServerPacketHandler::Disconnected(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	if(!g_pPlayerManager->IsActive(senderSocket.playerId))
 	{
@@ -29,7 +29,7 @@ void CServerPacketHandler::Disconnected(CBitStreamInterface * pBitStream, CPlaye
 	g_pPlayerManager->Delete(senderSocket.playerId);
 }
 
-void CServerPacketHandler::LostConnection(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CServerPacketHandler::LostConnection(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	if(!g_pPlayerManager->IsActive(senderSocket.playerId))
 	{

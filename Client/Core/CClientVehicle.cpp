@@ -14,7 +14,7 @@
 extern CClient * g_pClient;
 extern CRootEntity * g_pRootEntity;
 
-CClientVehicle::CClientVehicle(int iModelIndex) : CStreamableEntity(g_pClient->GetStreamer(), ENTITY_TYPE_VEHICLE, 200.0f), CEntity(ENTITY_TYPE_VEHICLE, g_pRootEntity, "player")
+CClientVehicle::CClientVehicle(int iModelIndex) : CStreamableEntity(ENTITY_TYPE_VEHICLE, g_pRootEntity, "vehicle", g_pClient->GetStreamer(), 200.0f)
 {
 	m_vehicleId = INVALID_ENTITY_ID;
 	m_pVehicle = NULL;
@@ -31,6 +31,9 @@ CClientVehicle::~CClientVehicle()
 {
 	// Notify the streamer that we have been deleted
 	OnDelete();
+
+	// Call the CStreamableEntity destructor
+	CStreamableEntity::~CStreamableEntity();
 }
 
 void CClientVehicle::SetColors(BYTE byteColor1, BYTE byteColor2, BYTE byteColor3, BYTE byteColor4)
@@ -414,7 +417,7 @@ BYTE CClientVehicle::GetMaxPassengers()
 	return 0;
 }
 
-void CClientVehicle::Serialize(CBitStreamInterface * pBitStream)
+void CClientVehicle::Serialize(CBitStream * pBitStream)
 {
 	// Write the vehicle position
 	CVector3 vecPosition;
@@ -440,7 +443,7 @@ void CClientVehicle::Serialize(CBitStreamInterface * pBitStream)
 	pBitStream->Write(GetHealth());
 }
 
-bool CClientVehicle::Deserialize(CBitStreamInterface * pBitStream)
+bool CClientVehicle::Deserialize(CBitStream * pBitStream)
 {
 	// Read the vehicle position
 	CVector3 vecPosition;

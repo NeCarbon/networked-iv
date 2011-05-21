@@ -11,19 +11,10 @@
 
 extern CClient * g_pClient;
 
-CIVPedTaskManager::CIVPedTaskManager(IVPedTaskManager * pPedTaskManager)
-{
-	SetPedTaskManager(pPedTaskManager);
-}
-
-void CIVPedTaskManager::SetPedTaskManager(IVPedTaskManager * pPedTaskManager)
+CIVPedTaskManager::CIVPedTaskManager(IVPedTaskManager * pPedTaskManager, CIVPed * pPed)
 {
 	m_pPedTaskManager = pPedTaskManager;
-}
-
-IVPedTaskManager * CIVPedTaskManager::GetPedTaskManager()
-{
-	return m_pPedTaskManager;
+	m_pPed = pPed;
 }
 
 void CIVPedTaskManager::SetTask(CIVTask * pTask, int iTaskPriority, bool bForceNewTask)
@@ -62,10 +53,37 @@ CIVTask * CIVPedTaskManager::GetTask(int iTaskPriority)
 	if(m_pPedTaskManager)
 	{
 		if(iTaskPriority < TASK_PRIORITY_MAX)
-			return g_pClient->GetClientTaskManager()->GetClientTaskFromGameTask(m_pPedTaskManager->m_tasks[iTaskPriority]);
+			return g_pClient->GetClientTaskManager()->GetClientTaskFromGameTask(m_pPedTaskManager->m_primaryTasks[iTaskPriority]);
 	}
 
 	return NULL;
+}
+
+void CIVPedTaskManager::SetTaskSecondary(CIVTask * pTask, int iType)
+{
+	// Do we have a valid ped task manager pointer?
+	if(m_pPedTaskManager)
+	{
+		DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CPedTaskManager__SetTaskSecondary);
+		IVPedTaskManager * pPedTaskManager = m_pPedTaskManager;
+		IVTask * pGameTask = pTask->GetTask();
+		_asm
+		{
+			push iType
+			push pGameTask
+			mov ecx, pPedTaskManager
+			call dwFunc
+		}
+	}
+}
+
+void CIVPedTaskManager::RemoveTaskSecondary(int iType)
+{
+	// Do we have a valid ped task manager pointer?
+	if(m_pPedTaskManager)
+	{
+		SetTaskSecondary(NULL, iType);
+	}
 }
 
 CIVTask * CIVPedTaskManager::GetTaskSecondary(int iType)
@@ -78,4 +96,27 @@ CIVTask * CIVPedTaskManager::GetTaskSecondary(int iType)
 	}
 
 	return NULL;
+}
+
+void CIVPedTaskManager::ClearTasks(int iAbortPriority)
+{
+	// Do we have a valid ped task manager pointer?
+	if(m_pPedTaskManager)
+	{
+		for(int i = 0; i < TASK_PRIORITY_MAX; i++)
+		{
+			CIVTask * pTask = GetTask(i);
+
+			if(pTask)
+				pTask->MakeAbortable(m_pPed, iAbortPriority, NULL);
+		}
+
+		for(int i = 0; i < TASK_SECONDARY_MAX; i++)
+		{
+			CIVTask * pTask = GetTaskSecondary(i);
+
+			if(pTask)
+				pTask->MakeAbortable(m_pPed, iAbortPriority, NULL);
+		}
+	}
 }

@@ -27,7 +27,7 @@ public:
 	PacketId packetId;
 
 	// The length of the packet in bytes
-	unsigned int uLength;
+	unsigned int uiLength;
 
 	// The data of the packet
 	unsigned char * ucData;

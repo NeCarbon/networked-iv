@@ -17,7 +17,7 @@
 
 class CClientVehicle;
 
-class CClientPlayer : public CStreamableEntity, public CEntity
+class CClientPlayer : public CStreamableEntity
 {
 private:
 	bool              m_bIsLocalPlayer;
@@ -61,6 +61,7 @@ private:
 		bool             bRequesting;
 	}                 m_vehicleEnterExit;
 	bool              m_bDucking;
+	bool              m_bSentDeath;
 
 	bool             Create();
 	void             Destroy();
@@ -100,6 +101,12 @@ public:
 
 	void             SetAimData(const Matrix& matAim);
 	void             GetAimData(Matrix& matAim);
+
+	// Deaths
+	void             Kill(bool bInstantly = false);
+	bool             IsDead();
+	void             SetSentDeath(bool bSentDeath) { m_bSentDeath = bSentDeath; }
+	bool             HasSentDeath() { return m_bSentDeath; }
 
 	// Health/armour
 	void             SetHealth(unsigned int uiHealth);
@@ -160,6 +167,6 @@ public:
 	bool             HasTargetPosition() { return (m_interp.pos.ulFinishTime != 0); }
 
 	// Information Serialization/Deserialization
-	void             Serialize(CBitStreamInterface * pBitStream);
-	bool             Deserialize(CBitStreamInterface * pBitStream);
+	void             Serialize(CBitStream * pBitStream);
+	bool             Deserialize(CBitStream * pBitStream);
 };

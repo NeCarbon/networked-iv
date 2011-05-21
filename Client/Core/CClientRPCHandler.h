@@ -14,16 +14,16 @@
 class CClientRPCHandler : public CRPCHandler
 {
 private:
-	static void InitialData(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void AddPlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void DeletePlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void SpawnPlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void DestroyPlayer(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void SpawnVehicle(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void DestroyVehicle(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void ChatInput(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void VehicleEnterExit(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
-	static void PlayerSync(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket);
+	static void InitialData(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void AddPlayer(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void DeletePlayer(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void SpawnPlayer(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void DestroyPlayer(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void SpawnVehicle(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void DestroyVehicle(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void ChatInput(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket senderSocket);
+	static void PlayerSync(CBitStream * pBitStream, CPlayerSocket senderSocket);
 
 public:
 	void        Register();

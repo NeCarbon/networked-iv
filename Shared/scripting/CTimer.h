@@ -18,7 +18,7 @@ public:
 			~CTimer();
 
 	void	Reset();
-	bool	Process(unsigned long ulTickCount);
+	bool	Process(unsigned long ulTime);
 
 	bool	SetParent(CEntity* pEntity);
 private:

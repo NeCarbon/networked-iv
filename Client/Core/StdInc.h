@@ -36,8 +36,6 @@
 #include <CVector3.h>
 #include <CMath.h>
 #include <CNetworkPadState.h>
-#include <CNetBitStreamInterface.h>
-#include <CBitStreamInterface.h>
 #include <CBitStream.h>
 #include <CPacketHandler.h>
 #include <CRPCHandler.h>
@@ -74,6 +72,7 @@
 #include "InvokeNative.h"
 #include "CIVEntity.h"
 #include "CIVDynamicEntity.h"
+#include "CIVWeaponInfo.h"
 #include "CIVPhysical.h"
 #include "CIVPedTaskManager.h"
 #include "CIVPed.h"
@@ -89,7 +88,6 @@
 #include "KeySync.h"
 #include "CIVPad.h"
 #include "CStreaming.h"
-#include "CIVWeaponInfo.h"
 #include "CIVWeapon.h"
 #include "CGame.h"
 #include "CClientPadState.h"
@@ -102,10 +100,10 @@
 #include "CBitStream.h"
 #include "CClientRPCHandler.h"
 #include "CClientPacketHandler.h"
-#include "CStreamableEntity.h"
 #include <squirrel/squirrel.h>
 #include <scripting/CEntity.h>
 #include <scripting/CRootEntity.h>
+#include "CStreamableEntity.h"
 #include "CClientPlayer.h"
 #include "CClientVehicle.h"
 #include "CStreamer.h"

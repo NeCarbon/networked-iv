@@ -11,10 +11,10 @@
 
 CTimer::CTimer(CResource* pResource, SQObjectPtr pFunction, unsigned long ulInterval, unsigned int uiAmountRepeating, CSquirrelArguments* pArguments) : CEntity(ENTITY_TYPE_TIMER, pResource, "timer")
 {
-	this->m_pFunction = pFunction;
-	this->m_ulInterval = ulInterval;
-	this->m_uiAmountRepeating = uiAmountRepeating;
-	this->m_pArguments = pArguments;
+	m_pFunction = pFunction;
+	m_ulInterval = ulInterval;
+	m_uiAmountRepeating = uiAmountRepeating;
+	m_pArguments = pArguments;
 
 	Reset();
 }
@@ -29,9 +29,9 @@ void CTimer::Reset()
 	m_ulNextExecution = (SharedUtility::GetTime() + m_ulInterval);
 }
 
-bool CTimer::Process(unsigned long ulTickCount)
+bool CTimer::Process(unsigned long ulTime)
 {
-	if(ulTickCount >= m_ulNextExecution)
+	if(ulTime >= m_ulNextExecution)
 	{
 		CResource* pResource = dynamic_cast< CResource* >(GetParent());
 		assert(pResource);

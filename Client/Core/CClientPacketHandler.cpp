@@ -11,13 +11,13 @@
 
 extern CClient * g_pClient;
 
-void CClientPacketHandler::ConnectionRejected(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::ConnectionRejected(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Connection failed! (Rejected)");
 	g_pClient->GetNetworkManager()->Disconnect();
 }
 
-void CClientPacketHandler::ConnectionSucceeded(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::ConnectionSucceeded(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Connection established!");
 
@@ -31,45 +31,45 @@ void CClientPacketHandler::ConnectionSucceeded(CBitStreamInterface * pBitStream,
 	g_pClient->GetNetworkManager()->RPC(RPC_INITIAL_DATA, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED);
 }
 
-void CClientPacketHandler::ConnectionFailed(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::ConnectionFailed(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Connection failed! (Timeout)");
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Retrying...");
 	g_pClient->GetNetworkManager()->Connect();
 }
 
-void CClientPacketHandler::AlreadyConnected(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::AlreadyConnected(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Connection failed! (Already Connected)");
 }
 
-void CClientPacketHandler::ServerFull(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::ServerFull(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Connection failed! (Server Full)");
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Retrying...");
 	g_pClient->GetNetworkManager()->Connect();
 }
 
-void CClientPacketHandler::Disconnected(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::Disconnected(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Disconnected from the server.");
 	g_pClient->GetNetworkManager()->Disconnect();
 }
 
-void CClientPacketHandler::LostConnection(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::LostConnection(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Connection to server lost!");
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Reconnecting...");
 	g_pClient->GetNetworkManager()->Connect();
 }
 
-void CClientPacketHandler::Banned(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::Banned(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Connection failed! (Banned)");
 	g_pClient->GetNetworkManager()->Disconnect();
 }
 
-void CClientPacketHandler::PasswordInvalid(CBitStreamInterface * pBitStream, CPlayerSocket senderSocket)
+void CClientPacketHandler::PasswordInvalid(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
 	g_pClient->GetChatWindow()->OutputMessage(MESSAGE_INFO_COLOR, "Connection failed! (Invalid Password)");
 	g_pClient->GetNetworkManager()->Disconnect();

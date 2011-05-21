@@ -16,7 +16,7 @@ class CContextData
 private:
 	CIVPlayerInfo * m_pPlayerInfo;
 	CIVPlayerPed  * m_pPlayerPed;
-	CClientPadState m_padState;
+	CIVPad        * m_pPad;
 	Matrix          m_matCameraMatrix;
 
 public:
@@ -24,20 +24,21 @@ public:
 	{
 		m_pPlayerInfo = pPlayerInfo;
 		m_pPlayerPed = NULL;
+		m_pPad = new CIVPad();
 		m_matCameraMatrix.Identity();
 	}
 
 	~CContextData()
 	{
-
+		delete m_pPad;
 	}
 
 	void              SetPlayerInfo(CIVPlayerInfo * pPlayerInfo) { m_pPlayerInfo = pPlayerInfo; }
-	CIVPlayerInfo *   GetPlayerInfo() { return m_pPlayerInfo; }
+	CIVPlayerInfo   * GetPlayerInfo() { return m_pPlayerInfo; }
 	void              SetPlayerPed(CIVPlayerPed * pPlayerPed) { m_pPlayerPed = pPlayerPed; }
-	CIVPlayerPed  *   GetPlayerPed() { return m_pPlayerPed; }
-	CClientPadState * GetPadState() { return &m_padState; }
-	Matrix        *   GetCameraMatrix() { return &m_matCameraMatrix; }
+	CIVPlayerPed    * GetPlayerPed() { return m_pPlayerPed; }
+	CIVPad          * GetPad() { return m_pPad; }
+	Matrix          * GetCameraMatrix() { return &m_matCameraMatrix; }
 };
 
 class CContextDataManager

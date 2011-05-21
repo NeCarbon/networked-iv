@@ -9,12 +9,24 @@
 
 #include <StdInc.h>
 
-CResourceManager::CResourceManager()
+CResourceManager::CResourceManager(String strResourceDirectory)
 {
+	// Does the resource directory not exist?
+	if(!SharedUtility::Exists(strResourceDirectory))
+	{
+		// Create the resource directory
+		SharedUtility::CreateDirectory(strResourceDirectory);
+	}
+
+	// Set the resource directory
+	m_strResourceDirectory = strResourceDirectory;
 }
 
 CResourceManager::~CResourceManager()
 {
+	for(std::list<CResource*>::iterator iter = m_pResources.begin(); iter != m_pResources.end(); ++ iter)
+		delete (*iter);
+
 	m_pResources.clear();
 }
 
@@ -34,14 +46,14 @@ CResource* CResourceManager::Get(SQVM* pVM)
 	return NULL;
 }
 
-bool CResourceManager::Load(String name, bool start)
+bool CResourceManager::Load(String strName, bool bStart)
 {
-	// if a function with that name exists, we don't load it
-	if(Get(name))
+	// if a resource with that name exists, we don't load it
+	if(Get(strName))
 		return false;
 	
-	// create a new entity
-	CResource* pResource = new CResource(name);
+	// create a new resource
+	CResource* pResource = new CResource(m_strResourceDirectory, strName);
 
 	// if it has no valid meta, stop it from loading
 	if(pResource->IsValidMeta())
@@ -49,11 +61,9 @@ bool CResourceManager::Load(String name, bool start)
 		// save it into our resources list (this needs to be done -before- starting the resource or some scripting functions (requiring CResource* CResourceManager::Get(SQVM* pVM)) will fail)
 		m_pResources.push_back(pResource);
 
-		// attempt tot start it if we're told to
-		if(!start || Start(pResource))
-		{
+		// attempt to start it if we're told to
+		if(!bStart || Start(pResource))
 			return true;
-		}
 		else
 		{
 			// failed to start, remove it
@@ -118,13 +128,13 @@ bool CResourceManager::Restart(CResource* pResource)
 	return false;
 }
 
-void CResourceManager::Process(DWORD dwTickCount)
+void CResourceManager::Process(unsigned long ulTime)
 {
 	for(std::list<CResource*>::iterator iter = m_pResources.begin(); iter != m_pResources.end(); ++ iter)
-		(*iter)->Process(dwTickCount);
+		(*iter)->Process(ulTime);
 
 	// at this time, we shouldn't really be in any kind of resource stuff so deleting should be fine - calling stopResource(getThisResource()) would delete the Squirrel VM while being used
-	if(m_pResourceQueue.size()>0)
+	if(m_pResourceQueue.size() > 0)
 	{
 		for(std::list<sResourceQueue>::iterator iter = m_pResourceQueue.begin(); iter != m_pResourceQueue.end(); ++ iter)
 		{
@@ -139,6 +149,7 @@ void CResourceManager::Process(DWORD dwTickCount)
 					break;
 			}
 		}
+
 		m_pResourceQueue.clear();
 	}
 }

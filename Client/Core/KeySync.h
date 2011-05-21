@@ -34,16 +34,20 @@
 	INPUT_STATE_ON_FOOT = 9
 };*/
 
-struct CPadData_m1_m1
+class CPadDataHistoryItem
 {
-	BYTE m_byteUnknown0;          // 0-1
-	PAD(CPadData_m1_m1, pad0, 3); // 1-3 (Unknown)
-	DWORD m_dwUnknown4;           // 4-8
+public:
+	BYTE m_byteValue;                  // 0-1
+	PAD(CPadDataHistoryItem, pad0, 3); // 1-3
+	DWORD m_dwLastUpdateTime;          // 4-8
 };
 
-struct CPadData_m1 // CPadData + 0xC = KeyBlock_m1 * pUnknown
+#define MAX_HISTORY_ITEMS 64
+
+class CPadDataHistory
 {
-	CPadData_m1_m1 m_unknown[64]; // 000-200
+public:
+	CPadDataHistoryItem m_historyItems[MAX_HISTORY_ITEMS]; // 000-200
 };
 
 // rage::ioConfig?
@@ -54,26 +58,27 @@ public:
 	//DWORD dwUnknown;              // 004-008
 	//CPadMap * m_pPadMaps[492]; // ??
 	PAD(CPadConfig, pad0, 0x7B4); // ?
+	// +0x4 - (DWORD) Unknown (Initializes at 0)
+	// +0x8 - (DWORD) First Control Type (9 - analog)
+	// +0x4 - (DWORD) Next Control Type (Continue for dwCount)
+	// +0x528 - (CPadData) Pad Data
+	// +0x4 - (CPadData) Next Pad Data (Continue for dwCount)
 };
 
 // this is actually rage::ioValue
 class CPadData
 {
 public:
-	// Control State Value:
-	// Min = 0
-	// Default = 0/128
-	// Max = 255
-	// Get current key (m_byteUnknown4 ^ m_byteUnknown6)
+	// Get current key (m_byteUnknown4 ^ m_byteCurrentValue)
 	// Get previous key (m_byteUnknown4 ^ m_byteUnknown7)
-	DWORD m_dwVFTable;        // 00-04 (Virtual Function Table (0xD55F2C))
-	BYTE m_byteUnknown4;      // 04-05 (Control state value? (xor with byte 6/7))
-	BYTE m_byteUnknown5;      // 05-06 (value of 0x188B550 (gets updated every pad update))
-	BYTE m_byteUnknown6;      // 06-07 (Control state value (Current?))
-	BYTE m_byteUnknown7;      // 07-08 (Control state value (Previous?))
-	BYTE m_byteUnknown8;      // 08-09 (current m_dwUnknownC index (0-64))
-	PAD(CPadData, pad0, 3);   // 09-0C
-	CPadData_m1 * m_pUnknown; // 0C-10 (Pointer to a 512 size dynamically allocated block of memory (KeyBlock_m1) (See 0x8340F0))
+	DWORD m_dwVFTable;            // 00-04
+	BYTE m_byteUnknown4;          // 04-05 (Control state value? (xor with byte 6/7))
+	BYTE m_byteContext;           // 05-06 (current context to avoid pad data being swapped more than once per process)
+	BYTE m_byteCurrentValue;      // 06-07
+	BYTE m_byteLastValue;         // 07-08
+	BYTE m_byteHistoryIndex;      // 08-09
+	PAD(CPadData, pad0, 3);       // 09-0C
+	CPadDataHistory * m_pHistory; // 0C-10
 };
 
 class CCamData
@@ -108,9 +113,6 @@ public:
 class IVPad;
 class CClientPadState;
 
-IVPad * GetGamePad();
-void    SetGamePadState(CClientPadState * padState);
-void    GetGamePadState(CClientPadState * padState);
 CCam *  GetGameCam();
 void    SetGameCameraMatrix(Matrix * matMatrix);
 void    GetGameCameraMatrix(Matrix * matMatrix);

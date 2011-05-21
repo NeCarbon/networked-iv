@@ -59,3 +59,51 @@ CIVTaskComplexNewExitVehicle::CIVTaskComplexNewExitVehicle(CIVVehicle * pVehicle
 		call dwFunc
 	}
 }
+
+CIVTaskComplexDie::CIVTaskComplexDie(int a2, int a3, int a4, int a5, float a6, float a7, char a8) : CIVTask()
+{
+	// Add ourselves to the client task manager
+	g_pClient->GetClientTaskManager()->AddTask(this);
+
+	// Create the task
+	Create();
+
+	// Call the task constructor
+	IVTask * pTask = GetTask();
+#define FUNC_CTaskComplexDie__CTaskComplexDie_7 0xABC6C0
+	DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CTaskComplexDie__CTaskComplexDie_7);
+	_asm
+	{
+		push a8
+		push a7
+		push a6
+		push a5
+		push a4
+		push a3
+		push a2
+		mov ecx, pTask
+		call dwFunc
+	}
+}
+
+CIVTaskSimpleDead::CIVTaskSimpleDead(DWORD dwDeathTime, char a3, char a4) : CIVTask()
+{
+	// Add ourselves to the client task manager
+	g_pClient->GetClientTaskManager()->AddTask(this);
+
+	// Create the task
+	Create();
+
+	// Call the task constructor
+	IVTask * pTask = GetTask();
+#define FUNC_CTaskSimpleDead__CTaskSimpleDead_7 0xABCF10
+	DWORD dwFunc = (g_pClient->GetBaseAddress() + FUNC_CTaskSimpleDead__CTaskSimpleDead_7);
+	_asm
+	{
+		push a4
+		push a3
+		push dwDeathTime
+		mov ecx, pTask
+		call dwFunc
+	}
+}

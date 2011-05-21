@@ -168,7 +168,7 @@ long WINAPI CExceptionHandler::ExceptionHandler(_EXCEPTION_POINTERS * ExceptionI
 	// Write the exception report
 	WriteUnhandledExceptionReport(ExceptionInfo);
 
-#ifndef NIV_DEBUG
+//#ifndef NIV_DEBUG
 	// Write the minidump file
 	WriteMiniDump(ExceptionInfo);
 
@@ -176,9 +176,9 @@ long WINAPI CExceptionHandler::ExceptionHandler(_EXCEPTION_POINTERS * ExceptionI
 	TerminateProcess(GetCurrentProcess(), 0);
 
 	return EXCEPTION_EXECUTE_HANDLER;
-#else
+/*#else
 	return EXCEPTION_CONTINUE_SEARCH;
-#endif
+#endif*/
 }
 #endif
 

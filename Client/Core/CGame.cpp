@@ -96,6 +96,11 @@ CIVWeaponInfo * CGame::GetWeaponInfo(eWeaponType weaponType)
 	return NULL;
 }
 
+DWORD CGame::GetTime()
+{
+	return *(DWORD *)(g_pClient->GetBaseAddress() + 0x11DDE74);
+}
+
 void CGame::GameLoadCallback_Static()
 {
 	g_pClient->GetGame()->GameLoadCallback();

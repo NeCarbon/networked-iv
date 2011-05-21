@@ -18,11 +18,11 @@ CTimers::~CTimers()
 {
 }
 
-void CTimers::Process(DWORD dwTickCount)
+void CTimers::Process(unsigned long ulTime)
 {
 	for(std::list<CTimer*>::iterator iter = m_pTimers.begin(); iter != m_pTimers.end();)
 	{
-		if(!(*iter)->Process(dwTickCount))
+		if(!(*iter)->Process(ulTime))
 		{
 			delete *iter;
 			m_pTimers.erase(iter++);

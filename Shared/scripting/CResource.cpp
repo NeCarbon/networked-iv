@@ -11,11 +11,11 @@
 
 extern CRootEntity * g_pRootEntity;
 
-CResource::CResource(String name) : CEntity(ENTITY_TYPE_RESOURCE, g_pRootEntity, "resource")
+CResource::CResource(String strDirectory, String strName) : CEntity(ENTITY_TYPE_RESOURCE, g_pRootEntity, "resource")
 {
 	m_bValidMeta = false;
 	m_eState = STATE_ERROR;
-	m_strName = name;
+	m_strName = strName;
 	m_pVM = NULL;
 	m_pTimers = NULL;
 
@@ -24,12 +24,8 @@ CResource::CResource(String name) : CEntity(ENTITY_TYPE_RESOURCE, g_pRootEntity,
 		return;
 
 	// place all files are located in
-#ifdef _SERVER
+	m_strResourcePath = String("%s%s%s", SharedUtility::GetAppPath(), strDirectory.Get(), strName.Get());
 
-	m_strResourcePath = String("%sresources/%s", SharedUtility::GetAppPath(), name.Get());
-#else
-	m_strResourcePath = String("%sclient/resources/%s", SharedUtility::GetAppPath(), name.Get());
-#endif
 	// load the meta.xml
 	if(!Reload())
 		return;
@@ -41,6 +37,8 @@ CResource::CResource(String name) : CEntity(ENTITY_TYPE_RESOURCE, g_pRootEntity,
 
 CResource::~CResource()
 {
+	SAFE_DELETE(m_pTimers);
+	SAFE_DELETE(m_pVM);
 	g_pRootEntity->RemoveEvents(this);
 }
 
@@ -165,12 +163,12 @@ bool CResource::IsValidMeta()
 	return m_bValidMeta;
 }
 
-void CResource::Process(DWORD dwTickCount)
+void CResource::Process(unsigned long ulTime)
 {
 	if( GetState() == STATE_RUNNING )
 	{
 		// Execute all outstanding timers
-		m_pTimers->Process(dwTickCount);
+		m_pTimers->Process(ulTime);
 	}
 }
 

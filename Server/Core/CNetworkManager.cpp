@@ -87,7 +87,7 @@ void CNetworkManager::Process()
 	m_pNetServer->Process();
 }
 
-void CNetworkManager::RPC(RPCIdentifier rpcId, CBitStreamInterface * pBitStream, ePacketPriority priority, ePacketReliability reliability, EntityId playerId, bool bBroadcast, char cOrderingChannel)
+void CNetworkManager::RPC(RPCIdentifier rpcId, CBitStream * pBitStream, ePacketPriority priority, ePacketReliability reliability, EntityId playerId, bool bBroadcast, char cOrderingChannel)
 {
 	m_pNetServer->RPC(rpcId, pBitStream, priority, reliability, playerId, bBroadcast, cOrderingChannel);
 }

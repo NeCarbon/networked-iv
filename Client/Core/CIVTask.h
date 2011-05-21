@@ -12,6 +12,7 @@
 
 #include <StdInc.h>
 
+// Move this stuff to IVTasks.h/cpp?
 // Task Types
 #define TASK_TYPE_NONE 9999 // 0?
 #define TASK_COMPLEX_PLAYER_ON_FOOT 4
@@ -28,6 +29,7 @@
 #define TASK_COMPLEX_FALL_AND_GET_UP 208
 #define TASK_COMPLEX_JUMP 211
 #define TASK_COMPLEX_DIE 217
+#define TASK_SIMPLE_DEAD 218
 #define TASK_COMPLEX_SIT_IDLE 221
 #define TASK_COMPLEX_SIT_DOWN_THEN_IDLE_THEN_STAND_UP 223
 #define TASK_COMPLEX_HIT_RESPONSE 230
@@ -224,7 +226,7 @@ public:
 class IVTaskComplexVFTable
 {
 public:
-	DWORD SetSubTask; 
+	DWORD SetSubTask;
 	DWORD CreateNextSubTask;
 	DWORD CreateFirstSubTask;
 	DWORD ControlSubTask;
