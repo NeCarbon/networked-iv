@@ -9,11 +9,9 @@
 
 #include <StdInc.h>
 
-extern CNetworkManager * g_pNetworkManager;
-extern CPlayerManager *  g_pPlayerManager;
-extern CRootEntity *     g_pRootEntity;
+extern CServer * g_pServer;
 
-CVehicle::CVehicle(EntityId vehicleId, int iModelIndex) : CEntity(ENTITY_TYPE_VEHICLE, g_pRootEntity, "vehicle")
+CVehicle::CVehicle(EntityId vehicleId, int iModelIndex) : CEntity(ENTITY_TYPE_VEHICLE, g_pServer->GetRootEntity(), "vehicle")
 {
 	m_vehicleId = vehicleId;
 	m_iModelIndex = iModelIndex;
@@ -50,7 +48,7 @@ void CVehicle::SpawnForPlayer(EntityId playerId)
 	bitStream.Write(m_fHealth);
 
 	// Send it to the player
-	g_pNetworkManager->RPC(RPC_SPAWN_VEHICLE, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
+	g_pServer->GetNetworkManager()->RPC(RPC_SPAWN_VEHICLE, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 }
 
 void CVehicle::SpawnForWorld()
@@ -59,7 +57,7 @@ void CVehicle::SpawnForWorld()
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
 	{
 		// Is the current player active?
-		if(g_pPlayerManager->IsActive(i))
+		if(g_pServer->GetPlayerManager()->IsActive(i))
 		{
 			// Spawn this vehicle for the current player
 			SpawnForPlayer(i);
@@ -77,7 +75,7 @@ void CVehicle::DestroyForPlayer(EntityId playerId)
 	bitStream.WriteCompressed(m_vehicleId);
 
 	// Send it to the player
-	g_pNetworkManager->RPC(RPC_DESTROY_VEHICLE, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
+	g_pServer->GetNetworkManager()->RPC(RPC_DESTROY_VEHICLE, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 }
 
 void CVehicle::DestroyForWorld()
@@ -86,7 +84,7 @@ void CVehicle::DestroyForWorld()
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
 	{
 		// Is the current player active?
-		if(g_pPlayerManager->IsActive(i))
+		if(g_pServer->GetPlayerManager()->IsActive(i))
 		{
 			// Destroy this vehicle for the current player
 			DestroyForPlayer(i);

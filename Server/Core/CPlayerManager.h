@@ -20,7 +20,7 @@ public:
 	CPlayerManager();
 	~CPlayerManager();
 
-	bool      Add(EntityId playerId, String strName);
+	bool      Add(EntityId playerId, String strName, String strSerial);
 	bool      Delete(EntityId playerId);
 	bool      IsActive(EntityId playerId);
 	CPlayer * Get(EntityId playerId);

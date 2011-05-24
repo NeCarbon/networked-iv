@@ -23,6 +23,12 @@ private:
 	std::queue<String> m_inputQueue;
 	CServerLister    * m_pServerLister;
 
+	CNetworkManager  * m_pNetworkManager;
+	CPlayerManager   * m_pPlayerManager;
+	CVehicleManager  * m_pVehicleManager;
+	CResourceManager * m_pResourceManager;
+	CRootEntity      * m_pRootEntity;
+
 	void        ProcessInputQueue();
 
 public:
@@ -40,4 +46,11 @@ public:
 	int         GetConfigInteger(String strKey, int iDefaultValue);
 	float       GetConfigFloat(String strKey, float fDefaultValue);
 	bool        GetConfigBoolean(String strKey, bool bDefaultValue);
+
+	CNetworkManager * GetNetworkManager() { return m_pNetworkManager; }
+	CPlayerManager * GetPlayerManager() { return m_pPlayerManager; }
+	CVehicleManager * GetVehicleManager() { return m_pVehicleManager; }
+	CResourceManager * GetResourceManager() { return m_pResourceManager; }
+	CRootEntity * GetRootEntity() { return m_pRootEntity; }
+
 };

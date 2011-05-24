@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Server.Core"
 	ProjectGUID="{F1233B8F-5386-487F-9C06-F8501A7EA338}"
 	RootNamespace="Server.Core"
@@ -403,6 +403,10 @@
 					</File>
 					<File
 						RelativePath=".\scripting\natives\CServerNatives.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\scripting\natives\CVehicleNatives.cpp"
 						>
 					</File>
 				</Filter>
@@ -1065,6 +1069,10 @@
 					</File>
 					<File
 						RelativePath=".\scripting\natives\CServerNatives.h"
+						>
+					</File>
+					<File
+						RelativePath=".\scripting\natives\CVehicleNatives.h"
 						>
 					</File>
 				</Filter>

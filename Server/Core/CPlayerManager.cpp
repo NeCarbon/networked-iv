@@ -29,14 +29,14 @@ CPlayerManager::~CPlayerManager()
 	}
 }
 
-bool CPlayerManager::Add(EntityId playerId, String strName)
+bool CPlayerManager::Add(EntityId playerId, String strName, String strSerial)
 {
 	// Is this player already added?
 	if(IsActive(playerId))
 		return false;
 
 	// Create the player instance
-	m_pPlayers[playerId] = new CPlayer(playerId, strName);
+	m_pPlayers[playerId] = new CPlayer(playerId, strName, strSerial);
 
 	// Was the player instance created?
 	if(m_pPlayers[playerId])

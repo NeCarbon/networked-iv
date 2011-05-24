@@ -9,7 +9,7 @@
 
 #include <StdInc.h>
 
-extern CNetworkManager * g_pNetworkManager;
+extern CServer * g_pServer;
 
 CNetworkManager::CNetworkManager()
 {
@@ -69,7 +69,7 @@ void CNetworkManager::Startup(int iPort, int iMaxPlayers, String strPassword, St
 void CNetworkManager::PacketHandler(CPacket * pPacket)
 {
 	// Get the network manager pointer
-	CNetworkManager * pNetworkManager = g_pNetworkManager;
+	CNetworkManager * pNetworkManager = g_pServer->GetNetworkManager();
 
 	// Pass it to the packet handler, if that doesn't handle it, pass it to the rpc handler
 	if(!pNetworkManager->m_pServerPacketHandler->HandlePacket(pPacket) && 

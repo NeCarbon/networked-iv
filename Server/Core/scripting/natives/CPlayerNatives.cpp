@@ -14,6 +14,7 @@ void CPlayerNatives::LoadFunctions(CSquirrel * pSquirrel)
 	pSquirrel->RegisterFunction("getPlayerId", GetId, 1, "p");
 	pSquirrel->RegisterFunction("getPlayerName", GetName, 1, "p");
 	pSquirrel->RegisterFunction("getPlayerIP", GetIP, 1, "p");
+	pSquirrel->RegisterFunction("getPlayerSerial", GetSerial, 1, "p");
 	pSquirrel->RegisterFunction("isPlayerSpawned", IsSpawned, 1, "p");
 	pSquirrel->RegisterFunction("getPlayerVehicle", GetVehicle, 1, "p");
 	pSquirrel->RegisterFunction("getPlayerVehicleSeatId", GetVehicleSeatId, 1, "p");
@@ -49,6 +50,18 @@ int CPlayerNatives::GetIP(SQVM* pVM)
 
 	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER)
 		sq_pushstring(pVM, pPlayer->GetIp(), pPlayer->GetIp().GetLength());
+	else
+		sq_pushnull(pVM);
+
+	return 1;
+}
+
+int CPlayerNatives::GetSerial(SQVM* pVM)
+{
+	CPlayer * pPlayer = (CPlayer *)sq_toentity(pVM, 2);
+
+	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER)
+		sq_pushstring(pVM, pPlayer->GetSerial().C_String(), pPlayer->GetSerial().GetLength());
 	else
 		sq_pushnull(pVM);
 

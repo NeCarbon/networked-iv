@@ -1,6 +1,6 @@
 //============== Networked: IV - http://code.networked-iv.com ==============
 //
-// File: CPlayerNatives.h
+// File: CVehicleNatives.h
 // Project: Server
 // Author(s): mabako
 // License: See LICENSE in root directory
@@ -11,15 +11,12 @@
 
 #include <StdInc.h>
 
-class CPlayerNatives
+class CVehicleNatives
 {
 public:
 	static void LoadFunctions(CSquirrel* pSquirrel);
-	static int  GetId(SQVM * pVM);
-	static int  GetName(SQVM* pVM);
-	static int  GetIP(SQVM* pVM);
-	static int  GetSerial(SQVM* pVM);
-	static int  IsSpawned(SQVM * pVM);
-	static int  GetVehicle(SQVM * pVM);
-	static int  GetVehicleSeatId(SQVM * pVM);
+	static int  Create(SQVM * pVM);
+	static int  SetPosition(SQVM * pVM);
+	static int  SetRotation(SQVM * pVM);
+	static int  Destroy(SQVM * pVM);
 };

@@ -24,6 +24,7 @@ class CPlayer : public CEntity
 private:
 	EntityId         m_playerId;
 	String           m_strName;
+	String           m_strSerial;
 	bool             m_bSpawned;
 	eState           m_state;
 	CNetworkPadState m_previousNetPadState;
@@ -36,7 +37,7 @@ private:
 	bool             m_bIsDucking;
 
 public:
-	CPlayer(EntityId playerId, String strName);
+	CPlayer(EntityId playerId, String strName, String strSerial);
 	~CPlayer();
 
 	bool       IsOnFoot() { return (m_pVehicle == NULL); }
@@ -61,6 +62,7 @@ public:
 	BYTE       GetVehicleSeatId() { return m_byteVehicleSeatId; }
 	void       SetDucking(bool bIsDucking) { m_bIsDucking = bIsDucking; }
 	bool       IsDucking() { return m_bIsDucking; }
+	String     GetSerial() { return m_strSerial; }
 
 	// Information Serialization/Deserialization
 	void       Serialize(CBitStream * pBitStream);

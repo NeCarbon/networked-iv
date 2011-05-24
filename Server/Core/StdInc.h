@@ -59,7 +59,6 @@
 // Project
 #include "CConfig.h"
 #include "CServerLister.h"
-#include "CServer.h"
 #include "CServerRPCHandler.h"
 #include "CServerPacketHandler.h"
 #include "CNetworkManager.h"
@@ -88,3 +87,7 @@
 // Server natives
 #include "scripting/natives/CServerNatives.h"
 #include "scripting/natives/CPlayerNatives.h"
+#include "scripting/natives/CVehicleNatives.h"
+
+// Server
+#include "CServer.h"

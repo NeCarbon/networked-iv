@@ -9,9 +9,7 @@
 
 #include <StdInc.h>
 
-extern CNetworkManager * g_pNetworkManager;
-extern CPlayerManager  * g_pPlayerManager;
-extern CVehicleManager * g_pVehicleManager;
+extern CServer * g_pServer;
 
 void CServerRPCHandler::InitialData(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
@@ -32,7 +30,7 @@ void CServerRPCHandler::InitialData(CBitStream * pBitStream, CPlayerSocket sende
 		return;
 
 	// Add them to the player manager
-	g_pPlayerManager->Add(senderSocket.playerId, strName);
+	g_pServer->GetPlayerManager()->Add(senderSocket.playerId, strName, senderSocket.GetSerial());
 
 	// Construct the initial data bit stream
 	CBitStream bitStream;
@@ -41,16 +39,16 @@ void CServerRPCHandler::InitialData(CBitStream * pBitStream, CPlayerSocket sende
 	bitStream.WriteCompressed(senderSocket.playerId);
 
 	// Send the initial data bit stream
-	g_pNetworkManager->RPC(RPC_INITIAL_DATA, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, senderSocket.playerId, false);
+	g_pServer->GetNetworkManager()->RPC(RPC_INITIAL_DATA, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, senderSocket.playerId, false);
 
 	// Send them all current players
-	g_pPlayerManager->HandlePlayerJoin(senderSocket.playerId);
+	g_pServer->GetPlayerManager()->HandlePlayerJoin(senderSocket.playerId);
 
 	// Send them all current vehicles
-	g_pVehicleManager->HandlePlayerJoin(senderSocket.playerId);
+	g_pServer->GetVehicleManager()->HandlePlayerJoin(senderSocket.playerId);
 
 	// Spawn them for all current players
-	g_pPlayerManager->Get(senderSocket.playerId)->SpawnForWorld();
+	g_pServer->GetPlayerManager()->Get(senderSocket.playerId)->SpawnForWorld();
 
 	CLogFile::Printf("Player %d has joined the game (Name: %s)\n", senderSocket.playerId, strName.C_String());
 }
@@ -67,7 +65,7 @@ void CServerRPCHandler::ChatInput(CBitStream * pBitStream, CPlayerSocket senderS
 	}
 
 	// Get the player pointer
-	CPlayer * pPlayer = g_pPlayerManager->Get(senderSocket.playerId);
+	CPlayer * pPlayer = g_pServer->GetPlayerManager()->Get(senderSocket.playerId);
 
 	// Is the player pointer valid?
 	if(pPlayer)
@@ -103,7 +101,7 @@ void CServerRPCHandler::ChatInput(CBitStream * pBitStream, CPlayerSocket senderS
 				bitStream.Write(strInput);
 
 				// Send it to all other players
-				g_pNetworkManager->RPC(RPC_CHAT_INPUT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, INVALID_ENTITY_ID, true);
+				g_pServer->GetNetworkManager()->RPC(RPC_CHAT_INPUT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, INVALID_ENTITY_ID, true);
 			}
 		}
 		else
@@ -128,7 +126,7 @@ void CServerRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket 
 	}
 
 	// Get the player pointer
-	CPlayer * pPlayer = g_pPlayerManager->Get(senderSocket.playerId);
+	CPlayer * pPlayer = g_pServer->GetPlayerManager()->Get(senderSocket.playerId);
 
 	// Is the player pointer valid?
 	if(pPlayer)
@@ -146,7 +144,7 @@ void CServerRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket 
 			return;
 
 		// Get the vehicle
-		CVehicle * pVehicle = g_pVehicleManager->Get(vehicleId);
+		CVehicle * pVehicle = g_pServer->GetVehicleManager()->Get(vehicleId);
 
 		// Does the vehicle not exist?
 		if(!pVehicle)
@@ -178,7 +176,7 @@ void CServerRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket 
 				bitStream.Write((BYTE)VEHICLE_ENTRY_RETURN);
 				bitStream.Write(vehicleId);
 				bitStream.Write(byteSeatId);
-				g_pNetworkManager->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, INVALID_ENTITY_ID, true);
+				g_pServer->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, INVALID_ENTITY_ID, true);
 			}
 		}
 		// Is this an entry cancellation?
@@ -201,7 +199,7 @@ void CServerRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket 
 			bitStream.WriteBit(true);
 			bitStream.Write((BYTE)VEHICLE_ENTRY_CANCELLED);
 			bitStream.Write(vehicleId);
-			g_pNetworkManager->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, senderSocket.playerId, true);
+			g_pServer->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, senderSocket.playerId, true);
 		}
 		// Is this an entry completion?
 		else if(byteVehicleEntryExitType == VEHICLE_ENTRY_COMPLETE)
@@ -243,7 +241,7 @@ void CServerRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket 
 			{
 				bitStream.Write((BYTE)VEHICLE_EXIT_RETURN);
 				bitStream.Write(vehicleId);
-				g_pNetworkManager->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, INVALID_ENTITY_ID, true);
+				g_pServer->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE, INVALID_ENTITY_ID, true);
 			}
 		}
 		// Is this an exit completion?
@@ -291,7 +289,7 @@ void CServerRPCHandler::PlayerSync(CBitStream * pBitStream, CPlayerSocket sender
 	}
 
 	// Get the player pointer
-	CPlayer * pPlayer = g_pPlayerManager->Get(senderSocket.playerId);
+	CPlayer * pPlayer = g_pServer->GetPlayerManager()->Get(senderSocket.playerId);
 
 	// Is the player pointer valid?
 	if(pPlayer)
@@ -309,7 +307,7 @@ void CServerRPCHandler::PlayerSync(CBitStream * pBitStream, CPlayerSocket sender
 		pPlayer->Serialize(&bitStream);
 
 		// Send it to all other players
-		g_pNetworkManager->RPC(RPC_PLAYER_SYNC, &bitStream, PRIORITY_LOW, RELIABILITY_UNRELIABLE_SEQUENCED, senderSocket.playerId, true);
+		g_pServer->GetNetworkManager()->RPC(RPC_PLAYER_SYNC, &bitStream, PRIORITY_LOW, RELIABILITY_UNRELIABLE_SEQUENCED, senderSocket.playerId, true);
 	}
 }
 

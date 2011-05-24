@@ -150,6 +150,7 @@ CSquirrel::CSquirrel(CResource* pResource)
 #ifdef _SERVER
 		CServerNatives::LoadFunctions( this );
 		CPlayerNatives::LoadFunctions( this );
+		CVehicleNatives::LoadFunctions( this );
 #else
 
 #endif

@@ -9,10 +9,12 @@
 
 #include <StdInc.h>
 
+extern CServer * g_pServer;
+
 EXPORT CServerInterface * GetServerInterface()
 {
-	CServer * pServer = new CServer();
-	return pServer;
+	g_pServer = new CServer();
+	return g_pServer;
 }
 
 EXPORT void DestroyServerInterface(CServerInterface * pServer)

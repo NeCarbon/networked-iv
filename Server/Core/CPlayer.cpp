@@ -9,16 +9,14 @@
 
 #include <StdInc.h>
 
-extern CNetworkManager * g_pNetworkManager;
-extern CPlayerManager *  g_pPlayerManager;
-extern CVehicleManager * g_pVehicleManager;
-extern CRootEntity *     g_pRootEntity;
+extern CServer * g_pServer;
 
-CPlayer::CPlayer(EntityId playerId, String strName) : CEntity(ENTITY_TYPE_PLAYER, g_pRootEntity, "player")
+CPlayer::CPlayer(EntityId playerId, String strName, String strSerial) : CEntity(ENTITY_TYPE_PLAYER, g_pServer->GetRootEntity(), "player")
 {
 	m_playerId = playerId;
 	m_strName.SetLimit(NICK_MAX);
 	m_strName = strName;
+	m_strSerial = strSerial;
 	m_bSpawned = false;
 	m_state = STATE_CONNECTED;
 	m_pVehicle = NULL;
@@ -42,7 +40,7 @@ String CPlayer::GetName()
 
 String CPlayer::GetIp()
 {
-	return g_pNetworkManager->GetPlayerIp(m_playerId);
+	return g_pServer->GetNetworkManager()->GetPlayerIp(m_playerId);
 }
 
 bool CPlayer::IsSpawned()
@@ -58,7 +56,7 @@ void CPlayer::AddForPlayer(EntityId playerId)
 	bitStream.Write(m_strName);
 
 	// Send it to the player
-	g_pNetworkManager->RPC(RPC_ADD_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
+	g_pServer->GetNetworkManager()->RPC(RPC_ADD_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 }
 
 void CPlayer::AddForWorld()
@@ -67,7 +65,7 @@ void CPlayer::AddForWorld()
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
 	{
 		// Is the current player not this player and active?
-		if(i != m_playerId && g_pPlayerManager->IsActive(i))
+		if(i != m_playerId && g_pServer->GetPlayerManager()->IsActive(i))
 		{
 			// Add this player for the current player
 			AddForPlayer(i);
@@ -82,7 +80,7 @@ void CPlayer::DeleteForPlayer(EntityId playerId)
 	bitStream.WriteCompressed(m_playerId);
 
 	// Send it to the player
-	g_pNetworkManager->RPC(RPC_DELETE_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
+	g_pServer->GetNetworkManager()->RPC(RPC_DELETE_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 
 }
 void CPlayer::DeleteForWorld()
@@ -91,7 +89,7 @@ void CPlayer::DeleteForWorld()
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
 	{
 		// Is the current player not this player and active?
-		if(i != m_playerId && g_pPlayerManager->IsActive(i))
+		if(i != m_playerId && g_pServer->GetPlayerManager()->IsActive(i))
 		{
 			// Delete this player for the current player
 			DeleteForPlayer(i);
@@ -106,7 +104,7 @@ void CPlayer::SpawnForPlayer(EntityId playerId)
 	bitStream.WriteCompressed(m_playerId);
 
 	// Send it to the player
-	g_pNetworkManager->RPC(RPC_SPAWN_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
+	g_pServer->GetNetworkManager()->RPC(RPC_SPAWN_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 }
 
 void CPlayer::SpawnForWorld()
@@ -115,7 +113,7 @@ void CPlayer::SpawnForWorld()
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
 	{
 		// Is the current player not this player and active?
-		if(i != m_playerId && g_pPlayerManager->IsActive(i))
+		if(i != m_playerId && g_pServer->GetPlayerManager()->IsActive(i))
 		{
 			// Spawn this player for the current player
 			SpawnForPlayer(i);
@@ -133,7 +131,7 @@ void CPlayer::DestroyForPlayer(EntityId playerId)
 	bitStream.WriteCompressed(m_playerId);
 
 	// Send it to the player
-	g_pNetworkManager->RPC(RPC_DESTROY_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
+	g_pServer->GetNetworkManager()->RPC(RPC_DESTROY_PLAYER, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE_ORDERED, playerId, false);
 }
 
 void CPlayer::DestroyForWorld()
@@ -142,7 +140,7 @@ void CPlayer::DestroyForWorld()
 	for(EntityId i = 0; i < PLAYER_MAX; i++)
 	{
 		// Is the current player not this player and active?
-		if(i != m_playerId && g_pPlayerManager->IsActive(i))
+		if(i != m_playerId && g_pServer->GetPlayerManager()->IsActive(i))
 		{
 			// Destroy this player for the current player
 			DestroyForPlayer(i);
@@ -270,7 +268,7 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 		// TODO: Check against vehicle seat id for validity?
 
 		// Get the vehicle pointer
-		CVehicle * pVehicle = g_pVehicleManager->Get(vehicleId);
+		CVehicle * pVehicle = g_pServer->GetVehicleManager()->Get(vehicleId);
 
 		// Is the vehicle pointer valid?
 		if(!pVehicle)

@@ -12,12 +12,10 @@
 
 #define SERVER_TITLE MOD_NAME " v" MOD_VERSION_STRING " Server [" MOD_OS_STRING "]"
 
+CServer          * g_pServer = NULL;
 CConfig          * g_pConfig = NULL;
-CNetworkManager  * g_pNetworkManager = NULL;
-CPlayerManager   * g_pPlayerManager = NULL;
-CVehicleManager  * g_pVehicleManager = NULL;
-CRootEntity      * g_pRootEntity = NULL;
 CResourceManager * g_pResourceManager = NULL;
+CRootEntity      * g_pRootEntity = NULL;
 
 /*String DumpDataAsHex(char * szData, unsigned int uiLength)
 {
@@ -108,9 +106,9 @@ bool CServer::OnLoad()
 	CLogFile::Printf("Net module initialized\n");
 
 	// Create the network manager instance
-	g_pNetworkManager = new CNetworkManager();
+	m_pNetworkManager = new CNetworkManager();
 
-	if(!g_pNetworkManager)
+	if(!m_pNetworkManager)
 	{
 		CLogFile::Printf("Failed to create network manager instance!\n");
 		return false;
@@ -119,9 +117,9 @@ bool CServer::OnLoad()
 	CLogFile::Printf("Network manager instance created\n");
 
 	// Create the player manager instance
-	g_pPlayerManager = new CPlayerManager();
+	m_pPlayerManager = new CPlayerManager();
 
-	if(!g_pPlayerManager)
+	if(!GetPlayerManager())
 	{
 		CLogFile::Printf("Failed to create player manager instance!\n");
 	}
@@ -129,9 +127,9 @@ bool CServer::OnLoad()
 	CLogFile::Printf("Player manager instance created\n");
 
 	// Create the vehicle manager instance
-	g_pVehicleManager = new CVehicleManager();
+	m_pVehicleManager = new CVehicleManager();
 
-	if(!g_pVehicleManager)
+	if(!m_pVehicleManager)
 	{
 		CLogFile::Printf("Failed to create vehicle manager instance!\n");
 	}
@@ -145,14 +143,14 @@ bool CServer::OnLoad()
 	m_bShowFPS = GetConfigBoolean("showfps", true);
 
 	// Start up the network manager
-	g_pNetworkManager->Startup(iServerPort, PLAYER_MAX);
+	m_pNetworkManager->Startup(iServerPort, PLAYER_MAX);
 
 	CLogFile::Printf("Network manager started up\n");
 
 	// Create the resource and scripting manager
 	CEntityIDs::Initalize();
-	g_pRootEntity = new CRootEntity();
-	g_pResourceManager = new CResourceManager("resources/");
+	m_pRootEntity = new CRootEntity();
+	m_pResourceManager = new CResourceManager("resources/");
 
 	// Load resources, get the first resource node
 	if(g_pConfig->GetXML()->findNode("resource"))
@@ -164,7 +162,7 @@ bool CServer::OnLoad()
 
 			// Make sure the name is valid and attempt to load the resource
 			if(strResource && !strResource.IsEmpty())
-				g_pResourceManager->Load(strResource);
+				m_pResourceManager->Load(strResource);
 
 			// Attempt to load the next resource node (if any)
 			if(!g_pConfig->GetXML()->nextNode())
@@ -194,7 +192,7 @@ bool CServer::OnLoad()
 	CLogFile::Printf("Server started on port %d\n", iServerPort);
 
 	// Temporary code
-	CVehicle * pVehicle = g_pVehicleManager->Add(174);
+	CVehicle * pVehicle = m_pVehicleManager->Add(174);
 	pVehicle->SetPosition(CVector3(-341.36f, 1144.80f, 14.79f));
 	pVehicle->SetRotation(CVector3(0.0f, 0.0f, 40.114815f));
 	pVehicle->SpawnForWorld();
@@ -236,10 +234,10 @@ void CServer::Process()
 	}
 
 	// Process the network manager
-	g_pNetworkManager->Process();
+	m_pNetworkManager->Process();
 
 	// Process the resource manager
-	g_pResourceManager->Process(ulTime);
+	m_pResourceManager->Process(ulTime);
 
 	// Process the server lister
 	m_pServerLister->Process();
@@ -264,19 +262,19 @@ void CServer::OnUnload()
 	SAFE_DELETE(m_pServerLister);
 
 	// Delete the vehicle manager instance
-	SAFE_DELETE(g_pVehicleManager);
+	SAFE_DELETE(m_pVehicleManager);
 
 	// Delete the player manager instance
-	SAFE_DELETE(g_pPlayerManager);
+	SAFE_DELETE(m_pPlayerManager);
 
 	// Delete the resource manager
-	SAFE_DELETE(g_pResourceManager);
+	SAFE_DELETE(m_pResourceManager);
 
 	// Delete the scripting manager
-	SAFE_DELETE(g_pRootEntity);
+	SAFE_DELETE(m_pRootEntity);
 
 	// Delete the network manager instance
-	SAFE_DELETE(g_pNetworkManager);
+	SAFE_DELETE(m_pNetworkManager);
 
 	// Shutdown the net module
 	CNetworkModule::Shutdown();
