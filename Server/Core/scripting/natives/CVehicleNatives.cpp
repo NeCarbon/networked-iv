@@ -13,31 +13,64 @@ extern CServer * g_pServer;
 
 void CVehicleNatives::LoadFunctions(CSquirrel * pSquirrel)
 {
-	pSquirrel->RegisterFunction("createVehicle", Create, 1, "iffffff");
+	pSquirrel->RegisterFunction("createVehicle", Create, 7, "iffffff");
+	pSquirrel->RegisterFunction("getVehicleId", GetId, 1, "v");
+	pSquirrel->RegisterFunction("getVehiclePosition", GetPosition, 1, "v");
+	pSquirrel->RegisterFunction("setVehiclePosition", SetPosition, 4, "vfff");
+	pSquirrel->RegisterFunction("getVehicleRotation", GetRotation, 1, "v");
+	pSquirrel->RegisterFunction("setVehicleRotation", SetRotation, 4, "vfff");
+	pSquirrel->RegisterFunction("destroyVehicle", Destroy, 1, "v");
 }
 
 int CVehicleNatives::Create(SQVM * pVM)
 {
 	int iVehicleId;
-	float fX, fY, fZ, rX, rY, rZ;
+	CVector3 vecPos, vecRot;
 	sq_getinteger(pVM, -7, &iVehicleId);
-	sq_getfloat(pVM, -6, &fX);
-	sq_getfloat(pVM, -5, &fY);
-	sq_getfloat(pVM, -4, &fZ);
-	sq_getfloat(pVM, -3, &rX);
-	sq_getfloat(pVM, -2, &rY);
-	sq_getfloat(pVM, -1, &rZ);
+	sq_getvector3(pVM, -6, &vecPos);
+	sq_getvector3(pVM, -3, &vecRot);
 	CVehicle * pVehicle = g_pServer->GetVehicleManager()->Add(iVehicleId);
 	if(pVehicle)
 	{
-		pVehicle->SetPosition(CVector3(fX, fY, fZ));
-		pVehicle->SetRotation(CVector3(rX, rY, rZ));
+		pVehicle->SetPosition(vecPos);
+		pVehicle->SetRotation(vecPos);
 		pVehicle->SpawnForWorld();
 		sq_pushentity(pVM, pVehicle);
 	}
 	sq_pushnull(pVM);
 	return 1;
 }
+
+int CVehicleNatives::GetId(SQVM * pVM)
+{
+	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+
+	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
+	{
+		sq_pushinteger(pVM, pVehicle->GetID());
+	}
+	else
+		sq_pushnull(pVM);
+
+	return 1;
+}
+
+int CVehicleNatives::GetPosition(SQVM * pVM)
+{
+	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+
+	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
+	{
+		CVector3 vecPos;
+		pVehicle->GetPosition(vecPos);
+		sq_pushvector3(pVM, &vecPos);
+	}
+	else
+		sq_pushnull(pVM);
+
+	return 1;
+}
+
 
 int CVehicleNatives::SetPosition(SQVM * pVM)
 {
@@ -46,9 +79,7 @@ int CVehicleNatives::SetPosition(SQVM * pVM)
 	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
 	{
 		CVector3 vecPos;
-		sq_getfloat(pVM, 3, &vecPos.fX);
-		sq_getfloat(pVM, 4, &vecPos.fY);
-		sq_getfloat(pVM, 5, &vecPos.fZ);
+		sq_getvector3(pVM, 3, &vecPos);
 		pVehicle->SetPosition(vecPos);
 		sq_pushbool(pVM, true);
 	}
@@ -56,7 +87,22 @@ int CVehicleNatives::SetPosition(SQVM * pVM)
 		sq_pushnull(pVM);
 
 	return 1;
+}
 
+int CVehicleNatives::GetRotation(SQVM * pVM)
+{
+	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+
+	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
+	{
+		CVector3 vecPos;
+		pVehicle->GetRotation(vecPos);
+		sq_pushvector3(pVM, &vecPos);
+	}
+	else
+		sq_pushnull(pVM);
+
+	return 1;
 }
 
 int CVehicleNatives::SetRotation(SQVM * pVM)
@@ -65,11 +111,9 @@ int CVehicleNatives::SetRotation(SQVM * pVM)
 
 	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
 	{
-		CVector3 vecPos;
-		sq_getfloat(pVM, 3, &vecPos.fX);
-		sq_getfloat(pVM, 4, &vecPos.fY);
-		sq_getfloat(pVM, 5, &vecPos.fZ);
-		pVehicle->SetRotation(vecPos);
+		CVector3 vecRot;
+		sq_getvector3(pVM, 3, &vecRot);
+		pVehicle->SetRotation(vecRot);
 		sq_pushbool(pVM, true);
 	}
 	else

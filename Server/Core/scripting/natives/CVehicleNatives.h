@@ -16,7 +16,10 @@ class CVehicleNatives
 public:
 	static void LoadFunctions(CSquirrel* pSquirrel);
 	static int  Create(SQVM * pVM);
+	static int  GetId(SQVM * pVM);
+	static int  GetPosition(SQVM * pVM);
 	static int  SetPosition(SQVM * pVM);
+	static int  GetRotation(SQVM * pVM);
 	static int  SetRotation(SQVM * pVM);
 	static int  Destroy(SQVM * pVM);
 };
