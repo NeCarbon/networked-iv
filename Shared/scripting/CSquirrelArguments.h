@@ -67,6 +67,8 @@ public:
 	void push(const char* c);
 	void push(String str);
 	void push(CEntity* pEntity);
+	void push(CVector3 vec);
 	void push(CSquirrelArguments* pArray, bool isArray);
 	bool pushFromStack(SQVM* pVM, int idx);
+	void pushFromStack(SQVM* pVM, int startidx, int count);
 };

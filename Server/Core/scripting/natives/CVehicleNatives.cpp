@@ -14,12 +14,12 @@ extern CServer * g_pServer;
 void CVehicleNatives::LoadFunctions(CSquirrel * pSquirrel)
 {
 	pSquirrel->RegisterFunction("createVehicle", Create, 7, "iffffff");
-	pSquirrel->RegisterFunction("getVehicleId", GetId, 1, "v");
-	pSquirrel->RegisterFunction("getVehiclePosition", GetPosition, 1, "v");
-	pSquirrel->RegisterFunction("setVehiclePosition", SetPosition, 4, "vfff");
-	pSquirrel->RegisterFunction("getVehicleRotation", GetRotation, 1, "v");
-	pSquirrel->RegisterFunction("setVehicleRotation", SetRotation, 4, "vfff");
-	pSquirrel->RegisterFunction("destroyVehicle", Destroy, 1, "v");
+	pSquirrel->RegisterFunction("getVehicleId", GetId, 1, "p");
+	pSquirrel->RegisterFunction("getVehiclePosition", GetPosition, 1, "p");
+	pSquirrel->RegisterFunction("setVehiclePosition", SetPosition, 4, "pfff");
+	pSquirrel->RegisterFunction("getVehicleRotation", GetRotation, 1, "p");
+	pSquirrel->RegisterFunction("setVehicleRotation", SetRotation, 4, "pfff");
+	pSquirrel->RegisterFunction("destroyVehicle", Destroy, 1, "p");
 }
 
 int CVehicleNatives::Create(SQVM * pVM)

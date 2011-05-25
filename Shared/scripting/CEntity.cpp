@@ -107,6 +107,8 @@ eEntityType CEntity::GetType(String strTag)
 		return ENTITY_TYPE_ROOT;
 	else if(strTag == "player")
 		return ENTITY_TYPE_PLAYER;
+	else if(strTag == "vehicle")
+		return ENTITY_TYPE_VEHICLE;
 	else if(strTag == "resource")
 		return ENTITY_TYPE_RESOURCE;
 	else if(strTag == "timer")

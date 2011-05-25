@@ -126,6 +126,13 @@ void CSquirrelArguments::push(CEntity* pEntity)
 	push_back(new CSquirrelArgument(pEntity));
 }
 
+void CSquirrelArguments::push(CVector3 vec)
+{
+	push_back(new CSquirrelArgument(vec.fX));
+	push_back(new CSquirrelArgument(vec.fY));
+	push_back(new CSquirrelArgument(vec.fZ));
+}
+
 void CSquirrelArguments::push(CSquirrelArguments* pArray, bool isArray)
 {
 	push_back(new CSquirrelArgument(pArray, isArray));
@@ -214,4 +221,12 @@ bool CSquirrelArguments::pushFromStack(SQVM* pVM, int idx)
 			return false;
 	}
 	return true;
+}
+
+void CSquirrelArguments::pushFromStack(SQVM* pVM, int startidx, int count)
+{
+	for(int i = startidx; i < count; i++)
+	{
+		pushFromStack(pVM, i);
+	}
 }

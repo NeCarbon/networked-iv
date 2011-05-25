@@ -150,7 +150,9 @@ bool CServer::OnLoad()
 	// Create the resource and scripting manager
 	CEntityIDs::Initalize();
 	m_pRootEntity = new CRootEntity();
+	g_pRootEntity = m_pRootEntity;
 	m_pResourceManager = new CResourceManager("resources/");
+	g_pResourceManager = m_pResourceManager;
 
 	// Load resources, get the first resource node
 	if(g_pConfig->GetXML()->findNode("resource"))
@@ -191,11 +193,11 @@ bool CServer::OnLoad()
 
 	CLogFile::Printf("Server started on port %d\n", iServerPort);
 
-	// Temporary code
+	/*// Temporary code
 	CVehicle * pVehicle = m_pVehicleManager->Add(174);
 	pVehicle->SetPosition(CVector3(-341.36f, 1144.80f, 14.79f));
 	pVehicle->SetRotation(CVector3(0.0f, 0.0f, 40.114815f));
-	pVehicle->SpawnForWorld();
+	pVehicle->SpawnForWorld();*/
 	return true;
 }
 
