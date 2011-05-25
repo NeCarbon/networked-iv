@@ -21,6 +21,7 @@ CPlayer::CPlayer(EntityId playerId, String strName, String strSerial) : CEntity(
 	m_state = STATE_CONNECTED;
 	m_pVehicle = NULL;
 	m_byteVehicleSeatId = 0;
+	m_uiHealth = 200;
 }
 
 CPlayer::~CPlayer()
@@ -156,6 +157,9 @@ void CPlayer::Serialize(CBitStream * pBitStream)
 	// Write the player net pad state
 	pBitStream->Write(m_currentNetPadState);
 
+	// Write the player health
+	pBitStream->Write(m_uiHealth);
+
 	// Write if we are on foot
 	pBitStream->WriteBit(IsOnFoot());
 
@@ -202,6 +206,13 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 	if(!pBitStream->Read(m_currentNetPadState))
 	{
 		CLogFile::Printf("CPlayer::Deserialize fail (Error code 1)\n");
+		return false;
+	}
+
+	// Read the health
+	if(!pBitStream->Read(m_uiHealth))
+	{
+		CLogFile::Printf("CPlayer::Deserialize fail (Error code 10)\n");
 		return false;
 	}
 

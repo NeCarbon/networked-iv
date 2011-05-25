@@ -35,6 +35,7 @@ private:
 	float            m_fHeading;
 	CVector3         m_vecMoveSpeed;
 	bool             m_bIsDucking;
+	unsigned int     m_uiHealth;
 
 public:
 	CPlayer(EntityId playerId, String strName, String strSerial);

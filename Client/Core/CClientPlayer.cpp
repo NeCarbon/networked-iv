@@ -1579,6 +1579,9 @@ void CClientPlayer::Serialize(CBitStream * pBitStream)
 	GetNetPadState(netPadState);
 	pBitStream->Write(netPadState);
 
+	// Write the player health
+	pBitStream->Write(GetHealth());
+
 	// Write if we are on foot
 	pBitStream->WriteBit(IsOnFoot());
 
@@ -1630,6 +1633,16 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 	}
 
 	SetNetPadState(netPadState);
+
+	// Read the player health
+	unsigned int uiHealth;
+	if(!pBitStream->Read(uiHealth))
+	{
+		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 10)\n");
+		return false;
+	}
+
+	SetHealth(uiHealth);
 
 	// Read if we are on foot
 	bool bIsOnFoot = pBitStream->ReadBit();
