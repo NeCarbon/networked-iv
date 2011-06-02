@@ -42,9 +42,6 @@ CStreamableEntity::~CStreamableEntity()
 		// Nothing we can do at this point, as it'd go only for pure virtual function call with StreamOut()
 		CLogFile::Printf("CStreamableEntity::Deleting %p (%d) while it is streamed in\n", this, m_eType);
 	}
-
-	// Call the CEntity destructor
-	CEntity::~CEntity();
 }
 
 void CStreamableEntity::SetDimension(DimensionId dimensionId)

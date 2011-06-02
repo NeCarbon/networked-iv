@@ -36,6 +36,7 @@ private:
 	CVector3         m_vecMoveSpeed;
 	bool             m_bIsDucking;
 	unsigned int     m_uiHealth;
+	unsigned int     m_uiCurrentWeapon;
 
 public:
 	CPlayer(EntityId playerId, String strName, String strSerial);

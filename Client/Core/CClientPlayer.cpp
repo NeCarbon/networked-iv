@@ -66,9 +66,6 @@ CClientPlayer::~CClientPlayer()
 {
 	// Notify the streamer that we have been deleted
 	OnDelete();
-
-	// Call the CStreamableEntity destructor
-	CStreamableEntity::~CStreamableEntity();
 }
 
 // TODO: Use this to create local player ped too instead of using scripting natives?
@@ -1603,6 +1600,9 @@ void CClientPlayer::Serialize(CBitStream * pBitStream)
 		
 		// Write the player duck state
 		pBitStream->WriteBit(IsDucking());
+
+		// Write the player current weapon
+		pBitStream->Write((unsigned int)GetCurrentWeaponType());
 	}
 	else
 	{
@@ -1693,6 +1693,16 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 
 		// Read the player duck state
 		SetDucking(pBitStream->ReadBit());
+
+		// Read the current weapon type
+		unsigned int uiCurrentWeapon;
+		if(!pBitStream->Read(uiCurrentWeapon))
+		{
+			CLogFile::Printf("CClientPlayer::Deserialize fail (error code: current weapon)");
+			return false;
+		}
+
+		SetCurrentWeapon(uiCurrentWeapon);
 	}
 	else
 	{

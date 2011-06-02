@@ -177,6 +177,9 @@ void CPlayer::Serialize(CBitStream * pBitStream)
 
 		// Write the player duck state
 		pBitStream->WriteBit(m_bIsDucking);
+
+		// Write the player current weapon
+		pBitStream->Write(m_uiCurrentWeapon);
 	}
 	else
 	{
@@ -252,6 +255,9 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 
 		// Read the player duck state
 		m_bIsDucking = pBitStream->ReadBit();
+
+		// Read the player current weapon
+		pBitStream->Read(m_uiCurrentWeapon);
 	}
 	else
 	{

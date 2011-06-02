@@ -31,9 +31,6 @@ CClientVehicle::~CClientVehicle()
 {
 	// Notify the streamer that we have been deleted
 	OnDelete();
-
-	// Call the CStreamableEntity destructor
-	CStreamableEntity::~CStreamableEntity();
 }
 
 void CClientVehicle::SetColors(BYTE byteColor1, BYTE byteColor2, BYTE byteColor3, BYTE byteColor4)
