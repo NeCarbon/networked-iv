@@ -43,6 +43,7 @@ public:
 	CPlayer * GetPassenger(BYTE bytePassengerId);
 	void      SetOccupant(BYTE byteSeatId, CPlayer * pOccupant);
 	CPlayer * GetOccupant(BYTE byteSeatId);
+	CPlayer * GetSyncer();
 	void      SetColors(BYTE byteColor1, BYTE byteColor2, BYTE byteColor3, BYTE byteColor4);
 	void      GetColors(BYTE& byteColor1, BYTE& byteColor2, BYTE& byteColor3, BYTE& byteColor4);
 	void      SetPosition(const CVector3& vecPosition);
@@ -55,4 +56,8 @@ public:
 	void      GetTurnSpeed(CVector3& vecTurnSpeed);
 	void      SetHealth(float fHealth);
 	float     GetHealth();
+
+	// Information Serialization/Deserialization
+	void      Serialize(CBitStream * pBitStream);
+	bool      Deserialize(CBitStream * pBitStream);
 };

@@ -137,6 +137,22 @@ CPlayer * CVehicle::GetOccupant(BYTE byteSeatId)
 	return GetPassenger(byteSeatId - 1);
 }
 
+CPlayer * CVehicle::GetSyncer()
+{
+	// Loop through all seats
+	for(BYTE byteSeatID = 0; byteSeatID < MAX_VEHICLE_PASSENGERS; ++byteSeatID)
+	{
+		// Check for the player occupying that seat
+		CPlayer * pPlayer = GetOccupant(byteSeatID);
+
+		// Any player in that seat?
+		if(pPlayer)
+			return pPlayer;
+	}
+
+	return NULL;
+}
+
 void CVehicle::SetColors(BYTE byteColor1, BYTE byteColor2, BYTE byteColor3, BYTE byteColor4)
 {
 	m_byteColors[0] = byteColor1;
@@ -201,4 +217,74 @@ void CVehicle::SetHealth(float fHealth)
 float CVehicle::GetHealth()
 {
 	return m_fHealth;
+}
+
+void CVehicle::Serialize(CBitStream * pBitStream)
+{
+	// Write the vehicle position
+	CVector3 vecPosition;
+	GetPosition(vecPosition);
+	pBitStream->Write(vecPosition);
+
+	// Write the vehicle rotation
+	CVector3 vecRotation;
+	GetRotation(vecRotation);
+	pBitStream->Write(vecRotation);
+
+	// Write the vehicle move speed
+	CVector3 vecMoveSpeed;
+	GetMoveSpeed(vecMoveSpeed);
+	pBitStream->Write(vecMoveSpeed);
+
+	// Write the vehicle turn speed
+	CVector3 vecTurnSpeed;
+	GetTurnSpeed(vecTurnSpeed);
+	pBitStream->Write(vecTurnSpeed);
+
+	// Write the vehicle health
+	pBitStream->Write(GetHealth());
+}
+
+bool CVehicle::Deserialize(CBitStream * pBitStream)
+{
+	// Read the vehicle position
+	CVector3 vecPosition;
+
+	if(!pBitStream->Read(vecPosition))
+		return false;
+
+	SetPosition(vecPosition);
+
+	// Read the vehicle rotation
+	CVector3 vecRotation;
+
+	if(!pBitStream->Read(vecRotation))
+		return false;
+
+	SetRotation(vecRotation);
+
+	// Read the vehicle move speed
+	CVector3 vecMoveSpeed;
+
+	if(!pBitStream->Read(vecMoveSpeed))
+		return false;
+
+	SetMoveSpeed(vecMoveSpeed);
+
+	// Read the vehicle turn speed
+	CVector3 vecTurnSpeed;
+
+	if(!pBitStream->Read(vecTurnSpeed))
+		return false;
+
+	SetTurnSpeed(vecTurnSpeed);
+
+	// Read the vehicle health
+	float fHealth;
+
+	if(!pBitStream->Read(fHealth))
+		return false;
+
+	SetHealth(fHealth);
+	return true;
 }

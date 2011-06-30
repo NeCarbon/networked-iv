@@ -85,6 +85,22 @@ CClientPlayer * CClientVehicle::GetOccupant(BYTE byteSeatId)
 	return GetPassenger(byteSeatId - 1);
 }
 
+CClientPlayer * CClientVehicle::GetSyncer()
+{
+	// Loop through all seats
+	for(BYTE byteSeatID = 0; byteSeatID < MAX_VEHICLE_PASSENGERS; ++byteSeatID)
+	{
+		// Check for the player occupying that seat
+		CClientPlayer * pPlayer = GetOccupant(byteSeatID);
+
+		// Any player in that seat?
+		if(pPlayer)
+			return pPlayer;
+	}
+
+	return NULL;
+}
+
 bool CClientVehicle::Create()
 {
 	// Are we not already created?

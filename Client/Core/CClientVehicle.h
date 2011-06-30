@@ -47,6 +47,7 @@ public:
 	CClientPlayer  * GetPassenger(BYTE bytePassengerId);
 	void             SetOccupant(BYTE byteSeatId, CClientPlayer * pOccupant);
 	CClientPlayer  * GetOccupant(BYTE byteSeatId);
+	CClientPlayer  * GetSyncer();
 	void             StreamIn();
 	void             StreamOut();
 	void             Process();

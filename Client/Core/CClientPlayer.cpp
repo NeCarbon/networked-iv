@@ -1610,10 +1610,11 @@ void CClientPlayer::Serialize(CBitStream * pBitStream)
 		pBitStream->WriteCompressed(m_pVehicle->GetVehicleId());
 
 		// Write our vehicle seat id
+		// TODO: Should this really be synched every time?
 		pBitStream->Write(m_byteVehicleSeatId);
 
-		// Are we the driver?
-		if(m_byteVehicleSeatId == 0)
+		// Are we the syncer?
+		if(m_pVehicle->GetSyncer() == this)
 		{
 			// Serialize the vehicle to the bit stream
 			m_pVehicle->Serialize(pBitStream);
@@ -1737,7 +1738,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 		}
 
 		// Are we not already in the vehicle?
-		if(m_pVehicle != pVehicle)
+		if(m_pVehicle != pVehicle || pVehicle->GetOccupant(byteSeatId) != this)
 		{
 			// Force us in to the vehicle
 			PutInVehicle(pVehicle, byteSeatId);
@@ -1746,10 +1747,19 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 		// Are we the driver?
 		if(byteSeatId == 0)
 		{
-			// Deserialize the vehicle from the bit stream
-			if(!pVehicle->Deserialize(pBitStream))
+			// Check if there is any sync data existing
+			if(pBitStream->GetNumberOfUnreadBits() > 0)
 			{
-				CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 9)");
+				// Deserialize the vehicle from the bit stream
+				if(!pVehicle->Deserialize(pBitStream))
+				{
+					CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 9)");
+					return false;
+				}
+			}
+			else
+			{
+				CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 10)");
 				return false;
 			}
 		}
