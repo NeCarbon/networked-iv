@@ -18,7 +18,7 @@ void CClientRPCHandler::InitialData(CBitStream * pBitStream, CPlayerSocket sende
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for InitialData RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for InitialData RPC");
 		return;
 	}
 
@@ -45,7 +45,7 @@ void CClientRPCHandler::AddPlayer(CBitStream * pBitStream, CPlayerSocket senderS
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for AddPlayer RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for AddPlayer RPC");
 		return;
 	}
 
@@ -75,7 +75,7 @@ void CClientRPCHandler::DeletePlayer(CBitStream * pBitStream, CPlayerSocket send
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for DeletePlayer RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for DeletePlayer RPC");
 		return;
 	}
 
@@ -111,7 +111,7 @@ void CClientRPCHandler::SpawnPlayer(CBitStream * pBitStream, CPlayerSocket sende
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for SpawnPlayer RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for SpawnPlayer RPC");
 		return;
 	}
 
@@ -147,7 +147,7 @@ void CClientRPCHandler::SpawnVehicle(CBitStream * pBitStream, CPlayerSocket send
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for SpawnVehicle RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for SpawnVehicle RPC");
 		return;
 	}
 
@@ -221,7 +221,7 @@ void CClientRPCHandler::DestroyVehicle(CBitStream * pBitStream, CPlayerSocket se
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for DestroyVehicle RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for DestroyVehicle RPC");
 		return;
 	}
 
@@ -246,7 +246,7 @@ void CClientRPCHandler::ChatInput(CBitStream * pBitStream, CPlayerSocket senderS
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for ChatInput RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for ChatInput RPC");
 		return;
 	}
 
@@ -280,7 +280,7 @@ void CClientRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket 
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for VehicleEnterExit RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for VehicleEnterExit RPC");
 		return;
 	}
 
@@ -311,7 +311,7 @@ void CClientRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket 
 	if(bReply && (byteEnterExitVehicleType == VEHICLE_ENTRY_RETURN) && !pBitStream->Read(byteSeatId))
 		return;
 
-	CLogFile::Printf("VehicleEntryExit(Player %d, Reply %d, Type %d, Vehicle %d, Seat %d)\n", playerId, bReply, byteEnterExitVehicleType, vehicleId, byteSeatId);
+	CLogFile::Printf("VehicleEntryExit(Player %d, Reply %d, Type %d, Vehicle %d, Seat %d)", playerId, bReply, byteEnterExitVehicleType, vehicleId, byteSeatId);
 
 	// Get the player pointer
 	CClientPlayer * pPlayer = NULL;
@@ -369,7 +369,7 @@ void CClientRPCHandler::PlayerSync(CBitStream * pBitStream, CPlayerSocket sender
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for PlayerSync RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for PlayerSync RPC");
 		return;
 	}
 

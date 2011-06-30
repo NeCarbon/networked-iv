@@ -208,14 +208,14 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 	// Read the net pad state
 	if(!pBitStream->Read(m_currentNetPadState))
 	{
-		CLogFile::Printf("CPlayer::Deserialize fail (Error code 1)\n");
+		CLogFile::Printf("CPlayer::Deserialize fail (Error code 1)");
 		return false;
 	}
 
 	// Read the health
 	if(!pBitStream->Read(m_uiHealth))
 	{
-		CLogFile::Printf("CPlayer::Deserialize fail (Error code 10)\n");
+		CLogFile::Printf("CPlayer::Deserialize fail (Error code 10)");
 		return false;
 	}
 
@@ -225,7 +225,7 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 	// Are we on foot or in a vehicle when we are not meant to be?
 	if(bIsOnFoot != IsOnFoot())
 	{
-		CLogFile::Printf("CPlayer::Deserialize fail (Error code 2)\n");
+		CLogFile::Printf("CPlayer::Deserialize fail (Error code 2)");
 		return false;
 	}
 
@@ -235,21 +235,21 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 		// Read the player position
 		if(!pBitStream->Read(m_vecPosition))
 		{
-			CLogFile::Printf("CPlayer::Deserialize fail (Error code 3)\n");
+			CLogFile::Printf("CPlayer::Deserialize fail (Error code 3)");
 			return false;
 		}
 
 		// Read the player heading
 		if(!pBitStream->Read(m_fHeading))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 4)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 4)");
 			return false;
 		}
 
 		// Read the player move speed
 		if(!pBitStream->Read(m_vecMoveSpeed))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 5)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 5)");
 			return false;
 		}
 
@@ -267,7 +267,7 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 
 		if(!pBitStream->ReadCompressed(vehicleId))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 6)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 6)");
 			return false;
 		}
 
@@ -278,7 +278,7 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 
 		if(!pBitStream->Read(byteSeatId))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 7)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 7)");
 			return false;
 		}
 
@@ -290,7 +290,7 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 		// Is the vehicle pointer valid?
 		if(!pVehicle)
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 8)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 8)");
 			return false;
 		}
 
@@ -307,7 +307,7 @@ bool CPlayer::Deserialize(CBitStream * pBitStream)
 			// Deserialize the vehicle from the bit stream
 			if(!pVehicle->Deserialize(pBitStream))
 			{
-				CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 9)\n");
+				CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 9)");
 				return false;
 			}
 		}*/

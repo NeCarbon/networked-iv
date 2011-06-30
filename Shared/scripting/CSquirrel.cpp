@@ -88,7 +88,7 @@ void errorfunc(HSQUIRRELVM vm, const char *s, ...)
 
 	tmp[len - offend] = '\0';
 
-	CLogFile::Printf("%s\n", tmp);
+	CLogFile::Printf("%s", tmp);
 }
 /************************************/
 
@@ -174,10 +174,10 @@ bool CSquirrel::LoadScript( String script )
 	String scriptPath( "%s/%s", m_pResource->GetPath().Get(), script.Get() );
 	if( SQ_FAILED( sqstd_dofile( m_pVM, scriptPath.Get(), SQFalse, SQTrue ) ) )
 	{
-		CLogFile::Printf("[%s] Failed to load file %s.\n", m_pResource->GetName().Get(), script.Get());
+		CLogFile::Printf("[%s] Failed to load file %s.", m_pResource->GetName().Get(), script.Get());
 		return false;
 	}
-	CLogFile::Printf("[%s] Loaded file %s.\n", m_pResource->GetName().Get(), script.Get());
+	CLogFile::Printf("[%s] Loaded file %s.", m_pResource->GetName().Get(), script.Get());
 	return true;
 }
 

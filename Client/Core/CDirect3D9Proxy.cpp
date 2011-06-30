@@ -104,7 +104,7 @@ HMONITOR STDMETHODCALLTYPE CDirect3D9Proxy::GetAdapterMonitor(UINT Adapter)
 
 HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS * pPresentationParameters, IDirect3DDevice9 ** ppReturnedDeviceInterface)
 {
-	CLogFile::Printf("CDirect3D9Proxy::CreateDevice Called\n");
+	CLogFile::Printf("CDirect3D9Proxy::CreateDevice Called");
 
 	// Set the window text
 	SetWindowText(hFocusWindow, MOD_NAME " " MOD_VERSION_STRING);
@@ -118,13 +118,13 @@ HRESULT STDMETHODCALLTYPE CDirect3D9Proxy::CreateDevice(UINT Adapter, D3DDEVTYPE
 	// If creation of the d3d device succeeded call the create device client event and create the proxy device
 	if(SUCCEEDED(hr))
 	{
-		CLogFile::Printf("CDirect3D9Proxy::CreateDevice Call Succeeded\n");
+		CLogFile::Printf("CDirect3D9Proxy::CreateDevice Call Succeeded");
 
 		g_pClient->OnD3DCreateDevice(*ppReturnedDeviceInterface);
 		*ppReturnedDeviceInterface = new CDirect3DDevice9Proxy(this, *ppReturnedDeviceInterface);
 	}
 	else
-		CLogFile::Printf("CDirect3D9Proxy::CreateDevice Call Failed!\n");
+		CLogFile::Printf("CDirect3D9Proxy::CreateDevice Call Failed!");
 
 	// Store the hwnd
 	//g_hFocusWindow = hFocusWindow;

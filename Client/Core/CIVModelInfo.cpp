@@ -78,12 +78,12 @@ void CIVModelInfo::Load(bool bWaitForLoad)
 	if(IsLoaded())
 		return;
 
-	CLogFile::Printf("Reference count before load is %d\n", GetReferenceCount());
+	CLogFile::Printf("Reference count before load is %d", GetReferenceCount());
 
 	// Request the model
 	g_pClient->GetGame()->GetStreaming()->RequestModel(m_iModelIndex);
 
-	CLogFile::Printf("Reference count after request is %d\n", GetReferenceCount());
+	CLogFile::Printf("Reference count after request is %d", GetReferenceCount());
 
 	// Do we need to wait for the model load?
 	if(bWaitForLoad)
@@ -91,14 +91,14 @@ void CIVModelInfo::Load(bool bWaitForLoad)
 		// Load all requested models
 		g_pClient->GetGame()->GetStreaming()->LoadRequestedModels();
 
-		CLogFile::Printf("Reference count before load is %d\n", GetReferenceCount());
+		CLogFile::Printf("Reference count before load is %d", GetReferenceCount());
 
 		// Loop until the model is loaded
 		while(!IsLoaded())
 			Sleep(10);
 	}
 
-	CLogFile::Printf("Reference count after all is %d\n", GetReferenceCount());
+	CLogFile::Printf("Reference count after all is %d", GetReferenceCount());
 }
 
 void CIVModelInfo::Unload()

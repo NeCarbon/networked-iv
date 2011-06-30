@@ -224,7 +224,7 @@ bool CClientVehicle::SetModel(int iModelIndex)
 		// Is the new model info valid?
 		if(!pNewModelInfo || !pNewModelInfo->IsValid() || !pNewModelInfo->IsVehicle())
 		{
-			CLogFile::Printf("CClientVehicle::SetModel Failed (Invalid model)!\n");
+			CLogFile::Printf("CClientVehicle::SetModel Failed (Invalid model)!");
 			return false;
 		}
 

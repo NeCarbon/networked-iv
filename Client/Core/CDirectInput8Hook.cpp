@@ -13,7 +13,7 @@ CDirectInput8Hook::DirectInput8Create_t CDirectInput8Hook::m_pDirectInput8Create
 
 HRESULT WINAPI CDirectInput8Hook::DirectInput8Create_Hook(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter)
 {
-	CLogFile::Printf("DirectInput8Create Called\n");
+	CLogFile::Printf("DirectInput8Create Called");
 
 	// Call the real 'DirectInput8Create'
 	HRESULT hr = m_pDirectInput8Create(hinst, dwVersion, riidltf, ppvOut, punkOuter);
@@ -25,7 +25,7 @@ HRESULT WINAPI CDirectInput8Hook::DirectInput8Create_Hook(HINSTANCE hinst, DWORD
 		*ppvOut = new CDirectInput8Proxy(pDInput);
 	}
 	else
-		CLogFile::Printf("DirectInput8Create Call Failed!\n");
+		CLogFile::Printf("DirectInput8Create Call Failed!");
 
 	return hr;
 }

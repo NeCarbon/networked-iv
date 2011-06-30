@@ -42,7 +42,7 @@ CIVPad::CIVPad()
 		{
 			m_pPad->m_padData[i].m_byteCurrentValue = DEFAULT_ANALOG_INPUT_VALUE;
 			m_pPad->m_padData[i].m_byteLastValue = DEFAULT_ANALOG_INPUT_VALUE;
-			//CLogFile::Printf("Analog input %d values are %d and %d\n", i, m_pPad->m_padData[i].m_byteCurrentValue, m_pPad->m_padData[i].m_byteLastValue);
+			//CLogFile::Printf("Analog input %d values are %d and %d", i, m_pPad->m_padData[i].m_byteCurrentValue, m_pPad->m_padData[i].m_byteLastValue);
 		}
 	}
 }

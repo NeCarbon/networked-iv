@@ -13,12 +13,12 @@ extern CServer * g_pServer;
 
 void CServerRPCHandler::InitialData(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
-	CLogFile::Printf("Got InitialData RPC from player %d\n", senderSocket.playerId);
+	CLogFile::Printf("Got InitialData RPC from player %d", senderSocket.playerId);
 
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for InitialData RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for InitialData RPC");
 		return;
 	}
 
@@ -50,17 +50,17 @@ void CServerRPCHandler::InitialData(CBitStream * pBitStream, CPlayerSocket sende
 	// Spawn them for all current players
 	g_pServer->GetPlayerManager()->Get(senderSocket.playerId)->SpawnForWorld();
 
-	CLogFile::Printf("Player %d has joined the game (Name: %s)\n", senderSocket.playerId, strName.C_String());
+	CLogFile::Printf("Player %d has joined the game (Name: %s)", senderSocket.playerId, strName.C_String());
 }
 
 void CServerRPCHandler::ChatInput(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
-	CLogFile::Printf("Got ChatInput RPC from player %d\n", senderSocket.playerId);
+	CLogFile::Printf("Got ChatInput RPC from player %d", senderSocket.playerId);
 
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for ChatInput RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for ChatInput RPC");
 		return;
 	}
 
@@ -110,18 +110,18 @@ void CServerRPCHandler::ChatInput(CBitStream * pBitStream, CPlayerSocket senderS
 			pPlayer->CallEvent("playerCommand", &arguments);
 		}
 
-		CLogFile::Printf("Recieved chat input from player %d (Command?: %s, Input: %s)\n", senderSocket.playerId, bIsCommand ? "Yes" : "No", strInput.C_String());
+		CLogFile::Printf("Recieved chat input from player %d (Command?: %s, Input: %s)", senderSocket.playerId, bIsCommand ? "Yes" : "No", strInput.C_String());
 	}
 }
 
 void CServerRPCHandler::VehicleEnterExit(CBitStream * pBitStream, CPlayerSocket senderSocket)
 {
-	CLogFile::Printf("Got VehicleEnterExit RPC from player %d\n", senderSocket.playerId);
+	CLogFile::Printf("Got VehicleEnterExit RPC from player %d", senderSocket.playerId);
 
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for VehicleEnterExit RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for VehicleEnterExit RPC");
 		return;
 	}
 
@@ -284,7 +284,7 @@ void CServerRPCHandler::PlayerSync(CBitStream * pBitStream, CPlayerSocket sender
 	// Ensure we have a valid bitstream
 	if(!pBitStream)
 	{
-		CLogFile::Printf("Warning: Invalid bitstream for PlayerSync RPC\n");
+		CLogFile::Printf("Warning: Invalid bitstream for PlayerSync RPC");
 		return;
 	}
 
@@ -313,20 +313,20 @@ void CServerRPCHandler::PlayerSync(CBitStream * pBitStream, CPlayerSocket sender
 
 void CServerRPCHandler::Register()
 {
-	CLogFile::Printf("Registering server RPCs\n");
+	CLogFile::Printf("Registering server RPCs");
 	AddFunction(RPC_INITIAL_DATA, InitialData);
 	AddFunction(RPC_CHAT_INPUT, ChatInput);
 	AddFunction(RPC_VEHICLE_ENTER_EXIT, VehicleEnterExit);
 	AddFunction(RPC_PLAYER_SYNC, PlayerSync);
-	CLogFile::Printf("Server RPCs registered\n");
+	CLogFile::Printf("Server RPCs registered");
 }
 
 void CServerRPCHandler::Unregister()
 {
-	CLogFile::Printf("Unregistering server RPCs\n");
+	CLogFile::Printf("Unregistering server RPCs");
 	RemoveFunction(RPC_INITIAL_DATA);
 	RemoveFunction(RPC_CHAT_INPUT);
 	RemoveFunction(RPC_VEHICLE_ENTER_EXIT);
 	RemoveFunction(RPC_PLAYER_SYNC);
-	CLogFile::Printf("Server RPCs unregistered\n");
+	CLogFile::Printf("Server RPCs unregistered");
 }

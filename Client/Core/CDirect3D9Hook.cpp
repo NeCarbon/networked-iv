@@ -13,7 +13,7 @@ CDirect3D9Hook::Direct3DCreate9_t CDirect3D9Hook::m_pfnDirect3DCreate9;
 
 IDirect3D9 * WINAPI CDirect3D9Hook::Direct3DCreate9_Hook(UINT SDKVersion)
 {
-	CLogFile::Printf("Direct3DCreate9 Called\n");
+	CLogFile::Printf("Direct3DCreate9 Called");
 
 	// Call the real 'Direct3DCreate9'
 	IDirect3D9 * pD3D = m_pfnDirect3DCreate9(SDKVersion);
@@ -24,7 +24,7 @@ IDirect3D9 * WINAPI CDirect3D9Hook::Direct3DCreate9_Hook(UINT SDKVersion)
 		return new CDirect3D9Proxy(pD3D);
 	}
 
-	CLogFile::Printf("Direct3DCreate9 Call Failed!\n");
+	CLogFile::Printf("Direct3DCreate9 Call Failed!");
 
 	return NULL;
 }

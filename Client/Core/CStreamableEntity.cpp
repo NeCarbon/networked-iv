@@ -40,7 +40,7 @@ CStreamableEntity::~CStreamableEntity()
 	if(m_bIsStreamedIn)
 	{
 		// Nothing we can do at this point, as it'd go only for pure virtual function call with StreamOut()
-		CLogFile::Printf("CStreamableEntity::Deleting %p (%d) while it is streamed in\n", this, m_eType);
+		CLogFile::Printf("CStreamableEntity::Deleting %p (%d) while it is streamed in", this, m_eType);
 	}
 }
 
@@ -67,7 +67,7 @@ void CStreamableEntity::StreamInInternal()
 	// check if the entity is streamed in
 	if(!m_bIsStreamedIn)
 	{
-		CLogFile::Printf("CStreamableEntity::Stream In %p (%d)\n", this, m_eType);
+		CLogFile::Printf("CStreamableEntity::Stream In %p (%d)", this, m_eType);
 
 		// flag us as streamed in
 		m_bIsStreamedIn = true;
@@ -82,7 +82,7 @@ void CStreamableEntity::StreamOutInternal()
 	// check if the entity is streamed in
 	if(m_bIsStreamedIn)
 	{
-		CLogFile::Printf("CStreamableEntity::Stream Out %p (%d)\n", this, m_eType);
+		CLogFile::Printf("CStreamableEntity::Stream Out %p (%d)", this, m_eType);
 
 		// stream it out
 		StreamOut();

@@ -76,7 +76,7 @@ void CNetworkManager::PacketHandler(CPacket * pPacket)
 	   !pNetworkManager->m_pServerRPCHandler->HandlePacket(pPacket))
 	{
 #ifdef NIV_DEBUG
-		CLogFile::Printf("Warning: Unhandled packet (Id: %d, Player: %d)\n", pPacket->packetId, pPacket->playerSocket.playerId);
+		CLogFile::Printf("Warning: Unhandled packet (Id: %d, Player: %d)", pPacket->packetId, pPacket->playerSocket.playerId);
 #endif
 	}
 }

@@ -39,7 +39,7 @@ void CStreamer::Reset()
 		if(m_streamedElements[i].size() > 0)
 		{
 			// Output a message
-			CLogFile::Printf("CStreamer::Reset with %d objects of type %d\n", m_streamedElements[i].size(), i);
+			CLogFile::Printf("CStreamer::Reset with %d objects of type %d", m_streamedElements[i].size(), i);
 
 			// Loop through all entities
 			for(std::list<CStreamableEntity *>::iterator iter = m_streamedElements[i].begin(); iter != m_streamedElements[i].end(); ++ iter)
@@ -99,7 +99,7 @@ void CStreamer::Process()
 					// out of range or in another dimension, but streamed in?
 					if((*iter)->IsStreamedIn())
 					{
-						CLogFile::Printf("Streamout with Distance %f and Dimension %d/%d\n", fDistance, m_dimensionId, (*iter)->GetDimension());
+						CLogFile::Printf("Streamout with Distance %f and Dimension %d/%d", fDistance, m_dimensionId, (*iter)->GetDimension());
 
 						// remove it from the list of streamed in elements
 						m_streamedElements[(*iter)->GetType()].remove(*iter);
@@ -122,7 +122,7 @@ void CStreamer::Process()
 			{
 				if((*iter)->IsStreamedIn())
 				{
-					CLogFile::Printf("Streamout due to not being allowed to be streamed in\n");
+					CLogFile::Printf("Streamout due to not being allowed to be streamed in");
 
 					// remove it from the list of streamed in elements
 					m_streamedElements[(*iter)->GetType()].remove(*iter);

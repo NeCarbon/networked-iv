@@ -160,7 +160,7 @@ bool CClient::OnLoad()
 	m_uiBaseAddress -= 0x400000;
 
 	// Log the base address
-	CLogFile::Printf("base address is 0x%p\n", m_uiBaseAddress);
+	CLogFile::Printf("base address is 0x%p", m_uiBaseAddress);
 
 	// Create the game instance
 	m_pGame = new CGame();
@@ -169,7 +169,7 @@ bool CClient::OnLoad()
 	if(!m_pGame)
 		return false;
 
-	CLogFile::Printf("game instance created\n");
+	CLogFile::Printf("game instance created");
 
 	// Create the xlive hook instance
 	m_pXLiveHook = new CXLiveHook();
@@ -178,12 +178,12 @@ bool CClient::OnLoad()
 	if(!m_pXLiveHook)
 		return false;
 
-	CLogFile::Printf("xlive hook instance created\n");
+	CLogFile::Printf("xlive hook instance created");
 
 	// Install the xlive hook
 	m_pXLiveHook->Install();
 
-	CLogFile::Printf("xlive hook installed\n");
+	CLogFile::Printf("xlive hook installed");
 
 	// Create the d3d9 hook instance
 	m_pDirect3D9Hook = new CDirect3D9Hook();
@@ -192,12 +192,12 @@ bool CClient::OnLoad()
 	if(!m_pDirect3D9Hook)
 		return false;
 
-	CLogFile::Printf("d3d9 hook instance created\n");
+	CLogFile::Printf("d3d9 hook instance created");
 
 	// Install the d3d9 hook
 	m_pDirect3D9Hook->Install();
 
-	CLogFile::Printf("d3d9 hook installed\n");
+	CLogFile::Printf("d3d9 hook installed");
 
 	// Create the dinput hook instance
 	m_pDirectInput8Hook = new CDirectInput8Hook();
@@ -206,7 +206,7 @@ bool CClient::OnLoad()
 	if(!m_pDirectInput8Hook)
 		return false;
 
-	CLogFile::Printf("dinput hook instance created\n");
+	CLogFile::Printf("dinput hook instance created");
 
 	// Install the dinput hook
 	m_pDirectInput8Hook->Install();
@@ -214,21 +214,21 @@ bool CClient::OnLoad()
 	// Initialize the net module, if it fails, exit
 	if(!CNetworkModule::Init())
 	{
-		CLogFile::Printf("Failed to initialize the net module!\n");
+		CLogFile::Printf("Failed to initialize the net module!");
 		return false;
 	}
 
-	CLogFile::Printf("net module initialized\n");
+	CLogFile::Printf("net module initialized");
 
 	// Create the network manager instance
 	m_pNetworkManager = new CClientNetworkManager();
 
-	CLogFile::Printf("network manager instance created\n");
+	CLogFile::Printf("network manager instance created");
 
 	// Create the client task manager instance
 	m_pClientTaskManager = new CClientTaskManager();
 
-	CLogFile::Printf("client task manager instance created\n");
+	CLogFile::Printf("client task manager instance created");
 
 	// Create the resource and scripting manager
 	CEntityIDs::Initalize();
@@ -241,100 +241,98 @@ bool CClient::OnLoad()
 
 void CClient::OnUnload()
 {
-	CLogFile::Printf("Client unload 1\n");
+	CLogFile::Printf("Client unload 1");
 
 	m_pNetworkManager->Disconnect();
 
-	CLogFile::Printf("Game shutdown 1\n");
+	CLogFile::Printf("Game shutdown 1");
 
 	// Delete the Root Entity instance
 	SAFE_DELETE(g_pRootEntity);
 
-	CLogFile::Printf("Game shutdown 2\n");
+	CLogFile::Printf("Game shutdown 2");
 
 	// Delete the resource manager
 	SAFE_DELETE(g_pResourceManager);
 
-	CLogFile::Printf("Game shutdown 3\n");
+	CLogFile::Printf("Game shutdown 3");
 
 	// Delete the chat window instance
 	SAFE_DELETE(m_pChatWindow);
 
-	CLogFile::Printf("Game shutdown 4\n");
+	CLogFile::Printf("Game shutdown 4");
 
 	// Delete the font instance
 	SAFE_DELETE(m_pFont);
 
-	CLogFile::Printf("Game shutdown 5\n");
+	CLogFile::Printf("Game shutdown 5");
 
 	// Delete the streamer instance
 	SAFE_DELETE(m_pStreamer);
 
-	CLogFile::Printf("Game shutdown 6\n");
+	CLogFile::Printf("Game shutdown 6");
 
 	// Delete the player manager instance
 	SAFE_DELETE(m_pPlayerManager);
 
-	CLogFile::Printf("Game shutdown 7\n");
+	CLogFile::Printf("Game shutdown 7");
 
 	// Delete the vehicle manager instance
 	SAFE_DELETE(m_pVehicleManager);
 
-	CLogFile::Printf("Game shutdown 8\n");
+	CLogFile::Printf("Game shutdown 8");
 
 	// Delete the client task manager instance
 	SAFE_DELETE(m_pClientTaskManager);
 
-	CLogFile::Printf("Game shutdown 9\n");
+	CLogFile::Printf("Game shutdown 9");
 
 	// Delete the network manager instance
 	SAFE_DELETE(m_pNetworkManager);
 
-	CLogFile::Printf("Game shutdown 10\n");
+	CLogFile::Printf("Game shutdown 10");
 
 	// Shutdown the net module
 	CNetworkModule::Shutdown();
 
-	CLogFile::Printf("Game shutdown 11\n");
+	CLogFile::Printf("Game shutdown 11");
 
 	// Uninstall the dinput hook
 	if(m_pDirectInput8Hook)
 		m_pDirectInput8Hook->Uninstall();
 
-	CLogFile::Printf("Game shutdown 13\n");
+	CLogFile::Printf("Game shutdown 13");
 
 	// Delete the dinput hook instance
 	SAFE_DELETE(m_pDirectInput8Hook);
 
-	CLogFile::Printf("Game shutdown 14\n");
+	CLogFile::Printf("Game shutdown 14");
 
 	// Uninstall the d3d9 hook
 	if(m_pDirect3D9Hook)
 		m_pDirect3D9Hook->Uninstall();
 
-	CLogFile::Printf("Game shutdown 15\n");
+	CLogFile::Printf("Game shutdown 15");
 
 	// Delete the d3d9 hook instance
 	SAFE_DELETE(m_pDirect3D9Hook);
 
-	CLogFile::Printf("Game shutdown 16\n");
+	CLogFile::Printf("Game shutdown 16");
 
 	// Uninstall the xlive hook
 	m_pXLiveHook->Uninstall();
 
-	CLogFile::Printf("Game shutdown 17\n");
+	CLogFile::Printf("Game shutdown 17");
 
 	// Delete the xlive hook instance
 	SAFE_DELETE(m_pXLiveHook);
 
-	CLogFile::Printf("Game shutdown 18\n");
+	CLogFile::Printf("Game shutdown 18");
 
-	CLogFile::Printf("Client unload 2\n");
+	CLogFile::Printf("Client unload 2");
 
 	// Close the log file
 	CLogFile::Close();
-
-	CLogFile::Printf("Client unload 3\n");
 }
 
 void CClient::LogFileCallback(const char * szBuffer)
@@ -356,15 +354,15 @@ void CClient::LogFileCallback(const char * szBuffer)
 void CClient::ExceptionHandlerCallback(_EXCEPTION_POINTERS * ExceptionInfo)
 {
 	// Write the client information header
-	CLogFile::Printf("Client information: \n");
+	CLogFile::Printf("Client information: ");
 
 	// Write the local player index
-	CLogFile::Printf("LPI: %d\n", CPools::GetLocalPlayerIndex());
+	CLogFile::Printf("LPI: %d", CPools::GetLocalPlayerIndex());
 }
 
 void CClient::OnD3DCreateDevice(IDirect3DDevice9 * pD3DDevice)
 {
-	CLogFile::Printf("d3d create\n");
+	CLogFile::Printf("d3d create");
 	// Create our font instance
 	m_pFont = new CD3DXFont(pD3DDevice, 14, 0, FW_BOLD, "Tahoma");
 
@@ -450,7 +448,7 @@ void _declspec(naked) FuncHook()
 	}
 
 	if(*(DWORD *)(g_pClient->GetBaseAddress() + 0x10C7F80) != __dwTemp)
-		CLogFile::Printf("Call of sub_7870A0(%d) from 0x%p\n", __dwTemp, (__dwReturnAddress - g_pClient->GetBaseAddress()));
+		CLogFile::Printf("Call of sub_7870A0(%d) from 0x%p", __dwTemp, (__dwReturnAddress - g_pClient->GetBaseAddress()));
 	*(DWORD *)(g_pClient->GetBaseAddress() + 0x10C7F80) = __dwTemp;
 
 	_asm
@@ -486,7 +484,7 @@ void _declspec(naked) MyHook()
 		pushad
 	}
 
-	CLogFile::Printf("sub_4205B0 called with arg %d from 0x%p\n", __dwTemp, (__dwReturnAddress - g_pClient->GetBaseAddress()));
+	CLogFile::Printf("sub_4205B0 called with arg %d from 0x%p", __dwTemp, (__dwReturnAddress - g_pClient->GetBaseAddress()));
 	__dwViewVal = *(DWORD *)(g_pClient->GetBaseAddress() + 0x10F47F4);
 	__dwRet = (g_pClient->GetBaseAddress() + 0x4205B9);
 
@@ -519,7 +517,7 @@ void CClient::OnD3DEndScene(IDirect3DDevice9 * pD3DDevice)
 		{
 			call dwFunc
 		}*/
-		CLogFile::Printf("BEGIN\n");
+		CLogFile::Printf("BEGIN");
 		int v7 = 0;
 		/*DWORD dwFunc = (g_pClient->GetBaseAddress() + 0x5AF930);
 		DWORD dwValue = *(DWORD *)(g_pClient->GetBaseAddress() + 0x10F8088);
@@ -537,7 +535,7 @@ void CClient::OnD3DEndScene(IDirect3DDevice9 * pD3DDevice)
 		}*/
 
 		*(DWORD *)(g_pClient->GetBaseAddress() + 0x10C7F80) = 6;
-		CLogFile::Printf("END\n");
+		CLogFile::Printf("END");
 	}
 	/*if(!bHooked)
 	{
@@ -547,7 +545,7 @@ void CClient::OnD3DEndScene(IDirect3DDevice9 * pD3DDevice)
 	BYTE byteSomeVal = *(BYTE *)(g_pClient->GetBaseAddress() + 0x18A818B);
 	if(byteSomeVal != byteSomeValOld)
 	{
-		CLogFile::Printf("byte_18A818B changed (Old %d, New %d)\n", byteSomeValOld, byteSomeVal);
+		CLogFile::Printf("byte_18A818B changed (Old %d, New %d)", byteSomeValOld, byteSomeVal);
 		byteSomeValOld = byteSomeVal;
 	}
 	/*if(!bLol)
@@ -600,13 +598,13 @@ void CClient::OnD3DEndScene(IDirect3DDevice9 * pD3DDevice)
 	DWORD dwVal3 = *(DWORD *)(g_pClient->GetBaseAddress() + 0x10C7F80);
 	if(dwVal3 != dwVal1)
 	{
-		CLogFile::Printf("dword_10C7F80 changed (Old %d, New %d)\n", dwVal1, dwVal3);
+		CLogFile::Printf("dword_10C7F80 changed (Old %d, New %d)", dwVal1, dwVal3);
 		dwVal1 = dwVal3;
 	}
 	BYTE byteVal4 = *(BYTE *)(g_pClient->GetBaseAddress() + 0x10C7F6F);
 	if(byteVal4 != byteVal2)
 	{
-		CLogFile::Printf("byte_10C7F6F changed (Old %d, New %d)\n", byteVal2, byteVal4);
+		CLogFile::Printf("byte_10C7F6F changed (Old %d, New %d)", byteVal2, byteVal4);
 		byteVal2 = byteVal4;
 	}
 
@@ -630,7 +628,7 @@ void CClient::OnD3DEndScene(IDirect3DDevice9 * pD3DDevice)
 
 	if(GetAsyncKeyState(VK_F1) & 1)
 	{
-		CLogFile::Printf("Changing menu shown value to 0\n");
+		CLogFile::Printf("Changing menu shown value to 0");
 		//*(DWORD *)(g_pClient->GetBaseAddress() + 0x10C7F80) = 0;
 		*(BYTE *)(g_pClient->GetBaseAddress() + 0x10C7F6F) = 0;
 	}
@@ -649,17 +647,17 @@ void CClient::OnGameLoad()
 	// Create the streamer instance
 	m_pStreamer = new CStreamer();
 
-	CLogFile::Printf("streamer instance created\n");
+	CLogFile::Printf("streamer instance created");
 
 	// Create the player manager instance
 	m_pPlayerManager = new CClientPlayerManager();
 
-	CLogFile::Printf("player manager instance created\n");
+	CLogFile::Printf("player manager instance created");
 
 	// Create the vehicle manager instance
 	m_pVehicleManager = new CClientVehicleManager();
 
-	CLogFile::Printf("vehicle manager instance created\n");
+	CLogFile::Printf("vehicle manager instance created");
 
 	// Set the local player name
 	m_pPlayerManager->GetLocalPlayer()->SetPlayerName(m_strNick);
@@ -779,12 +777,12 @@ void CClient::OnGameProcess()
 			pPlayers[i] = NULL;
 			pVehicles[i] = NULL;
 		}
-		CLogFile::Printf("sizeof(IVEntity) == 0x%p\n", sizeof(IVEntity));
-		CLogFile::Printf("sizeof(IVDynamicEntity) == 0x%p\n", sizeof(IVDynamicEntity));
-		CLogFile::Printf("sizeof(IVPhysical) == 0x%p\n", sizeof(IVPhysical));
-		CLogFile::Printf("sizeof(IVPed) == 0x%p\n", sizeof(IVPed));
-		CLogFile::Printf("sizeof(IVPlayerPed) == 0x%p\n", sizeof(IVPlayerPed));
-		CLogFile::Printf("sizeof(IVVehicle) == 0x%p\n", sizeof(IVVehicle));
+		CLogFile::Printf("sizeof(IVEntity) == 0x%p", sizeof(IVEntity));
+		CLogFile::Printf("sizeof(IVDynamicEntity) == 0x%p", sizeof(IVDynamicEntity));
+		CLogFile::Printf("sizeof(IVPhysical) == 0x%p", sizeof(IVPhysical));
+		CLogFile::Printf("sizeof(IVPed) == 0x%p", sizeof(IVPed));
+		CLogFile::Printf("sizeof(IVPlayerPed) == 0x%p", sizeof(IVPlayerPed));
+		CLogFile::Printf("sizeof(IVVehicle) == 0x%p", sizeof(IVVehicle));
 		bPrinted = true;
 	}
 #if 0
@@ -826,7 +824,7 @@ void CClient::OnGameProcess()
 				//test end
 			}
 		}
-		CLogFile::Printf("Done\n");
+		CLogFile::Printf("Done");
 	}
 #endif
 	// Testing code
@@ -935,7 +933,7 @@ top:
 						pVehicles[i]->SetCanBeStreamedIn(true);
 
 						pVehicles[i]->Teleport(vehicleSync.vecPosition);
-						CLogFile::Printf("Done!\n");
+						CLogFile::Printf("Done!");
 					}
 
 					// Put the player in the vehicle
@@ -998,7 +996,7 @@ vtop:
 				pPlayers[i]->Teleport(CVector3(-341.36f + i, 1144.80f, 14.79f));
 				pPlayers[i]->SetCurrentHeading(40.114815f);
 				pVehicles[i] = NULL;
-				CLogFile::Printf("Done!\n");
+				CLogFile::Printf("Done!");
 			}
 		}
 		else
@@ -1008,7 +1006,7 @@ vtop:
 				CLogFile::Printf("Deleting new player...");
 				SAFE_DELETE(pVehicles[i]);
 				SAFE_DELETE(pPlayers[i]);
-				CLogFile::Printf("Done!\n");
+				CLogFile::Printf("Done!");
 			}
 		}
 
@@ -1020,9 +1018,9 @@ vtop:
 
 		if(pVehicle)
 		{
-			CLogFile::Printf("Turning on vehicle interior lights and hazard lights\n");
+			CLogFile::Printf("Turning on vehicle interior lights and hazard lights");
 			IVVehicle * pIVVehicle = pVehicle->GetGameVehicle()->GetVehicle();
-			CLogFile::Printf("Before turn on is %d\n", pIVVehicle->m_byteUnknownFlags1);
+			CLogFile::Printf("Before turn on is %d", pIVVehicle->m_byteUnknownFlags1);
 			bool bHazardLights = true;
 			bool bInteriorLight = true;
 
@@ -1035,7 +1033,7 @@ vtop:
 				SET_BIT(pIVVehicle->m_byteUnknownFlags1, 0x10);
 			else
 				UNSET_BIT(pIVVehicle->m_byteUnknownFlags1, 0x10);
-			CLogFile::Printf("After turn on is %d\n", pIVVehicle->m_byteUnknownFlags1);
+			CLogFile::Printf("After turn on is %d", pIVVehicle->m_byteUnknownFlags1);
 
 			//*(BYTE *)(pIVVehicle->GetVehicle() + 0xF6C) ^= (*(BYTE *)(pIVVehicle->GetVehicle() + 0xF6C) ^ 2 * cHazardLights) & 2;
 			//*(BYTE *)(pIVVehicle->GetVehicle() + 0xF6C) ^= (*(BYTE *)(pIVVehicle->GetVehicle() + 0xF6C) ^ 0x10 * cInteriorLight) & 0x10;

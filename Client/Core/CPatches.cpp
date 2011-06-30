@@ -454,7 +454,7 @@ IVPlayerPed * GetLocalPlayerPed()
 		if(pPlayerInfo)
 		{
 			_pPlayerPed = pPlayerInfo->m_pPlayerPed;
-		//	CLogFile::Printf("GetLocalPlayerPed Set To REAL Local Player Ped\n");
+		//	CLogFile::Printf("GetLocalPlayerPed Set To REAL Local Player Ped");
 		}
 
 		if(CPools::GetLocalPlayerIndex() != 0)
@@ -464,20 +464,20 @@ IVPlayerPed * GetLocalPlayerPed()
 			if(pContextInfo)
 			{
 				_pPlayerPed = pContextInfo->GetPlayerPed()->GetPlayerPed();
-		//		CLogFile::Printf("GetLocalPlayerPed Set To Remote Local Player Ped\n");
+		//		CLogFile::Printf("GetLocalPlayerPed Set To Remote Local Player Ped");
 			}
 		}
 	}
 	else
 	{
-		//CLogFile::Printf("GetLocalPlayerPed Invalid Local Player Index\n");
+		//CLogFile::Printf("GetLocalPlayerPed Invalid Local Player Index");
 	}
 
 	/*if(_pPlayerPed == NULL)
 	{
 		if(!bInvalidReturn)
 		{
-			CLogFile::Printf("GetLocalPlayerPed Return Is Invalid (Start)\n");
+			CLogFile::Printf("GetLocalPlayerPed Return Is Invalid (Start)");
 			bInvalidReturn = true;
 		}
 	}
@@ -485,7 +485,7 @@ IVPlayerPed * GetLocalPlayerPed()
 	{
 		if(bInvalidReturn)
 		{
-			CLogFile::Printf("GetLocalPlayerPed Return Is Invalid (End)\n");
+			CLogFile::Printf("GetLocalPlayerPed Return Is Invalid (End)");
 			bInvalidReturn = false;
 		}
 	}*/
@@ -599,7 +599,7 @@ DWORD _dwAddress = NULL;
 void CrashFix1()
 {
 	
-	CLogFile::Printf("Player index %d player info 0x%p\n", CPools::GetLocalPlayerIndex(), _pPlayerInfo);
+	CLogFile::Printf("Player index %d player info 0x%p", CPools::GetLocalPlayerIndex(), _pPlayerInfo);
 }
 
 void _declspec(naked) CrashFix1_Hook()
@@ -647,7 +647,7 @@ void _declspec(naked) TestFunc_Hook()
 void LogFunc_Hook(int a1, int a2, const char *a3, ...)
 {
 	if(a3)
-		CLogFile::Printf("%s\n", a3);
+		CLogFile::Printf("%s", a3);
 }
 
 void DisableLoadingScreens()

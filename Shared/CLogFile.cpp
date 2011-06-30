@@ -40,7 +40,7 @@ void CLogFile::Printf(const char * szFormat, ...)
 	va_end(vaArgs);
 
 	// Print the message
-	printf(szBuffer);
+	printf("%s\n", szBuffer);
 
 	// If we have a callback and it is enabled call it
 	if(m_bUseCallback && m_pfnCallback)
@@ -50,7 +50,7 @@ void CLogFile::Printf(const char * szFormat, ...)
 	if(m_fLogFile)
 	{
 		// Log the message
-		fprintf(m_fLogFile, "[%s] %s", SharedUtility::GetTimeString(), szBuffer);
+		fprintf(m_fLogFile, "[%s] %s\n", SharedUtility::GetTimeString(), szBuffer);
 
 		// Flush the log file
 		fflush(m_fLogFile);

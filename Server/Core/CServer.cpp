@@ -77,64 +77,64 @@ bool CServer::OnLoad()
 	// Install our exception handler
 	CExceptionHandler::Install();
 
-	CLogFile::Printf("Starting up " SERVER_TITLE "...\n");
+	CLogFile::Printf("Starting up " SERVER_TITLE "...");
 
 	// Create the config instance
 	g_pConfig = new CConfig();
 
 	if(!g_pConfig)
 	{
-		CLogFile::Printf("Failed to create config instance!\n");
+		CLogFile::Printf("Failed to create config instance!");
 		return false;
 	}
 
-	CLogFile::Printf("Config instance created\n");
+	CLogFile::Printf("Config instance created");
 
 	// Open the config file
 	if(!g_pConfig->Open(String("%sServer.conf", SharedUtility::GetAppPath())))
-		CLogFile::Printf("Failed to open config file! Settings will default to appropriate values.\n");
+		CLogFile::Printf("Failed to open config file! Settings will default to appropriate values.");
 	else
-		CLogFile::Printf("Config file opened\n");
+		CLogFile::Printf("Config file opened");
 
 	// Initialize the net module
 	if(!CNetworkModule::Init())
 	{
-		CLogFile::Printf("Failed to initialize the net module!\n");
+		CLogFile::Printf("Failed to initialize the net module!");
 		return false;
 	}
 
-	CLogFile::Printf("Net module initialized\n");
+	CLogFile::Printf("Net module initialized");
 
 	// Create the network manager instance
 	m_pNetworkManager = new CNetworkManager();
 
 	if(!m_pNetworkManager)
 	{
-		CLogFile::Printf("Failed to create network manager instance!\n");
+		CLogFile::Printf("Failed to create network manager instance!");
 		return false;
 	}
 
-	CLogFile::Printf("Network manager instance created\n");
+	CLogFile::Printf("Network manager instance created");
 
 	// Create the player manager instance
 	m_pPlayerManager = new CPlayerManager();
 
 	if(!GetPlayerManager())
 	{
-		CLogFile::Printf("Failed to create player manager instance!\n");
+		CLogFile::Printf("Failed to create player manager instance!");
 	}
 
-	CLogFile::Printf("Player manager instance created\n");
+	CLogFile::Printf("Player manager instance created");
 
 	// Create the vehicle manager instance
 	m_pVehicleManager = new CVehicleManager();
 
 	if(!m_pVehicleManager)
 	{
-		CLogFile::Printf("Failed to create vehicle manager instance!\n");
+		CLogFile::Printf("Failed to create vehicle manager instance!");
 	}
 
-	CLogFile::Printf("Vehicle manager instance created\n");
+	CLogFile::Printf("Vehicle manager instance created");
 
 	// Get server port
 	int iServerPort = GetConfigInteger("port", 9999);
@@ -145,7 +145,7 @@ bool CServer::OnLoad()
 	// Start up the network manager
 	m_pNetworkManager->Startup(iServerPort, PLAYER_MAX);
 
-	CLogFile::Printf("Network manager started up\n");
+	CLogFile::Printf("Network manager started up");
 
 	// Create the resource and scripting manager
 	CEntityIDs::Initalize();
@@ -191,7 +191,7 @@ bool CServer::OnLoad()
 	SetTitle(SERVER_TITLE);
 #endif
 
-	CLogFile::Printf("Server started on port %d\n", iServerPort);
+	CLogFile::Printf("Server started on port %d", iServerPort);
 
 	/*// Temporary code
 	CVehicle * pVehicle = m_pVehicleManager->Add(174);
@@ -258,7 +258,7 @@ void CServer::Process()
 
 void CServer::OnUnload()
 {
-	CLogFile::Printf("Server exiting...\n");
+	CLogFile::Printf("Server exiting...");
 
 	// Delete the server lister instance
 	SAFE_DELETE(m_pServerLister);
@@ -284,7 +284,7 @@ void CServer::OnUnload()
 	// Delete the config instance
 	SAFE_DELETE(g_pConfig);
 
-	CLogFile::Printf("Server exited\n");
+	CLogFile::Printf("Server exited");
 
 	// Close the log file
 	CLogFile::Close();
@@ -347,7 +347,7 @@ String CServer::GetConfigString(String strKey, String strDefaultValue)
 
 	if(!(g_pConfig && g_pConfig->GetValueAsString(strKey, strDefaultValue, &strValue)))
 	{
-		CLogFile::Printf("Failed to get '%s' value from config, defaulting to '%s'\n", strKey.C_String(), strDefaultValue.C_String());
+		CLogFile::Printf("Failed to get '%s' value from config, defaulting to '%s'", strKey.C_String(), strDefaultValue.C_String());
 	}
 
 	return strValue;
@@ -359,7 +359,7 @@ int CServer::GetConfigInteger(String strKey, int iDefaultValue)
 
 	if(!(g_pConfig && g_pConfig->GetValueAsInteger(strKey, iDefaultValue, &iValue)))
 	{
-		CLogFile::Printf("Failed to get '%s' value from config, defaulting to '%d'\n", strKey.C_String(), iDefaultValue);
+		CLogFile::Printf("Failed to get '%s' value from config, defaulting to '%d'", strKey.C_String(), iDefaultValue);
 	}
 
 	return iValue;
@@ -371,7 +371,7 @@ float CServer::GetConfigFloat(String strKey, float fDefaultValue)
 
 	if(!(g_pConfig && g_pConfig->GetValueAsFloat(strKey, fDefaultValue, &fValue)))
 	{
-		CLogFile::Printf("Failed to get '%s' value from config, defaulting to '%f'\n", strKey.C_String(), fDefaultValue);
+		CLogFile::Printf("Failed to get '%s' value from config, defaulting to '%f'", strKey.C_String(), fDefaultValue);
 	}
 
 	return fValue;
@@ -383,7 +383,7 @@ bool CServer::GetConfigBoolean(String strKey, bool bDefaultValue)
 
 	if(!(g_pConfig && g_pConfig->GetValueAsBoolean(strKey, bDefaultValue, &bValue)))
 	{
-		CLogFile::Printf("Failed to get '%s' value from config, defaulting to '%s'\n", strKey.C_String(), (bDefaultValue ? "true" : "false"));
+		CLogFile::Printf("Failed to get '%s' value from config, defaulting to '%s'", strKey.C_String(), (bDefaultValue ? "true" : "false"));
 	}
 
 	return bValue;

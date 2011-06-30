@@ -99,14 +99,14 @@ bool CExceptionHandler::WriteMiniDump(_EXCEPTION_POINTERS * ExceptionInfo)
 void CExceptionHandler::WriteUnhandledExceptionReport(_EXCEPTION_POINTERS * ExceptionInfo)
 {
 	// Write the unhandled exception report start notice to the log file
-	CLogFile::Printf("-------------- Unhandled Exception Report Start --------------\n");
+	CLogFile::Printf("-------------- Unhandled Exception Report Start --------------");
 
 	// Write the exception code and exception code string to the log file
-	CLogFile::Printf("Exception code: 0x%p (%s)\n", ExceptionInfo->ExceptionRecord->ExceptionCode, 
+	CLogFile::Printf("Exception code: 0x%p (%s)", ExceptionInfo->ExceptionRecord->ExceptionCode, 
 		ExceptionCodeToString(ExceptionInfo->ExceptionRecord->ExceptionCode));
 
 	// Write the exception address to the log file
-	CLogFile::Printf("Exception address: 0x%p\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
+	CLogFile::Printf("Exception address: 0x%p", ExceptionInfo->ExceptionRecord->ExceptionAddress);
 
 	// Create a tool help 32 process snapshot
 	HANDLE hModuleSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, GetCurrentProcessId());
@@ -124,7 +124,7 @@ void CExceptionHandler::WriteUnhandledExceptionReport(_EXCEPTION_POINTERS * Exce
 				// See if exception was within this module
 				if((ExceptionInfo->ContextRecord->Eip >= (DWORD)ModuleEntry.modBaseAddr) && (ExceptionInfo->ContextRecord->Eip <= ((DWORD)ModuleEntry.modBaseAddr + ModuleEntry.modBaseSize)))
 				{
-					CLogFile::Printf("Exception module: %s (+0x%p)\n", ModuleEntry.szModule, (ExceptionInfo->ContextRecord->Eip - (DWORD)ModuleEntry.modBaseAddr));
+					CLogFile::Printf("Exception module: %s (+0x%p)", ModuleEntry.szModule, (ExceptionInfo->ContextRecord->Eip - (DWORD)ModuleEntry.modBaseAddr));
 					break;
 				}
 			}
@@ -132,12 +132,12 @@ void CExceptionHandler::WriteUnhandledExceptionReport(_EXCEPTION_POINTERS * Exce
 	}
 
 	// Write the registers segment header
-	CLogFile::Printf("Exception registers: \n");
+	CLogFile::Printf("Exception registers: ");
 
 	// If we have segments context information then write it to the log file
 	if(ExceptionInfo->ContextRecord->ContextFlags & CONTEXT_SEGMENTS)
 	{
-		CLogFile::Printf("GS=0x%p FS=0x%p ES=0x%p DS=0x%p\n", ExceptionInfo->ContextRecord->SegGs, 
+		CLogFile::Printf("GS=0x%p FS=0x%p ES=0x%p DS=0x%p", ExceptionInfo->ContextRecord->SegGs, 
 			ExceptionInfo->ContextRecord->SegFs, ExceptionInfo->ContextRecord->SegEs, 
 			ExceptionInfo->ContextRecord->SegDs);
 	}
@@ -145,20 +145,20 @@ void CExceptionHandler::WriteUnhandledExceptionReport(_EXCEPTION_POINTERS * Exce
 	// If we have integer context information then write it to the log file
 	if(ExceptionInfo->ContextRecord->ContextFlags & CONTEXT_INTEGER)
 	{
-		CLogFile::Printf("EDI=0x%p ESI=0x%p EBX=0x%p EDX=0x%p\n", ExceptionInfo->ContextRecord->Edi, 
+		CLogFile::Printf("EDI=0x%p ESI=0x%p EBX=0x%p EDX=0x%p", ExceptionInfo->ContextRecord->Edi, 
 			ExceptionInfo->ContextRecord->Esi, ExceptionInfo->ContextRecord->Ebx,
 			ExceptionInfo->ContextRecord->Edx);
-		CLogFile::Printf("ECX=0x%p EAX=0x%p\n", ExceptionInfo->ContextRecord->Ecx, 
+		CLogFile::Printf("ECX=0x%p EAX=0x%p", ExceptionInfo->ContextRecord->Ecx, 
 			ExceptionInfo->ContextRecord->Eax);
 	}
 
 	// If we have control context information then write it to the log file
 	if(ExceptionInfo->ContextRecord->ContextFlags & CONTEXT_CONTROL)
 	{
-		CLogFile::Printf("EBP=0x%p EIP=0x%p CS=0x%p EFLAGS=0x%p\n", ExceptionInfo->ContextRecord->Ebp, 
+		CLogFile::Printf("EBP=0x%p EIP=0x%p CS=0x%p EFLAGS=0x%p", ExceptionInfo->ContextRecord->Ebp, 
 			ExceptionInfo->ContextRecord->Eip, ExceptionInfo->ContextRecord->SegCs, 
 			ExceptionInfo->ContextRecord->EFlags);
-		CLogFile::Printf("ESP=0x%p SS=0x%p\n", ExceptionInfo->ContextRecord->Esp, 
+		CLogFile::Printf("ESP=0x%p SS=0x%p", ExceptionInfo->ContextRecord->Esp, 
 			ExceptionInfo->ContextRecord->SegSs);
 	}
 
@@ -167,7 +167,7 @@ void CExceptionHandler::WriteUnhandledExceptionReport(_EXCEPTION_POINTERS * Exce
 		m_pfnCallback(ExceptionInfo);
 
 	// Write the unhandled exception report end notice to the log file
-	CLogFile::Printf("-------------- Unhandled Exception Report End --------------\n");
+	CLogFile::Printf("-------------- Unhandled Exception Report End --------------");
 }
 
 long WINAPI CExceptionHandler::ExceptionHandler(_EXCEPTION_POINTERS * ExceptionInfo)

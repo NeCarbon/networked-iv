@@ -17,7 +17,7 @@ extern CClient * g_pClient;
 void InvokeNativeInternal(unsigned int uiHash, NativeContext * pContext)
 {
 	/*CLogFile::SetUseCallback(false);
-	CLogFile::Printf("InvokeNativeInternal(Hash 0x%p)\n", uiHash);
+	CLogFile::Printf("InvokeNativeInternal(Hash 0x%p)", uiHash);
 	CLogFile::SetUseCallback(true);*/
 	DWORD dwFunction = (g_pClient->GetBaseAddress() + FUNC_ScrVM__FindNativeAddress_7);
 	DWORD dwNativeAddress = NULL;

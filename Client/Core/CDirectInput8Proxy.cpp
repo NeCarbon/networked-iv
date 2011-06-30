@@ -37,14 +37,14 @@ ULONG STDMETHODCALLTYPE CDirectInput8Proxy::Release()
 
 HRESULT STDMETHODCALLTYPE CDirectInput8Proxy::CreateDevice(REFGUID rguid, LPDIRECTINPUTDEVICE8A * lplpDirectInputDevice, LPUNKNOWN pUknOuter)
 {
-	CLogFile::Printf("CDirectInput8Proxy::CreateDevice Called\n");
+	CLogFile::Printf("CDirectInput8Proxy::CreateDevice Called");
 
 	// Create the dinput device
 	HRESULT hr = m_dinput->CreateDevice(rguid, lplpDirectInputDevice, pUknOuter);
 
 	if(SUCCEEDED(hr))
 	{
-		CLogFile::Printf("CDirectInput8Proxy::CreateDevice Call Succeeded\n");
+		CLogFile::Printf("CDirectInput8Proxy::CreateDevice Call Succeeded");
 
 		// Get the device type
 		eDIDeviceType type = DIDEVICE_TYPE_UNKNOWN;
@@ -60,7 +60,7 @@ HRESULT STDMETHODCALLTYPE CDirectInput8Proxy::CreateDevice(REFGUID rguid, LPDIRE
 		*lplpDirectInputDevice = new CDirectInputDevice8Proxy(this, *lplpDirectInputDevice, type);
 	}
 	else
-		CLogFile::Printf("CDirect3D9Proxy::CreateDevice Call Failed!\n");
+		CLogFile::Printf("CDirect3D9Proxy::CreateDevice Call Failed!");
 
 	return hr;
 }

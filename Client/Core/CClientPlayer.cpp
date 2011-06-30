@@ -77,7 +77,7 @@ bool CClientPlayer::Create()
 		// Find a free player number
 		m_byteInternalPlayerNumber = (BYTE)CPools::FindFreePlayerInfoIndex();
 
-		CLogFile::Printf("PlayerNumber: %d\n", m_byteInternalPlayerNumber);
+		CLogFile::Printf("PlayerNumber: %d", m_byteInternalPlayerNumber);
 
 		// Invalid player number?
 		if(m_byteInternalPlayerNumber == INVALID_PLAYER_PED)
@@ -118,7 +118,7 @@ bool CClientPlayer::Create()
 			return false;
 		}
 
-		CLogFile::Printf("Player info for player ped 0x%p, our player info 0x%p\n", pPlayerPed->m_pPlayerInfo, m_pPlayerInfo->GetPlayerInfo());
+		CLogFile::Printf("Player info for player ped 0x%p, our player info 0x%p", pPlayerPed->m_pPlayerInfo, m_pPlayerInfo->GetPlayerInfo());
 
 		// Setup the player ped
 #define VAR_PedFactory 0x15E35A0
@@ -181,7 +181,7 @@ bool CClientPlayer::Create()
 		// Set initial rotation
 		SetCurrentHeading(m_fCurrentHeading);
 
-		CLogFile::Printf("Done: PlayerNumber: %d, ScriptingHandle: %d\n", m_byteInternalPlayerNumber, GetScriptingHandle());
+		CLogFile::Printf("Done: PlayerNumber: %d, ScriptingHandle: %d", m_byteInternalPlayerNumber, GetScriptingHandle());
 		return true;
 	}
 
@@ -388,7 +388,7 @@ bool CClientPlayer::SetModel(int iModelIndex)
 		// Is the new model info valid?
 		if(!pNewModelInfo || !pNewModelInfo->IsValid() || !pNewModelInfo->IsPed())
 		{
-			CLogFile::Printf("CClientPlayer::SetModel Failed (Invalid model)!\n");
+			CLogFile::Printf("CClientPlayer::SetModel Failed (Invalid model)!");
 			return false;
 		}
 
@@ -968,7 +968,7 @@ void CClientPlayer::EnterVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 	// Are we spawned?
 	if(IsSpawned())
 	{
-		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d)\n", pVehicle, byteSeatId);
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d)", pVehicle, byteSeatId);
 
 		// Is the vehicle invalid?
 		if(!pVehicle)
@@ -987,13 +987,13 @@ void CClientPlayer::EnterVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 				return;
 		}
 
-		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 2\n", pVehicle, byteSeatId);
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 2", pVehicle, byteSeatId);
 
 		// Are we already in a vehicle?
 		if(IsInVehicle())
 			return;
 
-		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 3\n", pVehicle, byteSeatId);
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 3", pVehicle, byteSeatId);
 
 		/*BYTE byteDoorId = GetDoorFromSeat(byteSeatId);
 		int iUnknown2 = 0;
@@ -1023,14 +1023,14 @@ void CClientPlayer::EnterVehicle(CClientVehicle * pVehicle, BYTE byteSeatId)
 			InvokeNative<void *>(TASK_ENTER_CAR_AS_PASSENGER, GetScriptingHandle(), pVehicle->GetScriptingHandle(), -2, (byteSeatId - 1));
 		}
 
-		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 4\n", pVehicle, byteSeatId);
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 4", pVehicle, byteSeatId);
 
 		// Mark ourselves as entering a vehicle and store our vehicle and seat
 		m_vehicleEnterExit.bEntering = true;
 		m_vehicleEnterExit.pVehicle = pVehicle;
 		m_vehicleEnterExit.byteSeatId = byteSeatId;
 
-		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 5\n", pVehicle, byteSeatId);
+		CLogFile::Printf("CClientPlayer::EnterVehicle(0x%p, %d) 5", pVehicle, byteSeatId);
 
 		// Reset interpolation
 		ResetInterpolation();
@@ -1178,9 +1178,9 @@ void CClientPlayer::CheckVehicleEntryExitKey()
 			if(!m_vehicleEnterExit.bRequesting && IsInVehicle() && !m_vehicleEnterExit.bExiting)
 			{
 				if(IsLocalPlayer())
-					CLogFile::Printf("HandleVehicleExit(LocalPlayer)\n");
+					CLogFile::Printf("HandleVehicleExit(LocalPlayer)");
 				else
-					CLogFile::Printf("HandleVehicleExit(%d)\n", m_playerId);
+					CLogFile::Printf("HandleVehicleExit(%d)", m_playerId);
 
 				// Is this a network vehicle?
 				if(m_pVehicle->IsNetworkVehicle())
@@ -1204,9 +1204,9 @@ void CClientPlayer::CheckVehicleEntryExitKey()
 				m_vehicleEnterExit.ulKeyHoldStartTime = SharedUtility::GetTime();
 
 				if(IsLocalPlayer())
-					CLogFile::Printf("EnterExitVehicleKeyHoldStart(LocalPlayer)\n");
+					CLogFile::Printf("EnterExitVehicleKeyHoldStart(LocalPlayer)");
 				else
-					CLogFile::Printf("EnterExitVehicleKeyHoldStart(%d)\n", m_playerId);
+					CLogFile::Printf("EnterExitVehicleKeyHoldStart(%d)", m_playerId);
 			}
 		}
 		else
@@ -1216,9 +1216,9 @@ void CClientPlayer::CheckVehicleEntryExitKey()
 				m_vehicleEnterExit.ulKeyHoldStartTime)
 			{
 				if(IsLocalPlayer())
-					CLogFile::Printf("EnterExitVehicleKeyHoldEnd(LocalPlayer)\n");
+					CLogFile::Printf("EnterExitVehicleKeyHoldEnd(LocalPlayer)");
 				else
-					CLogFile::Printf("EnterExitVehicleKeyHoldEnd(%d)\n", m_playerId);
+					CLogFile::Printf("EnterExitVehicleKeyHoldEnd(%d)", m_playerId);
 
 				if(!m_vehicleEnterExit.bRequesting)
 				{
@@ -1248,9 +1248,9 @@ void CClientPlayer::CheckVehicleEntryExitKey()
 						if(bFound)
 						{
 							if(IsLocalPlayer())
-								CLogFile::Printf("HandleVehicleEntry(LocalPlayer, %d, %d)\n", pVehicle->GetVehicleId(), byteSeatId);
+								CLogFile::Printf("HandleVehicleEntry(LocalPlayer, %d, %d)", pVehicle->GetVehicleId(), byteSeatId);
 							else
-								CLogFile::Printf("HandleVehicleEntry(%d, %d, %d)\n", m_playerId, pVehicle->GetVehicleId(), byteSeatId);
+								CLogFile::Printf("HandleVehicleEntry(%d, %d, %d)", m_playerId, pVehicle->GetVehicleId(), byteSeatId);
 
 							// Is this a network vehicle?
 							if(pVehicle->IsNetworkVehicle())
@@ -1332,9 +1332,9 @@ void CClientPlayer::ProcessVehicleEntryExit()
 					}
 
 					if(IsLocalPlayer())
-						CLogFile::Printf("VehicleEntryComplete(LocalPlayer)\n");
+						CLogFile::Printf("VehicleEntryComplete(LocalPlayer)");
 					else
-						CLogFile::Printf("VehicleEntryComplete(%d)\n", m_playerId);
+						CLogFile::Printf("VehicleEntryComplete(%d)", m_playerId);
 				}
 			}
 		}
@@ -1364,7 +1364,7 @@ void CClientPlayer::ProcessVehicleEntryExit()
 							bitStream.Write(m_byteVehicleSeatId);
 							g_pClient->GetNetworkManager()->RPC(RPC_VEHICLE_ENTER_EXIT, &bitStream, PRIORITY_HIGH, RELIABILITY_RELIABLE);
 
-							CLogFile::Printf("VehicleEntryCancelled(LocalPlayer)\n");
+							CLogFile::Printf("VehicleEntryCancelled(LocalPlayer)");
 						}
 
 						// Vehicle entry has been canceled
@@ -1375,7 +1375,7 @@ void CClientPlayer::ProcessVehicleEntryExit()
 					{
 						// Force ourselves to enter the vehicle
 						EnterVehicle(m_vehicleEnterExit.pVehicle, m_vehicleEnterExit.byteSeatId);
-						CLogFile::Printf("VehicleEntryRestarted(%d)\n", m_playerId);
+						CLogFile::Printf("VehicleEntryRestarted(%d)", m_playerId);
 					}
 				}
 			}
@@ -1388,9 +1388,9 @@ void CClientPlayer::ProcessVehicleEntryExit()
 					ClearPrimaryTask(true);
 
 					if(IsLocalPlayer())
-						CLogFile::Printf("VehicleEntryRemoved(LocalPlayer)\n");
+						CLogFile::Printf("VehicleEntryRemoved(LocalPlayer)");
 					else
-						CLogFile::Printf("VehicleEntryRemoved(%d)\n", m_playerId);
+						CLogFile::Printf("VehicleEntryRemoved(%d)", m_playerId);
 				}
 			}
 
@@ -1417,9 +1417,9 @@ void CClientPlayer::ProcessVehicleEntryExit()
 					m_byteVehicleSeatId = 0;
 
 					if(IsLocalPlayer())
-						CLogFile::Printf("VehicleExitComplete(LocalPlayer)\n");
+						CLogFile::Printf("VehicleExitComplete(LocalPlayer)");
 					else
-						CLogFile::Printf("VehicleExitComplete(%d)\n", m_playerId);
+						CLogFile::Printf("VehicleExitComplete(%d)", m_playerId);
 				}
 			}
 			else
@@ -1431,9 +1431,9 @@ void CClientPlayer::ProcessVehicleEntryExit()
 					ClearPrimaryTask(true);
 
 					if(IsLocalPlayer())
-						CLogFile::Printf("VehicleExitRemoved(LocalPlayer)\n");
+						CLogFile::Printf("VehicleExitRemoved(LocalPlayer)");
 					else
-						CLogFile::Printf("VehicleExitRemoved(%d)\n", m_playerId);
+						CLogFile::Printf("VehicleExitRemoved(%d)", m_playerId);
 				}
 
 				// Are we flagged as in a vehicle?
@@ -1455,9 +1455,9 @@ void CClientPlayer::ProcessVehicleEntryExit()
 					m_byteVehicleSeatId = 0;
 
 					if(IsLocalPlayer())
-						CLogFile::Printf("VehicleForcefulExit(LocalPlayer)\n");
+						CLogFile::Printf("VehicleForcefulExit(LocalPlayer)");
 					else
-						CLogFile::Printf("VehicleForcefulExit(%d)\n", m_playerId);
+						CLogFile::Printf("VehicleForcefulExit(%d)", m_playerId);
 				}
 			}
 		}
@@ -1628,7 +1628,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 
 	if(!pBitStream->Read(netPadState))
 	{
-		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 1)\n");
+		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 1)");
 		return false;
 	}
 
@@ -1638,7 +1638,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 	unsigned int uiHealth;
 	if(!pBitStream->Read(uiHealth))
 	{
-		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 10)\n");
+		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 10)");
 		return false;
 	}
 
@@ -1650,7 +1650,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 	// Are we on foot or in a vehicle when we are not meant to be?
 	if(bIsOnFoot != IsOnFoot())
 	{
-		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 2)\n");
+		CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 2)");
 		return false;
 	}
 
@@ -1662,7 +1662,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 
 		if(!pBitStream->Read(vecPosition))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 3)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 3)");
 			return false;
 		}
 
@@ -1674,7 +1674,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 
 		if(!pBitStream->Read(fHeading))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 4)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 4)");
 			return false;
 		}
 
@@ -1685,7 +1685,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 
 		if(!pBitStream->Read(vecMoveSpeed))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 5)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 5)");
 			return false;
 		}
 
@@ -1711,7 +1711,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 
 		if(!pBitStream->ReadCompressed(vehicleId))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 6)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 6)");
 			return false;
 		}
 
@@ -1720,7 +1720,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 
 		if(!pBitStream->Read(byteSeatId))
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 7)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 7)");
 			return false;
 		}
 
@@ -1732,7 +1732,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 		// Is the vehicle pointer valid?
 		if(!pVehicle)
 		{
-			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 8)\n");
+			CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 8)");
 			return false;
 		}
 
@@ -1749,7 +1749,7 @@ bool CClientPlayer::Deserialize(CBitStream * pBitStream)
 			// Deserialize the vehicle from the bit stream
 			if(!pVehicle->Deserialize(pBitStream))
 			{
-				CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 9)\n");
+				CLogFile::Printf("CClientPlayer::Deserialize fail (Error code 9)");
 				return false;
 			}
 		}

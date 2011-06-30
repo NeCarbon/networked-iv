@@ -111,7 +111,7 @@ void CChatWindow::OutputMessage(DWORD dwColor, const char * szFormat, ...)
 	{
 		bool bUseCallback = CLogFile::GetUseCallback();
 		CLogFile::SetUseCallback(false);
-		CLogFile::Printf("[ChatMsg:0x%p] %s\n", dwColor, szBuffer);
+		CLogFile::Printf("[ChatMsg:0x%p] %s", dwColor, szBuffer);
 		CLogFile::SetUseCallback(bUseCallback);
 	}
 
@@ -219,7 +219,7 @@ void CChatWindow::ProcessInput()
 			if(sCommandEnd < m_strCurrentInput.GetLength())
 				strParameters = m_strCurrentInput.SubStr((sCommandEnd + 1), m_strCurrentInput.GetLength());
 
-			CLogFile::Printf("Entered input %s (Command: %s) (Parameters: %s)\n", m_strCurrentInput.Get(), 
+			CLogFile::Printf("Entered input %s (Command: %s) (Parameters: %s)", m_strCurrentInput.Get(), 
 				strCommand.Get(), strParameters.Get());
 
 			// Check if we have a registered command for it
@@ -250,7 +250,7 @@ void CChatWindow::ProcessInput()
 					IVVehicle * pIVVehicle = pVehicle->GetGameVehicle()->GetVehicle();
 					if(iFlag > 1)
 						UNSET_BIT(pIVVehicle->m_byteUnknownFlags1, (iFlag / 2));
-					CLogFile::Printf("Turning on current vehicle lights with flag %d\n", iFlag);
+					CLogFile::Printf("Turning on current vehicle lights with flag %d", iFlag);
 					SET_BIT(pIVVehicle->m_byteUnknownFlags1, iFlag);
 					iFlag *= 2;
 				}

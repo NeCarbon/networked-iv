@@ -25,14 +25,14 @@ LRESULT APIENTRY CWindowSubclass::WndProc_Hook(HWND hWnd, UINT uMsg, WPARAM wPar
 	{
 		// Set the client focused flag
 		g_pClient->SetFocused(true);
-		CLogFile::Printf("Gained window focus\n");
+		CLogFile::Printf("Gained window focus");
 	}
 	// Have we lost focus?
 	else if(!bFocused && g_pClient->IsFocused())
 	{
 		// Set the client focused flag
 		g_pClient->SetFocused(false);
-		CLogFile::Printf("Lost window focus\n");
+		CLogFile::Printf("Lost window focus");
 	}
 
 	// Show/hide the mouse

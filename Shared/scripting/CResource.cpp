@@ -57,7 +57,7 @@ bool CResource::Reload()
 	// Load the meta.xml file
 	if(!pXML || !pXML->load(String( "%s/meta.xml", m_strResourcePath.Get())))
 	{
-		CLogFile::Printf("Unable to load resource %s - no meta.xml\n", GetName().Get());
+		CLogFile::Printf("Unable to load resource %s - no meta.xml", GetName().Get());
 		return false;
 	}
 
@@ -97,7 +97,7 @@ bool CResource::Start()
 	m_pVM = new CSquirrel(this);
 	if( !m_pVM )
 	{
-		CLogFile::Printf("[%s] Failed to create Squirrel VM.\n", GetName().Get());
+		CLogFile::Printf("[%s] Failed to create Squirrel VM.", GetName().Get());
 		return false;
 	}
 
@@ -105,12 +105,12 @@ bool CResource::Start()
 	m_pTimers = new CTimers(this);
 	if( !m_pTimers )
 	{
-		CLogFile::Printf("[%s] Failed to create timers.\n", GetName().Get());
+		CLogFile::Printf("[%s] Failed to create timers.", GetName().Get());
 		return false;
 	}
 
 	// show a message
-	CLogFile::Printf("[%s] Started resource.\n", GetName().Get());
+	CLogFile::Printf("[%s] Started resource.", GetName().Get());
 	m_eState = STATE_RUNNING;
 
 	// load all scripts, if at least one fails cancel the startup

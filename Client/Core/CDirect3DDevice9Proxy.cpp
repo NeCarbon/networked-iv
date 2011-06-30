@@ -111,7 +111,7 @@ UINT STDMETHODCALLTYPE CDirect3DDevice9Proxy::GetNumberOfSwapChains()
 
 HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Reset(D3DPRESENT_PARAMETERS * pPresentationParameters)
 {
-	CLogFile::Printf("CDirect3DDevice9Proxy::Reset Called\n");
+	CLogFile::Printf("CDirect3DDevice9Proxy::Reset Called");
 
 	// Call the lost device client event
 	g_pClient->OnD3DLostDevice(m_pD3DDevice);
@@ -133,11 +133,11 @@ HRESULT STDMETHODCALLTYPE CDirect3DDevice9Proxy::Reset(D3DPRESENT_PARAMETERS * p
 
 	if(SUCCEEDED(hResult))
 	{
-		CLogFile::Printf("CDirect3DDevice9Proxy::Reset Call Succeeded\n");
+		CLogFile::Printf("CDirect3DDevice9Proxy::Reset Call Succeeded");
 	}
 	else
 	{
-		CLogFile::Printf("CDirect3DDevice9Proxy::Reset Call Failed!\n");
+		CLogFile::Printf("CDirect3DDevice9Proxy::Reset Call Failed!");
 	}
 
 	// Call the reset device client event

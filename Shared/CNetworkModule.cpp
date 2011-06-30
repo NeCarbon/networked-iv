@@ -36,14 +36,14 @@ bool CNetworkModule::Init()
 	// Load the net module
 	if(!m_pLibrary->Load(strPath.C_String()))
 	{
-		CLogFile::Printf("Failed to load network module!\n");
+		CLogFile::Printf("Failed to load network module!");
 		return false;
 	}
 
 	// Verify the net module version
 	if(!VerifyVersion(NETWORK_MODULE_VERSION))
 	{
-		CLogFile::Printf("Invalid net module version!\n");
+		CLogFile::Printf("Invalid net module version!");
 		return false;
 	}
 
@@ -57,7 +57,7 @@ bool CNetworkModule::Init()
 	if(!m_pfnGetNetServerInterface || !m_pfnDestroyNetServerInterface || !m_pfnGetNetClientInterface || 
 		!m_pfnDestroyNetClientInterface)
 	{
-		CLogFile::Printf("Net module is corrupt!\n");
+		CLogFile::Printf("Net module is corrupt!");
 		return false;
 	}
 

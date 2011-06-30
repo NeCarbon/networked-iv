@@ -52,7 +52,7 @@ void CServerLister::Process()
 	{
 		// Is this the first post?
 		if(!m_bSentListedMessage && !m_bSentBannedMessage && !m_bSentFailedMessage)
-			CLogFile::Printf("Posting server to server list.\n");
+			CLogFile::Printf("Posting server to server list.");
 
 		// Post the update
 		if(m_pHttpClient->Post(true, m_strUpdatePath))
@@ -61,7 +61,7 @@ void CServerLister::Process()
 		{
 			if(!m_bSentFailedMessage)
 			{
-				CLogFile::Printf("Failed to post server to server list (%s)!\n", m_pHttpClient->GetLastErrorString().C_String());
+				CLogFile::Printf("Failed to post server to server list (%s)!", m_pHttpClient->GetLastErrorString().C_String());
 				m_bSentFailedMessage = true;
 			}
 		}
@@ -84,7 +84,7 @@ void CServerLister::Process()
 				// Server listed successfully
 				if(!m_bSentListedMessage)
 				{
-					CLogFile::Printf("Server posted to server list successfully!\n");
+					CLogFile::Printf("Server posted to server list successfully!");
 					m_bSentListedMessage = true;
 				}
 
@@ -99,7 +99,7 @@ void CServerLister::Process()
 				// This server is banned from listing
 				if(!m_bSentBannedMessage)
 				{
-					CLogFile::Printf("Failed to post server to server list (You are banned from listing your server)!\n");
+					CLogFile::Printf("Failed to post server to server list (You are banned from listing your server)!");
 					m_bSentBannedMessage = true;
 				}
 

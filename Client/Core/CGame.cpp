@@ -22,7 +22,7 @@ CGame::CGame()
 	if(COffsets::GetVersion() == GAME_VERSION_UNKNOWN)
 	{
 		MessageBox(NULL, "Unknown game version detected. Networked: IV currently only supports game version 1.0.7.0", "Unknown game version", NULL);
-		CLogFile::Printf("Unknown game version detected (N:IV only support 1.0.7.0)!\n");
+		CLogFile::Printf("Unknown game version detected (N:IV only support 1.0.7.0)!");
 		ExitProcess(0);
 	}
 
@@ -43,7 +43,7 @@ CGame::CGame()
 
 	if(!m_pStreaming)
 	{
-		CLogFile::Printf("Failed to create streaming instance!\n");
+		CLogFile::Printf("Failed to create streaming instance!");
 		ExitProcess(0);
 	}
 

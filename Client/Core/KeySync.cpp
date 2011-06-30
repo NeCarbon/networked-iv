@@ -74,7 +74,7 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 		pTestPad->GetLastClientPadState(lasPad);
 		if(curPad.byteKeys[INPUT_MELEE_KICK] && !lasPad.byteKeys[INPUT_MELEE_KICK])
 		{
-			CLogFile::Printf("(%d) Melee kick start hold\n", bLocalPlayer);
+			CLogFile::Printf("(%d) Melee kick start hold", bLocalPlayer);
 			if(bLocalPlayer)
 				bRecordHistory = true;
 			else
@@ -82,11 +82,11 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 		}
 		if(bRecordHistory || bRecordHistory2)
 		{
-			CLogFile::Printf("(%d) Current history taken at %d is %d\n", bLocalPlayer, pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_pHistory->m_historyItems[pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_byteHistoryIndex].m_dwLastUpdateTime, pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_pHistory->m_historyItems[pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_byteHistoryIndex].m_byteValue);
+			CLogFile::Printf("(%d) Current history taken at %d is %d", bLocalPlayer, pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_pHistory->m_historyItems[pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_byteHistoryIndex].m_dwLastUpdateTime, pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_pHistory->m_historyItems[pTestPad->GetPad()->m_padData[INPUT_MELEE_KICK].m_byteHistoryIndex].m_byteValue);
 		}
 		if(!curPad.byteKeys[INPUT_MELEE_KICK] && lasPad.byteKeys[INPUT_MELEE_KICK])
 		{
-			CLogFile::Printf("(%d) Melee kick end hold\n", bLocalPlayer);
+			CLogFile::Printf("(%d) Melee kick end hold", bLocalPlayer);
 			if(bLocalPlayer)
 				bRecordHistory = false;
 			else
@@ -98,13 +98,13 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 		{
 			if(!bPost && !bInLocalContext)
 			{
-				CLogFile::Printf("Not switching due to not being in local context!\n");
+				CLogFile::Printf("Not switching due to not being in local context!");
 				return;
 			}
 
 			if(bPost && bInLocalContext)
 			{
-				CLogFile::Printf("Not switching due to being in local context!\n");
+				CLogFile::Printf("Not switching due to being in local context!");
 				return;
 			}
 
@@ -115,7 +115,7 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 			if(pContextInfo)
 			{
 				//CLogFile::SetUseCallback(false);
-				//CLogFile::Printf("ContextSwitch(0x%p, %d) (Player Ped %d)\n", pPed, bPost, pContextInfo->GetPlayerInfo()->GetPlayerNumber());
+				//CLogFile::Printf("ContextSwitch(0x%p, %d) (Player Ped %d)", pPed, bPost, pContextInfo->GetPlayerInfo()->GetPlayerNumber());
 				//CLogFile::SetUseCallback(true);
 
 				if(!bPost)
@@ -174,7 +174,7 @@ void ContextSwitch(IVPed * pPed, bool bPost)
 				}
 			}
 			else
-				CLogFile::Printf("ContextSwitch Warning: Invalid Player Ped\n");
+				CLogFile::Printf("ContextSwitch Warning: Invalid Player Ped");
 		}
 	}
 }
@@ -187,7 +187,7 @@ void _declspec(naked) CPlayerPed__ProcessInput_Hook()
 		pushad
 	}
 
-	//CLogFile::Printf("CPlayerPed__ProcessInput Pre\n");
+	//CLogFile::Printf("CPlayerPed__ProcessInput Pre");
 	ContextSwitch(m_pPed, false);
 
 	_asm
@@ -198,7 +198,7 @@ void _declspec(naked) CPlayerPed__ProcessInput_Hook()
 	}
 
 	ContextSwitch(m_pPed, true);
-	//CLogFile::Printf("CPlayerPed__ProcessInput Post\n");
+	//CLogFile::Printf("CPlayerPed__ProcessInput Post");
 
 	_asm
 	{
@@ -380,7 +380,7 @@ void _declspec(naked) CTaskComplexAimAndThrowProjectile__ControlSubTask_Hook()
 		pushad
 	}
 
-	CLogFile::Printf("CTaskComplexAimAndThrowProjectile__ControlSubTask Pre\n");
+	CLogFile::Printf("CTaskComplexAimAndThrowProjectile__ControlSubTask Pre");
 	ContextSwitch(m_pPed, false);
 
 	_asm
@@ -391,7 +391,7 @@ void _declspec(naked) CTaskComplexAimAndThrowProjectile__ControlSubTask_Hook()
 	}
 
 	ContextSwitch(m_pPed, true);
-	CLogFile::Printf("CTaskComplexAimAndThrowProjectile__ControlSubTask Post\n");
+	CLogFile::Printf("CTaskComplexAimAndThrowProjectile__ControlSubTask Post");
 
 	_asm
 	{
@@ -411,7 +411,7 @@ void _declspec(naked) CTaskComplexGangDriveby__ControlSubTask_Hook()
 		pushad
 	}
 
-	CLogFile::Printf("CTaskComplexGangDriveby__ControlSubTask Pre\n");
+	CLogFile::Printf("CTaskComplexGangDriveby__ControlSubTask Pre");
 	ContextSwitch(m_pPed, false);
 
 	_asm
@@ -422,7 +422,7 @@ void _declspec(naked) CTaskComplexGangDriveby__ControlSubTask_Hook()
 	}
 
 	ContextSwitch(m_pPed, true);
-	CLogFile::Printf("CTaskComplexGangDriveby__ControlSubTask Post\n");
+	CLogFile::Printf("CTaskComplexGangDriveby__ControlSubTask Post");
 
 	_asm
 	{
@@ -441,7 +441,7 @@ void _declspec(naked) CTaskComplexGun__ControlSubTask_Hook()
 		//pushad
 	}
 
-	CLogFile::Printf("CTaskComplexGun__ControlSubTask Pre\n");
+	CLogFile::Printf("CTaskComplexGun__ControlSubTask Pre");
 	ContextSwitch(m_pPed, false);
 
 	_asm
@@ -455,7 +455,7 @@ void _declspec(naked) CTaskComplexGun__ControlSubTask_Hook()
 	}
 
 	ContextSwitch(m_pPed, true);
-	CLogFile::Printf("CTaskComplexGun__ControlSubTask Post\n");
+	CLogFile::Printf("CTaskComplexGun__ControlSubTask Post");
 
 	_asm
 	{
@@ -508,7 +508,7 @@ void _declspec(naked) CTaskSimpleFireGun__SetPedPosition_Hook()
 		//pushad
 	}
 
-	//CLogFile::Printf("CTaskSimpleFireGun__SetPedPositionk Pre\n");
+	//CLogFile::Printf("CTaskSimpleFireGun__SetPedPositionk Pre");
 	ContextSwitch(m_pPed, false);
 
 	_asm
@@ -521,7 +521,7 @@ void _declspec(naked) CTaskSimpleFireGun__SetPedPosition_Hook()
 	}
 
 	ContextSwitch(m_pPed, true);
-	//CLogFile::Printf("CTaskSimpleFireGun__SetPedPositionk Post\n");
+	//CLogFile::Printf("CTaskSimpleFireGun__SetPedPositionk Post");
 
 	_asm
 	{

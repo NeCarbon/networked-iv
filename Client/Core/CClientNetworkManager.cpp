@@ -84,7 +84,7 @@ void CClientNetworkManager::PacketHandler(CPacket * pPacket)
 	   !pNetworkManager->m_pClientRPCHandler->HandlePacket(pPacket))
 	{
 #ifdef NIV_DEBUG
-		CLogFile::Printf("Warning: Unhandled packet (Id: %d)\n", pPacket->packetId);
+		CLogFile::Printf("Warning: Unhandled packet (Id: %d)", pPacket->packetId);
 #endif
 	}
 }
