@@ -59,8 +59,15 @@ bool CExceptionHandler::WriteMiniDump(_EXCEPTION_POINTERS * ExceptionInfo)
 	GetLocalTime(&systemTime);
 
 	// Append the file name and system type to the application path string
-	// TODO: Write dumps to their own 'crashdumps' folder and possibly client/server prefix/suffix?
-	sMiniDumpPath.AppendF("crashdump-" MOD_VERSION_STRING "-%02d.%02d.%02d-%02d.%02d.%04d.dmp", systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wDay, systemTime.wMonth, systemTime.wYear);
+	sMiniDumpPath.Append("crashdumps/");
+	if(!SharedUtility::CreateDirectory(sMiniDumpPath))
+		return false;
+#ifdef _SERVER
+	sMiniDumpPath.Append("server");
+#else
+	sMiniDumpPath.Append("client");
+#endif
+	sMiniDumpPath.AppendF("-" MOD_VERSION_STRING "-%04d%02d%02d-%02d%02d%02d.dmp", systemTime.wYear, systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wSecond);
 
 	// Open the minidump file
 	HANDLE hFile = CreateFileA(sMiniDumpPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
