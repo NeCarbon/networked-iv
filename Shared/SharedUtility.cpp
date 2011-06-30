@@ -288,6 +288,15 @@ int CreateDirectory(const char * szPath)
 	if(iReturn == EEXIST)
 		return 2;
 
+	// Does the directory already exist?
+#ifdef WIN32
+	if(iReturn == -1 && GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		SetLastError(0);
+		return 2;
+	}
+#endif
+
 	// Failed to create the directory
 	return 0;
 }
