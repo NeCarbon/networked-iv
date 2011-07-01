@@ -24,8 +24,8 @@ CStreamableEntity::CStreamableEntity(eEntityType EntityType, CEntity* pParent, S
 	// streamed out by default
 	m_bIsStreamedIn = false;
 
-	// no dimension by default
-	m_dimensionId = INVALID_DIMENSION_ID;
+	// default dimension
+	m_dimensionId = DEFAULT_DIMENSION_ID;
 
 	// can't be streamed in by default
 	m_bCanBeStreamedIn = false;

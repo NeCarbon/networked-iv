@@ -16,7 +16,7 @@
 typedef unsigned char DimensionId;
 
 // Define used for invalid dimension ids
-#define INVALID_DIMENSION_ID 0xFF
+#define DEFAULT_DIMENSION_ID 0
 
 class CStreamer;
 

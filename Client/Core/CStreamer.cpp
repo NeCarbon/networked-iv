@@ -30,7 +30,7 @@ CStreamer::~CStreamer()
 void CStreamer::Reset()
 {
 	m_ulLastStreamTime = 0;
-	m_dimensionId = INVALID_DIMENSION_ID;
+	m_dimensionId = DEFAULT_DIMENSION_ID;
 
 	// Loop through all types
 	for(int i = 0; i < ENTITY_TYPE_MAX; ++i)
@@ -94,7 +94,7 @@ void CStreamer::Process()
 				float fDistance = GetDistanceBetweenPoints3D(vecPlayerPos.fX, vecPlayerPos.fY, vecPlayerPos.fZ, vecPos.fX, vecPos.fY, vecPos.fZ);
 				bool bInRange = (fDistance <= (*iter)->GetStreamingDistance());
 
-				if(!bInRange || (m_dimensionId != INVALID_DIMENSION_ID && (*iter)->GetDimension() != INVALID_DIMENSION_ID && (m_dimensionId != (*iter)->GetDimension())))
+				if(!bInRange || m_dimensionId != (*iter)->GetDimension())
 				{
 					// out of range or in another dimension, but streamed in?
 					if((*iter)->IsStreamedIn())
@@ -108,7 +108,7 @@ void CStreamer::Process()
 						(*iter)->StreamOutInternal();
 					}
 				}
-				else if(bInRange && (m_dimensionId == INVALID_DIMENSION_ID || (*iter)->GetDimension() == INVALID_DIMENSION_ID || (m_dimensionId == (*iter)->GetDimension())))
+				else
 				{
 					// in range and in same/all dimension, but not streamed in?
 					if(!(*iter)->IsStreamedIn())
@@ -255,8 +255,13 @@ void CStreamer::NotifyDimensionChange(CStreamableEntity * pEntity)
 	// Is the entity streamed in?
 	if(pEntity->IsStreamedIn())
 	{
+		// Is it the local player?
+		if(pEntity->GetType() == ENTITY_TYPE_PLAYER && g_pClient->GetPlayerManager()->GetLocalPlayer())
+		{
+			m_dimensionId = pEntity->GetDimension();
+		}
 		// Is the entity dimension different from our dimension?
-		if(pEntity->GetDimension() != m_dimensionId)
+		else if(pEntity->GetDimension() != m_dimensionId)
 		{
 			// Stream the entity out
 			pEntity->StreamOutInternal();
