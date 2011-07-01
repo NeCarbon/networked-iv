@@ -1385,6 +1385,7 @@ void CClientPlayer::ProcessVehicleEntryExit()
 				if(IsGettingInToAVehicle())
 				{
 					// Clear our primary task
+					// FIXME: This results in a permanent task clearing/log messages spam, making it impossible to use any controls (killing yourself fixes this)
 					ClearPrimaryTask(true);
 
 					if(IsLocalPlayer())
