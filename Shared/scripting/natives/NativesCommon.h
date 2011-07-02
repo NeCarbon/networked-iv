@@ -11,9 +11,19 @@
 
 #include <StdInc.h>
 
-CEntity*	sq_toentity(SQVM* pVM, int idx);
-CResource*	sq_toresource(SQVM* pVM, int idx);
-CTimer*		sq_totimer(SQVM* pVM, int idx);
+#ifdef _SERVER
+	#define PLAYER_CLASS CPlayer
+	#define VEHICLE_CLASS CVehicle
+#else
+	#define PLAYER_CLASS CClientPlayer
+	#define VEHICLE_CLASS CClientVehicle
+#endif
+
+CEntity*       sq_toentity(SQVM* pVM, int idx);
+CResource*     sq_toresource(SQVM* pVM, int idx);
+CTimer*        sq_totimer(SQVM* pVM, int idx);
+PLAYER_CLASS*  sq_toplayer(SQVM* pVM, int idx);
+VEHICLE_CLASS* sq_tovehicle(SQVM* pVM, int idx);
 
 inline void sq_getvector3(SQVM * pVM, int idx, CVector3 * vec)
 {

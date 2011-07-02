@@ -37,6 +37,22 @@ CTimer* sq_totimer(SQVM* pVM, int idx)
 	return NULL;
 }
 
+PLAYER_CLASS* sq_toplayer(SQVM* pVM, int idx)
+{
+	CEntity* pEntity = sq_toentity(pVM, idx);
+	if( pEntity && pEntity->GetType() == ENTITY_TYPE_PLAYER )
+		return dynamic_cast< PLAYER_CLASS* >( pEntity );
+	return NULL;
+}
+
+VEHICLE_CLASS* sq_tovehicle(SQVM* pVM, int idx)
+{
+	CEntity* pEntity = sq_toentity(pVM, idx);
+	if( pEntity && pEntity->GetType() == ENTITY_TYPE_VEHICLE )
+		return dynamic_cast< VEHICLE_CLASS* >( pEntity );
+	return NULL;
+}
+
 void sq_pushentity(SQVM* pVM, CEntity* pEntity)
 {
 	sq_pushuserpointer(pVM,(SQUserPointer)pEntity->GetID());

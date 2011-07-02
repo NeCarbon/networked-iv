@@ -43,12 +43,10 @@ int CVehicleNatives::Create(SQVM * pVM)
 
 int CVehicleNatives::GetId(SQVM * pVM)
 {
-	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+	CVehicle * pVehicle = sq_tovehicle(pVM, 2);
 
-	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
-	{
+	if(pVehicle)
 		sq_pushinteger(pVM, pVehicle->GetID());
-	}
 	else
 		sq_pushnull(pVM);
 
@@ -57,9 +55,9 @@ int CVehicleNatives::GetId(SQVM * pVM)
 
 int CVehicleNatives::GetPosition(SQVM * pVM)
 {
-	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+	CVehicle * pVehicle = sq_tovehicle(pVM, 2);
 
-	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
+	if(pVehicle)
 	{
 		CVector3 vecPos;
 		pVehicle->GetPosition(vecPos);
@@ -74,9 +72,9 @@ int CVehicleNatives::GetPosition(SQVM * pVM)
 
 int CVehicleNatives::SetPosition(SQVM * pVM)
 {
-	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+	CVehicle * pVehicle = sq_tovehicle(pVM, 2);
 
-	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
+	if(pVehicle)
 	{
 		CVector3 vecPos;
 		sq_getvector3(pVM, 3, &vecPos);
@@ -91,9 +89,9 @@ int CVehicleNatives::SetPosition(SQVM * pVM)
 
 int CVehicleNatives::GetRotation(SQVM * pVM)
 {
-	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+	CVehicle * pVehicle = sq_tovehicle(pVM, 2);
 
-	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
+	if(pVehicle)
 	{
 		CVector3 vecPos;
 		pVehicle->GetRotation(vecPos);
@@ -107,9 +105,9 @@ int CVehicleNatives::GetRotation(SQVM * pVM)
 
 int CVehicleNatives::SetRotation(SQVM * pVM)
 {
-	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+	CVehicle * pVehicle = sq_tovehicle(pVM, 2);
 
-	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
+	if(pVehicle)
 	{
 		CVector3 vecRot;
 		sq_getvector3(pVM, 3, &vecRot);
@@ -124,9 +122,9 @@ int CVehicleNatives::SetRotation(SQVM * pVM)
 
 int CVehicleNatives::Destroy(SQVM * pVM)
 {
-	CVehicle * pVehicle = (CVehicle *)sq_toentity(pVM, 2);
+	CVehicle * pVehicle = sq_tovehicle(pVM, 2);
 
-	if(pVehicle && pVehicle->GetType() == ENTITY_TYPE_VEHICLE)
+	if(pVehicle)
 	{
 		g_pServer->GetVehicleManager()->Delete((EntityId)pVehicle->GetID());
 		sq_pushbool(pVM, true);

@@ -22,9 +22,9 @@ void CPlayerNatives::LoadFunctions(CSquirrel * pSquirrel)
 
 int CPlayerNatives::GetId(SQVM * pVM)
 {
-	CPlayer * pPlayer = (CPlayer *)sq_toentity(pVM, 2);
+	CPlayer * pPlayer = sq_toplayer(pVM, 2);
 
-	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER)
+	if(pPlayer)
 		sq_pushinteger(pVM, pPlayer->GetPlayerId());
 	else
 		sq_pushnull(pVM);
@@ -34,9 +34,9 @@ int CPlayerNatives::GetId(SQVM * pVM)
 
 int CPlayerNatives::GetName(SQVM* pVM)
 {
-	CPlayer * pPlayer = (CPlayer *)sq_toentity(pVM, 2);
+	CPlayer * pPlayer = sq_toplayer(pVM, 2);
 
-	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER)
+	if(pPlayer)
 		sq_pushstring(pVM, pPlayer->GetName(), pPlayer->GetName().GetLength());
 	else
 		sq_pushnull(pVM);
@@ -46,9 +46,9 @@ int CPlayerNatives::GetName(SQVM* pVM)
 
 int CPlayerNatives::GetIP(SQVM* pVM)
 {
-	CPlayer * pPlayer = (CPlayer *)sq_toentity(pVM, 2);
+	CPlayer * pPlayer = sq_toplayer(pVM, 2);
 
-	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER)
+	if(pPlayer)
 		sq_pushstring(pVM, pPlayer->GetIp(), pPlayer->GetIp().GetLength());
 	else
 		sq_pushnull(pVM);
@@ -58,9 +58,9 @@ int CPlayerNatives::GetIP(SQVM* pVM)
 
 int CPlayerNatives::GetSerial(SQVM* pVM)
 {
-	CPlayer * pPlayer = (CPlayer *)sq_toentity(pVM, 2);
+	CPlayer * pPlayer = sq_toplayer(pVM, 2);
 
-	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER)
+	if(pPlayer)
 		sq_pushstring(pVM, pPlayer->GetSerial().C_String(), pPlayer->GetSerial().GetLength());
 	else
 		sq_pushnull(pVM);
@@ -70,9 +70,9 @@ int CPlayerNatives::GetSerial(SQVM* pVM)
 
 int CPlayerNatives::IsSpawned(SQVM * pVM)
 {
-	CPlayer * pPlayer = (CPlayer *)sq_toentity(pVM, 2);
+	CPlayer * pPlayer = sq_toplayer(pVM, 2);
 
-	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER)
+	if(pPlayer)
 		sq_pushbool(pVM, pPlayer->IsSpawned());
 	else
 		sq_pushnull(pVM);
@@ -82,9 +82,9 @@ int CPlayerNatives::IsSpawned(SQVM * pVM)
 
 int CPlayerNatives::GetVehicle(SQVM * pVM)
 {
-	CPlayer * pPlayer = (CPlayer *)sq_toentity(pVM, 2);
+	CPlayer * pPlayer = sq_toplayer(pVM, 2);
 
-	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER && pPlayer->GetVehicle())
+	if(pPlayer)
 		sq_pushentity(pVM, pPlayer->GetVehicle());
 	else
 		sq_pushnull(pVM);
@@ -94,9 +94,9 @@ int CPlayerNatives::GetVehicle(SQVM * pVM)
 
 int CPlayerNatives::GetVehicleSeatId(SQVM * pVM)
 {
-	CPlayer * pPlayer = (CPlayer *)sq_toentity(pVM, 2);
+	CPlayer * pPlayer = sq_toplayer(pVM, 2);
 
-	if(pPlayer && pPlayer->GetType() == ENTITY_TYPE_PLAYER && pPlayer->GetVehicle())
+	if(pPlayer && pPlayer->GetVehicle())
 		sq_pushinteger(pVM, pPlayer->GetVehicleSeatId());
 	else
 		sq_pushnull(pVM);
