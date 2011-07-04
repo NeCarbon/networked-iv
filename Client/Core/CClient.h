@@ -25,6 +25,7 @@ private:
 	CFont                 * m_pFont;
 	CChatWindow           * m_pChatWindow;
 	CClientTaskManager    * m_pClientTaskManager;
+	CGUI                  * m_pGUI;
 	unsigned int            m_uiBaseAddress;
 	String                  m_strIp;
 	unsigned short          m_usPort;
@@ -44,6 +45,7 @@ public:
 	CFont                 * GetFont() { return m_pFont; }
 	CChatWindow           * GetChatWindow() { return m_pChatWindow; }
 	CClientTaskManager    * GetClientTaskManager() { return m_pClientTaskManager; }
+	CGUI                  * GetGUI() { return m_pGUI; }
 	unsigned int            GetBaseAddress() { return m_uiBaseAddress; }
 	String                  GetNick() { return m_strNick; }
 	void                    SetInputState(bool bInputState) { m_bInputState = bInputState; }
@@ -57,7 +59,7 @@ public:
 	static void             ExceptionHandlerCallback(_EXCEPTION_POINTERS * ExceptionInfo);
 	void                    OnD3DCreateDevice(IDirect3DDevice9 * pD3DDevice);
 	void                    OnD3DLostDevice(IDirect3DDevice9 * pD3DDevice);
-	void                    OnD3DResetDevice(IDirect3DDevice9 * pD3DDevice);
+	void                    OnD3DResetDevice(IDirect3DDevice9 * pD3DDevice, D3DPRESENT_PARAMETERS * pPresentationParameters);
 	void                    OnD3DBeginScene(IDirect3DDevice9 * pD3DDevice);
 	void                    OnD3DEndScene(IDirect3DDevice9 * pD3DDevice);
 	void                    OnGameLoad();

@@ -375,6 +375,11 @@ void CClient::OnD3DCreateDevice(IDirect3DDevice9 * pD3DDevice)
 	// Testing code
 	m_pChatWindow->Enable();
 	m_pChatWindow->OutputMessage(MESSAGE_INFO_COLOR, "Chat window initialized!");
+
+	// Initalize GUI
+	CLogFile::Printf("Initalizing GUI");
+	m_pGUI = new CGUI(pD3DDevice);
+	CLogFile::Printf("GUI loaded");
 }
 
 void CClient::OnD3DLostDevice(IDirect3DDevice9 * pD3DDevice)
@@ -387,13 +392,19 @@ void CClient::OnD3DLostDevice(IDirect3DDevice9 * pD3DDevice)
 	}
 }
 
-void CClient::OnD3DResetDevice(IDirect3DDevice9 * pD3DDevice)
+void CClient::OnD3DResetDevice(IDirect3DDevice9 * pD3DDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
 {
 	// Does the font exist?
 	if(m_pFont)
 	{
 		// Inform it of the device reset
 		m_pFont->OnDeviceReset();
+	}
+
+	if(m_pGUI)
+	{
+		// Update screen size for GUI
+		m_pGUI->SetScreenSize(pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
 	}
 }
 
@@ -640,6 +651,13 @@ void CClient::OnD3DEndScene(IDirect3DDevice9 * pD3DDevice)
 	}
 
 	// TODO: Draw warning text if fps is low (togglable though)
+
+	// Does the GUI root exist?
+	if(m_pGUI)
+	{
+		// Render the GUI
+		m_pGUI->Render();
+	}
 }
 
 void CClient::OnGameLoad()

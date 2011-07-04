@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../Shared;./DXSDK/Include;../../Shared/Detours"
+				AdditionalIncludeDirectories=".;../../Shared;./DXSDK/Include;../../Shared/Detours;../../vendor/gwen/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CLIENT_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;DIRECTINPUT_VERSION=0x0800"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -993,6 +993,14 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="GUI"
+				>
+				<File
+					RelativePath=".\CGUI.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1770,6 +1778,14 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="GUI"
+				>
+				<File
+					RelativePath=".\CGUI.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

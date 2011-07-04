@@ -110,6 +110,14 @@
 #include "CClientNetworkManager.h"
 #include "CClientPlayerManager.h"
 #include "CClientVehicleManager.h"
+
+// GUI
+#include <Gwen/Renderers/DirectX9.h>
+#include <Gwen/Skins/Simple.h>
+#include <Gwen/Controls/WindowControl.h>
+#include "CGUI.h"
+
+// Project
 #include "CClient.h"
 
 // IV
