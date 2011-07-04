@@ -138,6 +138,17 @@ void CClientNetworkManager::Connect()
 	// Are we not already connected?
 	if(!IsConnected())
 	{
+		// Is the GUI created?
+		CGUI* pGUI = g_pClient->GetGUI();
+		if(pGUI)
+		{
+			// Clear any custom GUI elements showing
+			pGUI->ClearView(CGUI::GUI_SERVER);
+
+			// Set the current view to  the server's one (now empty)
+			pGUI->SetView(CGUI::GUI_SERVER);
+		}
+
 		// Start the net client connection process
 		eConnectionAttemptResult connectionAttemptResult = m_pNetClient->Connect();
 

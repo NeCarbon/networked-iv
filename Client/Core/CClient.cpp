@@ -124,6 +124,7 @@ bool CClient::OnLoad()
 	m_pPlayerManager = NULL;
 	m_pFont = NULL;
 	m_pChatWindow = NULL;
+	m_pGUI = NULL;
 
 	// Reset the port and set the nick limit
 	m_usPort = 0;
@@ -657,6 +658,12 @@ void CClient::OnD3DEndScene(IDirect3DDevice9 * pD3DDevice)
 	{
 		// Render the GUI
 		m_pGUI->Render();
+
+		// Switch modes if pressing F5
+		if(GetAsyncKeyState(VK_F5) & 1)
+		{
+			m_pGUI->SetView((CGUI::eGUIView)((m_pGUI->GetView() + 1) % (CGUI::GUI_NONE+1)));
+		}
 	}
 }
 

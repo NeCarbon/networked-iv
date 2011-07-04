@@ -112,9 +112,13 @@
 #include "CClientVehicleManager.h"
 
 // GUI
+#include <Gwen/Controls/Text.h>
+#include <Gwen/Controls/WindowControl.h>
+#include <Gwen/Input/Windows.h>
 #include <Gwen/Renderers/DirectX9.h>
 #include <Gwen/Skins/Simple.h>
-#include <Gwen/Controls/WindowControl.h>
+#include <Gwen/Align.h>
+#include "CGUIView.h"
 #include "CGUI.h"
 
 // Project

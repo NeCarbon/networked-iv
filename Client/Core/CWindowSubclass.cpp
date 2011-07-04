@@ -51,6 +51,21 @@ LRESULT APIENTRY CWindowSubclass::WndProc_Hook(HWND hWnd, UINT uMsg, WPARAM wPar
 				return 0;
 			}
 		}
+
+		/*
+		CGUI* pGUI = g_pClient->GetGUI();
+		CLogFile::Printf("%p", pGUI);
+		if(pGUI)
+		{
+			MSG msg;
+			msg.hwnd = hWnd;
+			msg.lParam = lParam;
+			msg.wParam = wParam;
+			msg.message = uMsg;
+
+			pGUI->ProcessInput(msg);
+		}
+		*/
 	}
 
 	// Return this input back to windows

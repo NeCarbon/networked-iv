@@ -1000,6 +1000,10 @@
 					RelativePath=".\CGUI.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\CGUIView.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1784,6 +1788,10 @@
 				>
 				<File
 					RelativePath=".\CGUI.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CGUIView.h"
 					>
 				</File>
 			</Filter>

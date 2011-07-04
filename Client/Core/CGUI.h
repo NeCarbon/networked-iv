@@ -12,23 +12,30 @@
 class CGUI
 {
 public:
+	// Different GUI modes
+	enum eGUIView { GUI_IVMP = 0, GUI_SERVER = 1, GUI_NONE = 2 };
+
 	 CGUI(IDirect3DDevice9* pDevice);
 	~CGUI();
 
 	void Render();
+	bool ProcessInput(MSG msg);
 
 	void SetScreenSize(int iWidth, int iHeight);
 
+	eGUIView GetView();
+	void SetView(eGUIView view);
+	void ClearView(eGUIView view);
+
+	Gwen::Controls::Canvas* GetCanvas(eGUIView view);
 private:
 	// DX-based renderer
 	Gwen::Renderer::DirectX9* m_pRenderer;
 
-	// Skin
-	Gwen::Skin::Simple skin;
+	CGUIView* m_pActiveView;
+	CGUIView* m_pViews[GUI_NONE];
 
-	// For the IV:MP Menu
-	Gwen::Controls::Canvas* m_pClientBase;
-
-	// For the server's custom menus
-	Gwen::Controls::Canvas* m_pCustomBase;
+	// Screen size
+	int m_iScreenWidth;
+	int m_iScreenHeight;
 };

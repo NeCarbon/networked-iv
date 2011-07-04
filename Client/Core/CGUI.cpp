@@ -13,40 +13,115 @@ using namespace Gwen;
 
 CGUI::CGUI(IDirect3DDevice9* pDevice)
 {
+	m_pActiveView = NULL;
+	memset(m_pViews, 0, sizeof(m_pViews));
+
 	// Create the renderer
 	m_pRenderer = new Renderer::DirectX9( pDevice );
 
-	// Set the skin
-	// TODO: Should use the image-based variation
-	skin.SetRender( m_pRenderer );
+	// Set the default screen size
+	m_iScreenWidth = 1024;
+	m_iScreenHeight = 768;
 
-	// Create the root for the IV:MP Menu
-	m_pClientBase = new Controls::Canvas( &skin );
-	
-	// Default screen size
-	SetScreenSize(1024, 768);
+	// Clear all contents
+	ClearView(GUI_IVMP);
+	ClearView(GUI_SERVER);
 
-	// Example code
-	Controls::WindowControl* pWindow = new Controls::WindowControl( m_pClientBase );
-	pWindow->SetTitle("Important Information");
-	pWindow->SetSize(200, 100);
-	pWindow->SetPos(500, 500);
-	pWindow->SetClosable(false);
+	// Finally, set the view
+	// TODO: Should be GUI_NONE unless the main menu shows
+	SetView(GUI_IVMP);
 }
 
 CGUI::~CGUI()
 {
-	SAFE_DELETE(m_pClientBase);
-	SAFE_DELETE(m_pRenderer);
+	// Deletes all views
+	for(int i = 0; i < GUI_NONE; ++ i)
+		SAFE_DELETE(m_pViews[i]);
 }
 
 void CGUI::Render()
 {
-	m_pClientBase->RenderCanvas();
+	// Do we have an active view?
+	if(m_pActiveView)
+	{
+		// Render its content
+		m_pActiveView->Render();
+	}
+}
+
+bool CGUI::ProcessInput(MSG msg)
+{
+	// Do we have an active view?
+	if(m_pActiveView)
+	{
+		// Pass the message
+		return m_pActiveView->ProcessInput(msg);
+	}
+
+	return false;
+}
+
+CGUI::eGUIView CGUI::GetView()
+{
+	// No view - always none
+	if(!m_pActiveView)
+		return GUI_NONE;
+
+	// Loop through views
+	for(int i = 0; i < GUI_NONE; ++ i)
+		if(m_pViews[i] == m_pActiveView)
+			return (eGUIView)i;
+	return GUI_NONE;
+}
+
+void CGUI::SetView(eGUIView view)
+{
+	CLogFile::Printf("GUI - Active view %d -> %d", GetView(), view);
+	if(view < GUI_NONE)
+		m_pActiveView = m_pViews[view];
+	else
+		m_pActiveView = NULL;
+}
+
+void CGUI::ClearView(eGUIView view)
+{
+	// Ignore it if we try to clear a non-existant view
+	if(view >= GUI_NONE)
+		return;
+
+	CLogFile::Printf("Clearing view %d", view);
+
+	// Set the GUI to show nothing if this view is deleted
+	if(m_pActiveView && m_pActiveView == m_pViews[view])
+		SetView(GUI_NONE);
+
+	// Delete the old view
+	SAFE_DELETE(m_pViews[view]);
+
+	// Create a new view
+	CGUIView* pView = new CGUIView(m_pRenderer);
+
+	// Update the screen size
+	pView->SetScreenSize(m_iScreenWidth, m_iScreenHeight);
+
+	// Store the view
+	m_pViews[view] = pView;
 }
 
 void CGUI::SetScreenSize(int iWidth, int iHeight)
 {
-	CLogFile::Printf("Changing GUI resolution to %dx%d", iWidth, iHeight);
-	m_pClientBase->SetSize(iWidth, iHeight);
+	// Update all views
+	for(int i = 0; i < GUI_NONE; ++ i)
+		m_pViews[i]->SetScreenSize(iWidth, iHeight);
+
+	// Store the resolution
+	m_iScreenWidth = iWidth;
+	m_iScreenHeight = iHeight;
+}
+
+Gwen::Controls::Canvas* CGUI::GetCanvas(eGUIView view)
+{
+	if(m_pActiveView)
+		return m_pActiveView->GetCanvas();
+	return NULL;
 }
