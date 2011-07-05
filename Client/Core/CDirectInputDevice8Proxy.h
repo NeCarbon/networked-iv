@@ -26,6 +26,9 @@ private:
 	IDirectInputDevice8 * m_pDIDevice;
 	eDIDeviceType m_DeviceType;
 
+	POINT m_Cursor;
+	bool m_bMouseButtons[3];
+
 public:
 	CDirectInputDevice8Proxy(IDirectInput8 * dinput, IDirectInputDevice8 * dinputdevice, eDIDeviceType DeviceType);
 

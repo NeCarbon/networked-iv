@@ -22,6 +22,9 @@ CDirectInputDevice8Proxy::CDirectInputDevice8Proxy(IDirectInput8 * dinput, IDire
 	m_pDI = dinput;
 	m_pDIDevice = dinputdevice;
 	m_DeviceType = DeviceType;
+	m_Cursor.x = 0;
+	m_Cursor.y = 0;
+	memset(m_bMouseButtons, 0, sizeof(m_bMouseButtons));
 }
 
 /*** IUnknown methods ***/
@@ -85,6 +88,61 @@ HRESULT STDMETHODCALLTYPE CDirectInputDevice8Proxy::GetDeviceState(DWORD p0, LPV
 	{
 		// If the inputstate is disabled clear the buffer
 		memset(p1, 0, p0);
+	}
+
+	// Check if we're asking for mouse input
+	if(m_DeviceType == DIDEVICE_TYPE_MOUSE)
+	{
+		// Save the current position
+		DIMOUSESTATE2 state = *(DIMOUSESTATE2*)p1;
+		m_Cursor.x += state.lX * 0.7f;
+		m_Cursor.y += state.lY * 0.7f;
+
+		// Check for existence of the GUI
+		CGUI* pGUI = g_pClient->GetGUI();
+		if(pGUI)
+		{
+			// Bounds check
+			int width;
+			int height;
+			pGUI->GetScreenSize(&width, &height);
+			m_Cursor.x = max(0, min(m_Cursor.x, width));
+			m_Cursor.y = max(0, min(m_Cursor.y, height));
+
+			// Pass the mouse moving
+			pGUI->ProcessInput(WM_MOUSEMOVE, MAKELONG(m_Cursor.x, m_Cursor.y), 0);
+
+			// Scrolling the mouse wheel?
+			if(state.lZ != 0)
+				pGUI->ProcessInput(WM_MOUSEWHEEL, 0, MAKELONG(0, state.lZ));
+
+			// Mouse clicks
+			for(int i = 0; i < 3; ++ i)
+			{
+				// Is the button pressed?
+				if(state.rgbButtons[i] & 0x80)
+				{
+					// But was not pressed before?
+					if(!m_bMouseButtons[i])
+					{
+						// Store that the button is pressed
+						m_bMouseButtons[i] = true;
+
+						// And process the GUI event
+						pGUI->ProcessInput(WM_LBUTTONDOWN + 3*i, 0, 0);
+					}
+				}
+				// Is the mouse button stored as pressed?
+				else if(m_bMouseButtons[i])
+				{
+					// Mark it as not pressed
+					m_bMouseButtons[i] = false;
+
+					// And process the GUI event
+					pGUI->ProcessInput(WM_LBUTTONUP + 3*i, 0, 0);
+				}
+			}
+		}
 	}
 
 #if 0

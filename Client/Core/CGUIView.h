@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 
+#define MOUSE_DEBUG 1
+
 class CGUIView
 {
 public:
@@ -16,7 +18,7 @@ public:
 	~CGUIView();
 
 	void Render();
-	bool ProcessInput(MSG msg);
+	bool ProcessInput(UINT message, LPARAM lParam, WPARAM wParam);
 
 	void SetScreenSize(int iWidth, int iHeight);
 
@@ -33,4 +35,9 @@ private:
 
 	// Input handler
 	Gwen::Input::Windows* m_pInput;
+
+#ifdef MOUSE_DEBUG
+	// Button that pretends to be a mouse in lack of an image for it
+	Gwen::Controls::Button* m_pHelper;
+#endif
 };

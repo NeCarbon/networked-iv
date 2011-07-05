@@ -27,6 +27,11 @@ CGUI::CGUI(IDirect3DDevice9* pDevice)
 	ClearView(GUI_IVMP);
 	ClearView(GUI_SERVER);
 
+	// Create the main menu
+	Gwen::Controls::Canvas* pCanvas = GetCanvas(GUI_IVMP);
+	CLogFile::Printf("canvas -> %p");
+	new CMainMenu(pCanvas);
+
 	// Finally, set the view
 	// TODO: Should be GUI_NONE unless the main menu shows
 	SetView(GUI_IVMP);
@@ -49,13 +54,13 @@ void CGUI::Render()
 	}
 }
 
-bool CGUI::ProcessInput(MSG msg)
+bool CGUI::ProcessInput(UINT message, LPARAM lParam, WPARAM wParam)
 {
 	// Do we have an active view?
 	if(m_pActiveView)
 	{
 		// Pass the message
-		return m_pActiveView->ProcessInput(msg);
+		return m_pActiveView->ProcessInput(message, lParam, wParam);
 	}
 
 	return false;
@@ -117,6 +122,13 @@ void CGUI::SetScreenSize(int iWidth, int iHeight)
 	// Store the resolution
 	m_iScreenWidth = iWidth;
 	m_iScreenHeight = iHeight;
+}
+
+void CGUI::GetScreenSize(int* iWidth, int* iHeight)
+{
+	// Store the resolution
+	*iWidth = m_iScreenWidth;
+	*iHeight = m_iScreenHeight;
 }
 
 Gwen::Controls::Canvas* CGUI::GetCanvas(eGUIView view)

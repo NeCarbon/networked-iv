@@ -31,6 +31,12 @@ CGUIView::CGUIView(Renderer::DirectX9* pRenderer)
 	pLabel->SetText( "This is example." );
 	pLabel->SizeToContents();
 	*/
+#ifdef MOUSE_DEBUG
+	m_pHelper = new Controls::Button( m_pCanvas );
+	m_pHelper->SetPos(0,0);
+	m_pHelper->SetSize(10, 10);
+	m_pHelper->SetText("M");
+#endif
 }
 
 
@@ -45,12 +51,22 @@ void CGUIView::Render()
 	m_pCanvas->RenderCanvas();
 }
 
-bool CGUIView::ProcessInput(MSG msg)
+bool CGUIView::ProcessInput(UINT message, LPARAM lParam, WPARAM wParam)
 {
-	bool b = m_pInput->ProcessMessage(msg);
-	if(b)
-		CLogFile::Printf("Parsing message %d", msg.message);
-	return b;
+	MSG msg;
+	msg.message = message;
+	msg.lParam = lParam;
+	msg.wParam = wParam;
+
+#ifdef MOUSE_DEBUG
+	if(message == WM_MOUSEMOVE)
+	{
+		int x = LOWORD( msg.lParam );
+		int y = HIWORD( msg.lParam );
+		m_pHelper->SetPos(x + 1, y + 1);
+	}
+#endif
+	return m_pInput->ProcessMessage(msg);
 }
 
 void CGUIView::SetScreenSize(int iWidth, int iHeight)

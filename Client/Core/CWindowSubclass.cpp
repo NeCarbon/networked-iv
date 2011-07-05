@@ -41,6 +41,12 @@ LRESULT APIENTRY CWindowSubclass::WndProc_Hook(HWND hWnd, UINT uMsg, WPARAM wPar
 	// Are we focused?
 	if(bFocused)
 	{
+		CGUI* pGUI = g_pClient->GetGUI();
+		if(pGUI)
+		{
+			pGUI->ProcessInput(uMsg, lParam, wParam);
+		}
+
 		// Does our chat window exist?
 		if(g_pClient->GetChatWindow())
 		{
@@ -51,21 +57,6 @@ LRESULT APIENTRY CWindowSubclass::WndProc_Hook(HWND hWnd, UINT uMsg, WPARAM wPar
 				return 0;
 			}
 		}
-
-		/*
-		CGUI* pGUI = g_pClient->GetGUI();
-		CLogFile::Printf("%p", pGUI);
-		if(pGUI)
-		{
-			MSG msg;
-			msg.hwnd = hWnd;
-			msg.lParam = lParam;
-			msg.wParam = wParam;
-			msg.message = uMsg;
-
-			pGUI->ProcessInput(msg);
-		}
-		*/
 	}
 
 	// Return this input back to windows

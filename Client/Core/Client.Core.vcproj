@@ -1004,6 +1004,14 @@
 					RelativePath=".\CGUIView.cpp"
 					>
 				</File>
+				<Filter
+					Name="MainMenu"
+					>
+					<File
+						RelativePath=".\CMainMenu.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1794,6 +1802,14 @@
 					RelativePath=".\CGUIView.h"
 					>
 				</File>
+				<Filter
+					Name="MainMenu"
+					>
+					<File
+						RelativePath=".\CMainMenu.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

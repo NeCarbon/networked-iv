@@ -19,9 +19,10 @@ public:
 	~CGUI();
 
 	void Render();
-	bool ProcessInput(MSG msg);
+	bool ProcessInput(UINT message, LPARAM lParam, WPARAM wParam);
 
 	void SetScreenSize(int iWidth, int iHeight);
+	void GetScreenSize(int* iWidth, int* iHeight);
 
 	eGUIView GetView();
 	void SetView(eGUIView view);
