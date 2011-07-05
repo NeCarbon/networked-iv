@@ -28,9 +28,7 @@ CGUI::CGUI(IDirect3DDevice9* pDevice)
 	ClearView(GUI_SERVER);
 
 	// Create the main menu
-	Gwen::Controls::Canvas* pCanvas = GetCanvas(GUI_IVMP);
-	CLogFile::Printf("canvas -> %p");
-	new CMainMenu(pCanvas);
+	new CMainMenu(GetCanvas(GUI_IVMP));
 
 	// Finally, set the view
 	// TODO: Should be GUI_NONE unless the main menu shows
