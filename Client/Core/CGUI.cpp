@@ -121,7 +121,7 @@ void CGUI::SetScreenSize(int iWidth, int iHeight)
 
 Gwen::Controls::Canvas* CGUI::GetCanvas(eGUIView view)
 {
-	if(m_pActiveView)
-		return m_pActiveView->GetCanvas();
+	if(view < GUI_NONE)
+		return m_pViews[view]->GetCanvas();
 	return NULL;
 }
